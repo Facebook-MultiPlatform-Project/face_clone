@@ -14,8 +14,10 @@ const LoginPage = () => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.circle_top}></View>
-      <View style={styles.circle_bottom}></View>
+      <View style={[styles.circle_top, styles.circle]}></View>
+      <View style={[styles.circle_bottom, styles.circle]}></View>
+      <View style={[styles.shadow, styles.shadow_top]}></View>
+      <View style={[styles.shadow, styles.shadow_bottom]}></View>
       <View style={styles.form}>
         <Text style={styles.title}>SIGN IN</Text>
         <View style={styles.form_item}>
@@ -74,23 +76,38 @@ const styles = StyleSheet.create({
     height: "100%",
     backgroundColor: "#E7E7E7",
   },
-  circle_top: {
+  circle: {
+    zIndex: 10,
     width: 250,
     height: 250,
     position: "absolute",
-    top: -100,
-    right: -50,
     borderRadius: 200,
     backgroundColor: "#252F6B",
+    shadowColor: "#252F6B",
+  },
+  shadow: {
+    zIndex: 9,
+    width: 250,
+    height: 250,
+    position: "absolute",
+    borderRadius: 200,
+    backgroundColor: "#C3CBCF",
   },
   circle_bottom: {
-    width: 250,
-    height: 250,
-    position: "absolute",
     bottom: -150,
     left: 10,
-    borderRadius: 200,
-    backgroundColor: "#252F6B",
+  },
+  circle_top: {
+    top: -100,
+    right: -50,
+  },
+  shadow_top: {
+    top: -80,
+    right: -30,
+  },
+  shadow_bottom: {
+    bottom: -130,
+    left: 30,
   },
   form: {
     marginTop: 200,
