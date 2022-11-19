@@ -42,6 +42,7 @@ const LoginPage = () => {
             placeholder="Password"
             value={password}
             onChangeText={(text) => setPassword(text)}
+            secureTextEntry="true"
             leftIcon={
               <Icon
                 style={styles.icon}
