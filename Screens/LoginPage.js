@@ -7,6 +7,7 @@ import {
 } from "react-native";
 import React, { useState } from "react";
 import { Icon, Input } from "react-native-elements";
+import { loginApi } from "../apis/Auth/loginApi";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -42,7 +43,7 @@ const LoginPage = () => {
             placeholder="Password"
             value={password}
             onChangeText={(text) => setPassword(text)}
-            secureTextEntry="true"
+            secureTextEntry={true}
             leftIcon={
               <Icon
                 style={styles.icon}
