@@ -7,6 +7,9 @@ import {
 } from "react-native";
 import React, { useState } from "react";
 import { Icon, Input } from "react-native-elements";
+import { EMAIL_REGEX } from "../common/regex";
+import { signupApi } from "../apis/Auth/signupApi";
+import axios from "axios";
 
 const LoginPage = () => {
   const [firstName, setFirstName] = useState("");
@@ -14,7 +17,16 @@ const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+
+  const [errFirstName, setErrFirstName] = useState("");
+  const [errLastName, setErrLastName] = useState("");
+  const [errEmail, setErrEmail] = useState("");
+  const [errPassword, setErrPassword] = useState("");
+  const [errConfirmPassword, setErrConfirmPassword] = useState("");
+
   const [hidePassword, setHidePassword] = useState(true);
+  const [activeSignup, setActiveSignup] = useState(false);
+
   const checkHidePass = () => {
     return hidePassword ? (
       <Icon
@@ -34,6 +46,73 @@ const LoginPage = () => {
       ></Icon>
     );
   };
+  const isValide = () => {
+    if (!firstName) {
+      setErrFirstName("Required");
+    } else {
+      setErrFirstName("");
+    }
+    if (!lastName) {
+      setErrLastName("Required");
+    } else {
+      setErrLastName("");
+    }
+    if (!email) {
+      setErrEmail("Required");
+    } else {
+      setErrEmail("");
+    }
+    if (!password) {
+      setErrPassword("Required");
+    } else {
+      setErrPassword("");
+    }
+    if (!confirmPassword) {
+      setErrConfirmPassword("Required");
+    } else {
+      if (password !== confirmPassword) {
+        setErrConfirmPassword("Do not match password");
+      } else {
+        setErrConfirmPassword("");
+      }
+    }
+    if (!EMAIL_REGEX.test(email)) {
+      setErrEmail("Invalid Email");
+      return false;
+    }
+    if (firstName && lastName && email && password && confirmPassword)
+      return true;
+    else return false;
+  };
+  const handleSignup = async () => {
+    if (isValide()) {
+      setActiveSignup(true);
+      const name = firstName + " " + lastName;
+      const data = {
+        email,
+        name,
+        password,
+      };
+      try {
+        console.log(data);
+        const res = await axios.post(
+          "http://192.168.0.107:8000/auth/signup",
+          data,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        // const res = await signupApi.signup(data);
+        console.log(res);
+      } catch (error) {
+        console.log("err", error);
+      } finally {
+        setActiveSignup(false);
+      }
+    }
+  };
   return (
     <View style={styles.container}>
       <View style={[styles.dont_shadow, styles.circle]}></View>
@@ -50,6 +129,7 @@ const LoginPage = () => {
               style={styles.input}
               placeholder="First Name"
               value={firstName}
+              errorMessage={errFirstName}
               onChangeText={(text) => setFirstName(text)}
             ></Input>
           </View>
@@ -58,6 +138,7 @@ const LoginPage = () => {
               style={styles.input}
               placeholder="Last Name"
               value={lastName}
+              errorMessage={errLastName}
               onChangeText={(text) => setLastName(text)}
             ></Input>
           </View>
@@ -67,6 +148,7 @@ const LoginPage = () => {
             style={styles.input}
             placeholder="Email"
             value={email}
+            errorMessage={errEmail}
             onChangeText={(text) => setEmail(text)}
             leftIcon={
               <Icon
@@ -82,6 +164,7 @@ const LoginPage = () => {
             style={styles.input}
             placeholder="Password"
             value={password}
+            errorMessage={errPassword}
             onChangeText={(text) => setPassword(text)}
             leftIcon={
               <Icon style={styles.icon} name="key" type="ionicon"></Icon>
@@ -95,6 +178,7 @@ const LoginPage = () => {
             style={styles.input}
             placeholder="Confirm Password"
             value={confirmPassword}
+            errorMessage={errConfirmPassword}
             onChangeText={(text) => setConfirmPassword(text)}
             leftIcon={
               <Icon
@@ -107,7 +191,11 @@ const LoginPage = () => {
             secureTextEntry={hidePassword}
           ></Input>
         </View>
-        <TouchableOpacity style={styles.signup_button}>
+        <TouchableOpacity
+          disabled={activeSignup}
+          style={styles.signup_button}
+          onPress={handleSignup}
+        >
           <Text style={styles.signup_text}>SIGN UP</Text>
         </TouchableOpacity>
         <View style={styles.footer}>
@@ -176,7 +264,7 @@ const styles = StyleSheet.create({
   form_item: {
     color: "#919194",
     height: 55,
-    marginBottom: 2,
+    marginBottom: 10,
   },
   signup_button: {
     marginBottom: 20,
