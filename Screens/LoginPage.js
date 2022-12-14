@@ -6,12 +6,59 @@ import {
   KeyboardAvoidingView,
 } from "react-native";
 import React, { useState } from "react";
+import * as SecureStore from "expo-secure-store";
 import { Icon, Input } from "react-native-elements";
 import { loginApi } from "../apis/Auth/loginApi";
-
+import { EMAIL_REGEX } from "../common/regex";
+import { getToken } from "../utils/getToken";
+import { navigation } from "../rootNavigation";
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [errMail, setErrMail] = useState("");
+  const [errPass, setErrPass] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const validate = () => {
+    if (email === "") {
+      setErrMail("Required");
+      if (password === "") {
+        setErrPass("Required");
+        return false;
+      }
+      return false;
+    }
+    if (!EMAIL_REGEX.test(email)) {
+      setErrMail("Invalid Email");
+      return false;
+    }
+    return true;
+  };
+  const handleSubmit = async () => {
+    if (validate()) {
+      setIsSubmitting(true);
+      const data = {
+        email: email,
+        password: password,
+      };
+      const res = loginApi.login(data);
+      res.then(async (res) => {
+        const token = getToken(res.headers["set-cookie"]);
+        console.log(token);
+        // await SecureStore.setItemAsync("access_token", token.access_token);
+        // await SecureStore.setItemAsync("refresh_token", token.refresh_token);
+
+        // window.localStorage.setItem("access_token", token.access_token);
+        console.log(res);
+        setIsSubmitting(false);
+        navigation.navigate("createPost");
+      });
+      res.catch((err) => {
+        console.log(err);
+        setErrMail(err.message);
+        setIsSubmitting(false);
+      });
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -27,10 +74,11 @@ const LoginPage = () => {
             placeholder="Email"
             value={email}
             onChangeText={(text) => setEmail(text)}
+            errorMessage={errMail}
             leftIcon={
               <Icon
                 style={styles.icon}
-                name="person-circle"
+                name="mail"
                 type="ionicon"
                 color="#919194"
               ></Icon>
@@ -44,6 +92,7 @@ const LoginPage = () => {
             value={password}
             onChangeText={(text) => setPassword(text)}
             secureTextEntry={true}
+            errorMessage={errPass}
             leftIcon={
               <Icon
                 style={styles.icon}
@@ -55,7 +104,11 @@ const LoginPage = () => {
           ></Input>
         </View>
 
-        <TouchableOpacity style={styles.login}>
+        <TouchableOpacity
+          disabled={isSubmitting}
+          style={styles.login}
+          onPress={handleSubmit}
+        >
           <Text style={styles.login_text}>SIGN IN</Text>
         </TouchableOpacity>
         <Text style={styles.forgot}>Forgot your password</Text>

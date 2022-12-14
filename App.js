@@ -1,14 +1,13 @@
+import { StyleSheet, View, Text } from "react-native";
+import CreatePost from "./Screens/CreatePost.js";
+import LoginPage from "./Screens/LoginPage.js";
 import * as React from "react";
 
 import { Icon } from "react-native-elements";
 
 import { navigationRef } from "./rootNavigation";
-import {
-  NavigationContainer,
-} from "@react-navigation/native";
+import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
-
-import { View, Text } from "react-native";
 
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import Header from "./Components/Header";
@@ -16,11 +15,7 @@ const Stack = createStackNavigator();
 const rootStack = createStackNavigator();
 
 const Home = () => {
-  return (
-    <View>
-      <Text>hometab</Text>
-    </View>
-  );
+  return <View></View>;
 };
 const HomeTab = () => {
   return (
@@ -156,11 +151,10 @@ export default function App() {
   return (
     <NavigationContainer ref={navigationRef}>
       <rootStack.Navigator screenOptions={navigationOptions}>
-        <rootStack.Screen
-          component={MainTab}
-          name="facebook"
-        />
-        <rootStack.Screen component={ProfileTab} name="haha" />
+        <rootStack.Screen component={LoginPage} name="Login" />
+        <rootStack.Screen component={MainTab} name="facebook" />
+        <rootStack.Screen component={ProfileTab} name="Profile" />
+        <rootStack.Screen component={CreatePost} name="createPost" />
       </rootStack.Navigator>
     </NavigationContainer>
   );

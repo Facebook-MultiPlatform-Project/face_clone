@@ -1,29 +1,19 @@
 import axios from "axios";
-import { SecureStore } from "expo";
+import * as SecureStore from "expo-secure-store";
 
 const axiosClient = axios.create({
-  baseURL: process.env.REACT_APP_API,
+  baseURL: "http://192.168.1.22:8000",
   headers: {
-    "Content-Type": "application/json",
+    "Content-Type": "application/x-www-form-urlencoded",
   },
 });
 
 axiosClient.interceptors.request.use(async (config) => {
-  const access_token = await SecureStore.getItemAsync("access_token");
-  if (access_token) config.headers.authorization = access_token;
+  // const access_token = await SecureStore.getItemAsync("access_token");
+  // const refresh_token = await SecureStore.getItemAsync("refresh_token");
+  // const access_token = await window.localStorage.getItem("access_token");
+  // if (access_token) config.headers.authorization = access_token;
   return config;
 });
-
-axiosClient.interceptors.response.use(
-  (response) => {
-    if (response && response.data) {
-      return response.data;
-    }
-    return response;
-  },
-  (error) => {
-    throw error;
-  }
-);
 
 export default axiosClient;
