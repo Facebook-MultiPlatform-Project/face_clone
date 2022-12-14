@@ -1,10 +1,11 @@
 import { StyleSheet, View } from "react-native";
+import CreatePost from "./Screens/CreatePost.js";
 import LoginPage from "./Screens/LoginPage.js";
 
 export default function App() {
   return (
     <View style={styles.container}>
-      <LoginPage></LoginPage>
+      <CreatePost />
     </View>
   );
 }
