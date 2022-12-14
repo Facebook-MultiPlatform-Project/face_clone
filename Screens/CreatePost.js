@@ -63,12 +63,14 @@ const CreatePost = () => {
       data.append("images[]", image[i]);
     }
     data.append("video", video);
-    await upPostApi
-      .post(data)
+    console.log(image);
+
+    const res = await upPostApi.post(data);
+    res
       .then((res) => {
-        console.log(res);
+        console.log("asdad", res);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => console.log("err", err));
   };
 
   return (

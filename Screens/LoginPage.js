@@ -11,7 +11,7 @@ import { Icon, Input } from "react-native-elements";
 import { loginApi } from "../apis/Auth/loginApi";
 import { EMAIL_REGEX } from "../common/regex";
 import { getToken } from "../utils/getToken";
-
+import { navigation } from "../rootNavigation";
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -42,10 +42,15 @@ const LoginPage = () => {
       };
       const res = loginApi.login(data);
       res.then(async (res) => {
-        const token = getToken(res.headers["set-cookie"][0]);
-        await SecureStore.setItemAsync("access_token", token.access_token);
-        await SecureStore.setItemAsync("refresh_token", token.refresh_token);
+        const token = getToken(res.headers["set-cookie"]);
+        console.log(token);
+        // await SecureStore.setItemAsync("access_token", token.access_token);
+        // await SecureStore.setItemAsync("refresh_token", token.refresh_token);
+
+        // window.localStorage.setItem("access_token", token.access_token);
+        console.log(res);
         setIsSubmitting(false);
+        navigation.navigate("createPost");
       });
       res.catch((err) => {
         console.log(err);
