@@ -1,6 +1,7 @@
 import { StyleSheet, View, Text } from "react-native";
 import CreatePost from "./Screens/CreatePost.js";
 import LoginPage from "./Screens/LoginPage.js";
+import SignupPage from "./Screens/SignupPage";
 import * as React from "react";
 
 import { Icon } from "react-native-elements";
@@ -59,7 +60,6 @@ const NotificationTab = () => {
 const Tab = createMaterialTopTabNavigator();
 export const MainTab = () => {
   const mainTabNavigationOptions = {
-    initialRouteName: "Profile",
     tabBarStyle: {
       height: 60,
     },
@@ -69,7 +69,10 @@ export const MainTab = () => {
   return (
     <>
       <Header></Header>
-      <Tab.Navigator screenOptions={mainTabNavigationOptions}>
+      <Tab.Navigator
+        initialRouteName="HomeTab"
+        screenOptions={mainTabNavigationOptions}
+      >
         <Tab.Screen
           options={{
             tabBarIcon: ({ tintColor, focused }) => (
@@ -144,16 +147,18 @@ export const MainTab = () => {
 
 export default function App() {
   const navigationOptions = {
-    initialRouteName: "facebook",
     headerShown: false,
     headerMode: "screen",
   };
   return (
     <NavigationContainer ref={navigationRef}>
-      <rootStack.Navigator screenOptions={navigationOptions}>
-        <rootStack.Screen component={LoginPage} name="Login" />
+      <rootStack.Navigator
+        screenOptions={navigationOptions}
+        initialRouteName="Signup"
+      >
         <rootStack.Screen component={MainTab} name="facebook" />
-        <rootStack.Screen component={ProfileTab} name="Profile" />
+        <rootStack.Screen component={LoginPage} name="Login" />
+        <rootStack.Screen component={SignupPage} name="Signup" />
         <rootStack.Screen component={CreatePost} name="createPost" />
       </rootStack.Navigator>
     </NavigationContainer>
