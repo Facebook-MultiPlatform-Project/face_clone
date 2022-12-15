@@ -10,6 +10,7 @@ import { Icon, Input } from "react-native-elements";
 import { EMAIL_REGEX } from "../common/regex";
 import { signupApi } from "../apis/Auth/signupApi";
 import axios from "axios";
+import { navigation } from "../rootNavigation";
 
 const LoginPage = () => {
   const [firstName, setFirstName] = useState("");
@@ -46,7 +47,7 @@ const LoginPage = () => {
       ></Icon>
     );
   };
-  const isValide = () => {
+  const isValid = () => {
     if (!firstName) {
       setErrFirstName("Required");
     } else {
@@ -85,32 +86,27 @@ const LoginPage = () => {
     else return false;
   };
   const handleSignup = async () => {
-    if (isValide()) {
+    if (isValid()) {
       setActiveSignup(true);
       const name = firstName + " " + lastName;
       const data = {
-        email,
-        name,
-        password,
+        email: email,
+        name: name,
+        password: password,
       };
-      try {
-        console.log(data);
-        const res = await axios.post(
-          "http://192.168.0.107:8000/auth/signup",
-          data,
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        // const res = await signupApi.signup(data);
-        console.log(res);
-      } catch (error) {
-        console.log("err", error);
-      } finally {
-        setActiveSignup(false);
-      }
+      console.log(data);
+      const res = signupApi.post(data);
+      res
+        .then((response) => {
+          console.log("res:", response.data);
+          navigation.navigate("verify");
+          setActiveSignup(false);
+        })
+        .catch((err) => {
+          console.log("err:", err);
+          setErrConfirmPassword("err network");
+          setActiveSignup(false);
+        });
     }
   };
   return (
@@ -200,7 +196,9 @@ const LoginPage = () => {
         </TouchableOpacity>
         <View style={styles.footer}>
           <Text>Already have an account?</Text>
-          <Text style={styles.signup}>SIGN IN</Text>
+          <TouchableOpacity onPress={() => navigation.navigate("login")}>
+            <Text style={styles.signup}>SIGN IN</Text>
+          </TouchableOpacity>
         </View>
       </View>
       <KeyboardAvoidingView behavior={"position"}></KeyboardAvoidingView>

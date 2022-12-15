@@ -35,8 +35,12 @@ const CreatePost = () => {
         allowsMultipleSelection: true,
         selectionLimit: 4,
       });
+      console.log(result.selected);
       if (result.selected) {
-        result.selected.map((item) => setImage([...image, item]));
+        result.selected.map((item) => {
+          console.log(item);
+          setImage([...image, item]);
+        });
       } else {
         setImage([...image, result]);
       }
@@ -60,15 +64,17 @@ const CreatePost = () => {
     const data = new FormData();
     data.append("content", content);
     for (let i = 0; i < image.length; i++) {
-      data.append("images[]", image[i]);
+      // data.append("images[]", image[i]);
+      data.append("images[]", { ...image[i], name: "nobi.jpg" });
     }
-    data.append("video", video);
-    console.log(image);
+    // data.append("images", image[0]);
+    // data.append("video", video);
+    console.log(data);
 
-    const res = await upPostApi.post(data);
+    const res = upPostApi.post(data);
     res
       .then((res) => {
-        console.log("asdad", res);
+        console.log("asdad", res.data);
       })
       .catch((err) => console.log("err", err));
   };

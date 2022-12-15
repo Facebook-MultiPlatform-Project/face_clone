@@ -3,11 +3,13 @@ import {
   Text,
   View,
   FlatList,
+  LogBox,
   SafeAreaView,
   TouchableOpacity,
 } from "react-native";
 import React, { useState } from "react";
 import { Icon, Image } from "react-native-elements";
+import { useEffect } from "react";
 // import ScaleImage from "./Image";
 
 const Post = () => {
@@ -16,6 +18,10 @@ const Post = () => {
   const [comments, setComments] = useState(200);
 
   const [full, setFull] = useState(false);
+  useEffect(() => {
+    LogBox.ignoreLogs(["VirtualizedLists should never be nested"]);
+  }, []);
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -49,8 +55,9 @@ const Post = () => {
         </View>
         <SafeAreaView style={{ minHeight: 380, maxHeight: 570 }}>
           <FlatList
-            data={[...new Array(1)].map((_, i) => i.toString())}
+            data={[...new Array(4)].map((_, i) => i.toString())}
             // style={}
+            scrollEnabled={false}
             numColumns={2}
             keyExtractor={(e) => e}
             renderItem={({ item }) => (
@@ -104,6 +111,8 @@ export default Post;
 const styles = StyleSheet.create({
   container: {
     padding: 10,
+    backgroundColor: "#fff",
+    marginTop: 10,
   },
   header: {
     flexDirection: "row",
