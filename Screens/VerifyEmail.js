@@ -6,26 +6,25 @@ import {
   KeyboardAvoidingView,
 } from "react-native";
 import React, { useState } from "react";
-import * as SecureStore from "expo-secure-store";
 import { Icon, Input } from "react-native-elements";
-import { loginApi } from "../apis/Auth/loginApi";
 import { EMAIL_REGEX } from "../common/regex";
-import { getToken } from "../utils/getToken";
 import { navigation } from "../rootNavigation";
+import { verifyApi } from "../apis/Auth/verifyApi";
 
-const LoginPage = () => {
+const VerifyEmail = () => {
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [verifyCode, setVerifyCode] = useState("");
   const [errMail, setErrMail] = useState("");
-  const [errPass, setErrPass] = useState("");
+  const [errVerify, setErrVerify] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
   const validate = () => {
     if (email === "") {
       setErrMail("Required");
-      if (password === "") {
-        setErrPass("Required");
+      if (verifyCode.length < 6) {
+        setErrVerify("code must be 6 character");
         return false;
-      } else setErrPass(null);
+      } else setErrVerify(null);
       return false;
     } else setErrMail(null);
     if (!EMAIL_REGEX.test(email)) {
@@ -34,33 +33,26 @@ const LoginPage = () => {
     }
     return true;
   };
-  const handleSubmit = async () => {
+
+  const handleSubmit = () => {
     if (validate()) {
       setIsSubmitting(true);
       const data = {
         email: email,
-        password: password,
+        verifyCode: verifyCode,
       };
-      const res = loginApi.login(data);
-      res.then(async (res) => {
-        const token = getToken(res.headers["set-cookie"][0]);
-        // console.log(token);
-        await SecureStore.setItemAsync("access_token", token.access_token);
-        await SecureStore.setItemAsync("refresh_token", token.refresh_token);
-
-        // window.localStorage.setItem("access_token", token.access_token);
-        console.log(res.data);
-        setIsSubmitting(false);
-        navigation.navigate("facebook");
-      });
-      res.catch((err) => {
-        console.log("err", err);
-        setErrMail(err.message);
-        setIsSubmitting(false);
-      });
+      const res = verifyApi.post(data);
+      res
+        .then((response) => {
+          console.log(response);
+          alert("verify success, please login");
+          navigation.navigate("login");
+        })
+        .catch((err) => {
+          setErrVerify("err");
+        });
     }
   };
-
   return (
     <View style={styles.container}>
       <View style={[styles.circle_top, styles.circle]}></View>
@@ -68,7 +60,7 @@ const LoginPage = () => {
       <View style={[styles.shadow, styles.shadow_top]}></View>
       <View style={[styles.shadow, styles.shadow_bottom]}></View>
       <View style={styles.form}>
-        <Text style={styles.title}>SIGN IN</Text>
+        <Text style={styles.title}>Verify Email</Text>
         <View style={styles.form_item}>
           <Input
             style={styles.input}
@@ -89,11 +81,13 @@ const LoginPage = () => {
         <View style={styles.form_item}>
           <Input
             style={styles.input}
-            placeholder="Password"
-            value={password}
-            onChangeText={(text) => setPassword(text)}
+            placeholder="Verify Code"
+            value={verifyCode}
+            onChangeText={(text) => setVerifyCode(text)}
+            keyboardType="numeric"
+            maxLength={6}
             secureTextEntry={true}
-            errorMessage={errPass}
+            errorMessage={errVerify}
             leftIcon={
               <Icon
                 style={styles.icon}
@@ -110,26 +104,15 @@ const LoginPage = () => {
           style={styles.login}
           onPress={handleSubmit}
         >
-          <Text style={styles.login_text}>SIGN IN</Text>
+          <Text style={styles.login_text}>Verify</Text>
         </TouchableOpacity>
-        <Text style={styles.forgot}>Forgot your password</Text>
-        <View style={styles.footer}>
-          <Text>Don't have an account?</Text>
-          <TouchableOpacity
-            onPress={() => {
-              navigation.navigate("signup");
-            }}
-          >
-            <Text style={styles.signup}>SIGN UP</Text>
-          </TouchableOpacity>
-        </View>
       </View>
       <KeyboardAvoidingView behavior={"position"}></KeyboardAvoidingView>
     </View>
   );
 };
 
-export default LoginPage;
+export default VerifyEmail;
 
 const styles = StyleSheet.create({
   container: {
@@ -176,7 +159,7 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: "#e0e0e0",
     marginRight: 40,
-    height: "60%",
+    height: "50%",
     borderRadius: 8,
     shadowColor: "#000",
     shadowOffset: {
@@ -185,7 +168,6 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.3,
     shadowRadius: 4.65,
-
     elevation: 8,
   },
   title: {

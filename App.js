@@ -1,7 +1,7 @@
 import { StyleSheet, View, Text } from "react-native";
 import CreatePost from "./Screens/CreatePost.js";
 import LoginPage from "./Screens/LoginPage.js";
-import SignupPage from "./Screens/SignupPage";
+import SignupPage from "./Screens/SignupPage.js";
 import * as React from "react";
 
 import { Icon } from "react-native-elements";
@@ -12,11 +12,17 @@ import { createStackNavigator } from "@react-navigation/stack";
 
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import Header from "./Components/Header";
+import VerifyEmail from "./Screens/VerifyEmail.js";
+import HomePage from "./Components/HomePage.js";
 const Stack = createStackNavigator();
 const rootStack = createStackNavigator();
 
 const Home = () => {
-  return <View></View>;
+  return (
+    <View>
+      <HomePage />
+    </View>
+  );
 };
 const HomeTab = () => {
   return (
@@ -152,14 +158,13 @@ export default function App() {
   };
   return (
     <NavigationContainer ref={navigationRef}>
-      <rootStack.Navigator
-        screenOptions={navigationOptions}
-        initialRouteName="Signup"
-      >
+      <rootStack.Navigator screenOptions={navigationOptions}>
+        <rootStack.Screen component={LoginPage} name="login" />
+        <rootStack.Screen component={VerifyEmail} name="verify" />
         <rootStack.Screen component={MainTab} name="facebook" />
-        <rootStack.Screen component={LoginPage} name="Login" />
-        <rootStack.Screen component={SignupPage} name="Signup" />
-        <rootStack.Screen component={CreatePost} name="createPost" />
+        <rootStack.Screen component={ProfileTab} name="profile" />
+        <rootStack.Screen component={SignupPage} name="signup" />
+        <rootStack.Screen component={CreatePost} name="createpost" />
       </rootStack.Navigator>
     </NavigationContainer>
   );

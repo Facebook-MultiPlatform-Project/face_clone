@@ -12,14 +12,8 @@ const Header = () => {
   }, [navigationRef.current?.getCurrentRoute()]);
 
   return (
-    <View style={{ marginTop: StatusBar.currentHeight }}>
-      {isHome ? (
-        <View>
-          <Text>làm cái quần què gì đó cho home page cũng được</Text>
-        </View>
-      ) : (
-        <View></View>
-      )}
+    <View style={{ paddingTop: StatusBar.currentHeight, backgroundColor:'#fff' }}>
+      {isHome ? <View></View> : <View></View>}
     </View>
   );
 };

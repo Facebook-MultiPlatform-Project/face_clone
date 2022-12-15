@@ -1,9 +1,8 @@
 import axiosClient from "../axiosClient";
 
-export const signupApi = {
+export const verifyApi = {
   post: (data) => {
-    console.log("api", data);
-    const url = "/auth/signup";
+    const url = "/email/confirm";
     return axiosClient.post(url, data);
   },
 };
