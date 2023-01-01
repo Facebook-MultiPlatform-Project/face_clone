@@ -4,6 +4,8 @@ import {
   View,
   TouchableOpacity,
   KeyboardAvoidingView,
+  Image,
+  Dimensions,
 } from "react-native";
 import React, { useState } from "react";
 import * as SecureStore from "expo-secure-store";
@@ -12,13 +14,20 @@ import { loginApi } from "../apis/Auth/loginApi";
 import { EMAIL_REGEX } from "../common/regex";
 import { getToken } from "../utils/getToken";
 import { navigation } from "../rootNavigation";
+import { useEffect } from "react";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
+  const [width, setWidth] = useState(null);
   const [password, setPassword] = useState("");
   const [errMail, setErrMail] = useState("");
   const [errPass, setErrPass] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    setWidth(Dimensions.get("window").width);
+  }, []);
+
   const validate = () => {
     if (email === "") {
       setErrMail("Required");
@@ -63,45 +72,30 @@ const LoginPage = () => {
 
   return (
     <View style={styles.container}>
-      <View style={[styles.circle_top, styles.circle]}></View>
-      <View style={[styles.circle_bottom, styles.circle]}></View>
-      <View style={[styles.shadow, styles.shadow_top]}></View>
-      <View style={[styles.shadow, styles.shadow_bottom]}></View>
+      <View>
+        <Image
+          source={require("../assets/imgs/Bg_login.jpg")}
+          style={{ width: width, height: 200 }}
+        ></Image>
+      </View>
       <View style={styles.form}>
-        <Text style={styles.title}>SIGN IN</Text>
         <View style={styles.form_item}>
           <Input
             style={styles.input}
-            placeholder="Email"
+            placeholder="Nhập email"
             value={email}
             onChangeText={(text) => setEmail(text)}
             errorMessage={errMail}
-            leftIcon={
-              <Icon
-                style={styles.icon}
-                name="mail"
-                type="ionicon"
-                color="#919194"
-              ></Icon>
-            }
           ></Input>
         </View>
         <View style={styles.form_item}>
           <Input
             style={styles.input}
-            placeholder="Password"
+            placeholder="Nhập mật khẩu"
             value={password}
             onChangeText={(text) => setPassword(text)}
             secureTextEntry={true}
             errorMessage={errPass}
-            leftIcon={
-              <Icon
-                style={styles.icon}
-                name="key"
-                type="ionicon"
-                color="#919194"
-              ></Icon>
-            }
           ></Input>
         </View>
 
@@ -110,17 +104,42 @@ const LoginPage = () => {
           style={styles.login}
           onPress={handleSubmit}
         >
-          <Text style={styles.login_text}>SIGN IN</Text>
+          <Text style={styles.login_text}>Đăng nhập</Text>
         </TouchableOpacity>
-        <Text style={styles.forgot}>Forgot your password</Text>
+        <Text style={styles.forgot}>Quên mật khẩu?</Text>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            marginVertical: 30,
+          }}
+        >
+          <View
+            style={{
+              flex: 1,
+              height: 0,
+              borderWidth: 1,
+              borderColor: "#919194",
+            }}
+          ></View>
+          <Text style={{ color: "#919194", paddingHorizontal: 5 }}>OR</Text>
+          <View
+            style={{
+              flex: 1,
+              height: 0,
+              borderWidth: 1,
+              borderColor: "#919194",
+            }}
+          ></View>
+        </View>
         <View style={styles.footer}>
-          <Text>Don't have an account?</Text>
           <TouchableOpacity
+            style={{ width: "100%", height: "100%", alignItems: "center" }}
             onPress={() => {
               navigation.navigate("signup");
             }}
           >
-            <Text style={styles.signup}>SIGN UP</Text>
+            <Text style={styles.signup}>Đăng ký</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -136,65 +155,16 @@ const styles = StyleSheet.create({
     position: "relative",
     width: "100%",
     height: "100%",
-    backgroundColor: "#E7E7E7",
+    backgroundColor: "#fff",
   },
-  circle: {
-    zIndex: 10,
-    width: 250,
-    height: 250,
-    position: "absolute",
-    borderRadius: 200,
-    backgroundColor: "#252F6B",
-    shadowColor: "#252F6B",
-  },
-  shadow: {
-    zIndex: 9,
-    width: 250,
-    height: 250,
-    position: "absolute",
-    borderRadius: 200,
-    backgroundColor: "#C3CBCF",
-  },
-  circle_bottom: {
-    bottom: -150,
-    left: 10,
-  },
-  circle_top: {
-    top: -100,
-    right: -50,
-  },
-  shadow_top: {
-    top: -80,
-    right: -30,
-  },
-  shadow_bottom: {
-    bottom: -130,
-    left: 30,
-  },
-  form: {
-    marginTop: 200,
-    padding: 20,
-    backgroundColor: "#e0e0e0",
-    marginRight: 40,
-    height: "60%",
-    borderRadius: 8,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 4.65,
 
-    elevation: 8,
+  form: {
+    marginTop: 80,
+    backgroundColor: "#222222",
+    padding: 30,
+    backgroundColor: "#fff",
   },
-  title: {
-    color: "#252F6B",
-    fontSize: 30,
-    fontWeight: "700",
-    marginBottom: 40,
-    marginTop: 20,
-  },
+
   form_item: {
     color: "#919194",
   },
@@ -202,11 +172,11 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     marginTop: 30,
     borderRadius: 8,
-    backgroundColor: "#252F6B",
+    backgroundColor: "#00008B",
     padding: 10,
   },
   login_text: {
-    color: "#f5f5f5",
+    color: "#fff",
     fontWeight: "600",
     fontSize: 17,
     textAlign: "center",
@@ -218,11 +188,12 @@ const styles = StyleSheet.create({
   footer: {
     flexDirection: "row",
     justifyContent: "center",
-    marginTop: "auto",
-    marginBottom: 20,
+    backgroundColor: "#008000",
+    borderRadius: 8,
+    paddingVertical: 10,
   },
   signup: {
-    color: "#252F6B",
+    color: "#fff",
     fontWeight: "500",
     fontSize: 16,
     marginLeft: 5,

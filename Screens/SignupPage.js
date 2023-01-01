@@ -111,28 +111,22 @@ const LoginPage = () => {
   };
   return (
     <View style={styles.container}>
-      <View style={[styles.dont_shadow, styles.circle]}></View>
-      <View style={[styles.shadow, styles.circle]}></View>
       <View style={styles.form}>
-        <Text style={styles.title}>SIGN UP</Text>
-        <View style={styles.row}>
-          <Icon name="person-outline" type="ionicon" />
-          <Text style={{ padding: 4, fontSize: 17 }}>Name</Text>
-        </View>
-        <View style={[styles.row, { justifyContent: "space-around" }]}>
-          <View style={[styles.form_item, { width: "45%" }]}>
+        <Text style={styles.title}>Đăng ký</Text>
+        <View style={[styles.row, { justifyContent: "space-between" }]}>
+          <View style={[styles.form_item, { width: "60%" }]}>
             <Input
               style={styles.input}
-              placeholder="First Name"
+              placeholder="Họ"
               value={firstName}
               errorMessage={errFirstName}
               onChangeText={(text) => setFirstName(text)}
             ></Input>
           </View>
-          <View style={[styles.form_item, { width: "45%" }]}>
+          <View style={[styles.form_item, { width: "35%" }]}>
             <Input
               style={styles.input}
-              placeholder="Last Name"
+              placeholder="Tên"
               value={lastName}
               errorMessage={errLastName}
               onChangeText={(text) => setLastName(text)}
@@ -146,25 +140,15 @@ const LoginPage = () => {
             value={email}
             errorMessage={errEmail}
             onChangeText={(text) => setEmail(text)}
-            leftIcon={
-              <Icon
-                style={styles.icon}
-                name="mail-outline"
-                type="ionicon"
-              ></Icon>
-            }
           ></Input>
         </View>
         <View style={styles.form_item}>
           <Input
             style={styles.input}
-            placeholder="Password"
+            placeholder="Mật khẩu"
             value={password}
             errorMessage={errPassword}
             onChangeText={(text) => setPassword(text)}
-            leftIcon={
-              <Icon style={styles.icon} name="key" type="ionicon"></Icon>
-            }
             rightIcon={checkHidePass()}
             secureTextEntry={hidePassword}
           ></Input>
@@ -172,17 +156,10 @@ const LoginPage = () => {
         <View style={styles.form_item}>
           <Input
             style={styles.input}
-            placeholder="Confirm Password"
+            placeholder="Nhập lại mật khẩu"
             value={confirmPassword}
             errorMessage={errConfirmPassword}
             onChangeText={(text) => setConfirmPassword(text)}
-            leftIcon={
-              <Icon
-                style={styles.icon}
-                name="checkmark-circle-outline"
-                type="ionicon"
-              ></Icon>
-            }
             rightIcon={checkHidePass()}
             secureTextEntry={hidePassword}
           ></Input>
@@ -192,12 +169,12 @@ const LoginPage = () => {
           style={styles.signup_button}
           onPress={handleSignup}
         >
-          <Text style={styles.signup_text}>SIGN UP</Text>
+          <Text style={styles.signup_text}>Đăng ký</Text>
         </TouchableOpacity>
         <View style={styles.footer}>
-          <Text>Already have an account?</Text>
+          <Text>Bạn đã có tài khoản?</Text>
           <TouchableOpacity onPress={() => navigation.navigate("login")}>
-            <Text style={styles.signup}>SIGN IN</Text>
+            <Text style={styles.login}>Đăng nhập</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -212,52 +189,24 @@ const styles = StyleSheet.create({
   container: {
     width: "100%",
     height: "100%",
-    backgroundColor: "#E7E7E7",
-  },
-  circle: {
-    width: 250,
-    height: 250,
-    position: "absolute",
-    borderRadius: 200,
-  },
-  dont_shadow: {
-    zIndex: 10,
-    backgroundColor: "#252F6B",
-    top: -180,
-    left: 60,
-  },
-  shadow: {
-    zIndex: 9,
-    backgroundColor: "#C3CBCF",
-    top: -170,
-    left: 100,
+    backgroundColor: "#FFF",
   },
   form: {
+    flex: 1,
     marginTop: 120,
     padding: 20,
-    backgroundColor: "#e0e0e0",
-    marginRight: 40,
-    borderRadius: 8,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 4.65,
-    elevation: 8,
+    backgroundColor: "#FFF",
   },
   row: {
     flexDirection: "row",
-    paddingLeft: 10,
     alignItems: "center",
   },
   title: {
-    color: "#252F6B",
+    color: "#00008B",
+    textAlign: "center",
     fontSize: 30,
     fontWeight: "700",
-    marginBottom: 20,
-    marginTop: 10,
+    marginBottom: 40,
   },
   form_item: {
     color: "#919194",
@@ -268,11 +217,11 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     marginTop: 30,
     borderRadius: 8,
-    backgroundColor: "#252F6B",
+    backgroundColor: "#008000",
     padding: 10,
   },
   signup_text: {
-    color: "#f5f5f5",
+    color: "#fff",
     fontWeight: "600",
     fontSize: 17,
     textAlign: "center",
@@ -284,10 +233,11 @@ const styles = StyleSheet.create({
   footer: {
     flexDirection: "row",
     justifyContent: "center",
-    marginBottom: 20,
+    alignItems: "center",
+    marginTop: 20,
   },
-  signup: {
-    color: "#252F6B",
+  login: {
+    color: "#00008B",
     fontWeight: "500",
     fontSize: 16,
     marginLeft: 5,
