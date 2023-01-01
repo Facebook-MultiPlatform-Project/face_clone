@@ -14,6 +14,7 @@ import { createMaterialTopTabNavigator } from "@react-navigation/material-top-ta
 import Header from "./Components/Header";
 import VerifyEmail from "./Screens/VerifyEmail.js";
 import HomePage from "./Components/HomePage.js";
+import Profile from "./Screens/Profile.js";
 const Stack = createStackNavigator();
 const rootStack = createStackNavigator();
 
@@ -45,7 +46,7 @@ const FriendTab = () => {
 const ProfileTab = () => {
   return (
     <View>
-      <Text>ProfileTab</Text>
+      <Profile />
     </View>
   );
 };

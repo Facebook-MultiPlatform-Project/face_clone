@@ -9,7 +9,7 @@ import {
   Dimensions,
 } from "react-native";
 import React from "react";
-import { Image } from "react-native-elements";
+import { Icon, Image } from "react-native-elements";
 import * as ImagePicker from "expo-image-picker";
 import { useState } from "react";
 import { upPostApi } from "../apis/Post/upPostApi";
@@ -64,13 +64,28 @@ const CreatePost = () => {
     const data = new FormData();
     data.append("content", content);
     for (let i = 0; i < image.length; i++) {
-      // data.append("images[]", image[i]);
-      data.append("images[]", { ...image[i], name: "nobi.jpg" });
+      const upload_body = {
+        uri: image[i]["uri"],
+        type: `image/${image[i]["uri"].slice(-4) === "jpeg" ? "jpg" : "png"}`,
+        name:
+          Platform.OS === "ios"
+            ? image[i]["filename"]
+            : `my_profile${Date.now()}.${
+                image[i]["uri"].slice(-4) === "jpeg" ? "jpg" : "png"
+              }`,
+      };
+      data.append("images", upload_body);
     }
-    // data.append("images", image[0]);
-    // data.append("video", video);
-    console.log(data);
-
+    if (video["uri"]) {
+      data.append("video", {
+        uri: video["uri"],
+        type: "video/mp4",
+        name:
+          Platform.OS === "ios"
+            ? image[i]["filename"]
+            : `my_profile${Date.now()}.mp4`,
+      });
+    }
     const res = upPostApi.post(data);
     res
       .then((res) => {
@@ -192,21 +207,30 @@ const CreatePost = () => {
       >
         <TouchableOpacity
           style={{
-            width: "50%",
+            width: "25%",
             alignItems: "center",
           }}
           onPress={handleAddImage}
         >
-          <Text>Thêm ảnh</Text>
+          <Icon type="ionicon" name="images" color={"#58C472"}></Icon>
         </TouchableOpacity>
         <TouchableOpacity
           style={{
-            width: "50%",
+            width: "25%",
             alignItems: "center",
           }}
           onPress={handleUploadVideo}
         >
-          <Text>Thêm Video</Text>
+          <Icon type="ionicon" name="videocam" color={"#F23E5C"}></Icon>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={{
+            width: "25%",
+            alignItems: "center",
+          }}
+          onPress={handleUploadVideo}
+        >
+          <Icon type="material" name="mood" color={"#F8C03E"}></Icon>
         </TouchableOpacity>
       </View>
     </View>

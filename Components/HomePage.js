@@ -1,8 +1,10 @@
 import { StyleSheet, Text, View, ScrollView, SafeAreaView } from "react-native";
 import Post from "./Post";
 import React from "react";
-import { TouchableOpacity } from "react-native-gesture-handler";
+import { TextInput, TouchableOpacity } from "react-native-gesture-handler";
 import { navigation } from "../rootNavigation";
+import { Image } from "react-native";
+import { Icon } from "react-native-elements";
 
 const HomePage = () => {
   return (
@@ -16,16 +18,40 @@ const HomePage = () => {
             navigation.navigate("createpost");
           }}
         >
-          <Text
+          <View
             style={{
-              textAlign: "center",
-              marginTop: 10,
-              fontWeight: "500",
-              fontSize: 15,
+              flexDirection: "row",
+              paddingHorizontal: 20,
+              paddingVertical: 10,
+              backgroundColor: "#fff",
+              alignItems: "center",
             }}
           >
-            Create Post
-          </Text>
+            <Image
+              source={{
+                uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHMbNbn5XcHIXV3PoLxkmsKdTQIbNffNpyuQ&usqp=CAU",
+              }}
+              style={{
+                width: 40,
+                height: 40,
+                borderRadius: 100,
+                marginRight: 10,
+              }}
+            ></Image>
+            <TextInput
+              placeholder="Bạn đang nghĩ gì..."
+              style={{
+                borderRadius: 100,
+                flex: 1,
+                borderWidth: 1,
+                borderColor: "#CFCFD5",
+                paddingHorizontal: 20,
+                paddingVertical: 5,
+                marginRight: 15,
+              }}
+            ></TextInput>
+            <Icon type="ionicon" name="images" color={"#58C472"}></Icon>
+          </View>
         </TouchableOpacity>
 
         <Post />
