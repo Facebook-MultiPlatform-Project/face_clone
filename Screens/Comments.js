@@ -161,7 +161,7 @@ const CommentBox = (props) => {
         marginLeft: 10,
       }}
     >
-      <Avatar.Image size={40} source={require("../assets/avatar.png")} />
+      <Avatar.Image size={40} source={require("../assets/icon.png")} />
 
       <View
         style={{

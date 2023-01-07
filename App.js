@@ -15,6 +15,8 @@ import Header from "./Components/Header";
 import VerifyEmail from "./Screens/VerifyEmail.js";
 import HomePage from "./Components/HomePage.js";
 import Profile from "./Screens/Profile.js";
+// import Noti from './Screens/Notifications.js'
+// import Friends from './Screens/Friends.js'
 const Stack = createStackNavigator();
 const rootStack = createStackNavigator();
 
@@ -166,6 +168,8 @@ export default function App() {
         <rootStack.Screen component={ProfileTab} name="profile" />
         <rootStack.Screen component={SignupPage} name="signup" />
         <rootStack.Screen component={CreatePost} name="createpost" />
+        {/* <rootStack.Screen component={Friends} name="notifications" /> */}
+
       </rootStack.Navigator>
     </NavigationContainer>
   );
