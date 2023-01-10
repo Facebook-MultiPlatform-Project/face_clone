@@ -6,31 +6,37 @@ import { navigation } from "../rootNavigation";
 const Shortcut = (props) => {
   const { name, icon, des } = props;
   return (
-    <View
-      style={{
-        backgroundColor: "#fff",
-        flexGrow: 1,
-        borderRadius: 10,
-        padding: 16,
-        margin: 5,
-      }}
-      // onTouchEnd={() => navigation.navigate(des)}
-    >
-      <Image
-        source={{
-          uri: icon,
-        }}
+    <View style={{ width: "50%" }}>
+      <View
         style={{
-          width: 40,
-          height: 40,
-          borderRadius: 100,
+          backgroundColor: "#fff",
+          borderRadius: 10,
+          padding: 16,
+          margin: 5,
         }}
-      ></Image>
-      <Text
-        style={{ color: "#333", fontWeight: "600", fontSize: 18, marginTop: 8 }}
+        // onTouchEnd={() => navigation.navigate(des)}
       >
-        {name}
-      </Text>
+        <Image
+          source={{
+            uri: icon,
+          }}
+          style={{
+            width: 40,
+            height: 40,
+            borderRadius: 100,
+          }}
+        ></Image>
+        <Text
+          style={{
+            color: "#333",
+            fontWeight: "600",
+            fontSize: 18,
+            marginTop: 8,
+          }}
+        >
+          {name}
+        </Text>
+      </View>
     </View>
   );
 };
@@ -38,15 +44,14 @@ const Shortcut = (props) => {
 const Menu = () => {
   const handleLogOut = async () => {
     try {
-      await logoutApi.logout();
+      // await logoutApi.logout();
       await SecureStore.deleteItemAsync("access_token");
       await SecureStore.deleteItemAsync("refresh_token");
-      navigation.navigate('login');
+      navigation.navigate("login");
+    } catch (err) {
+      console.log(err);
     }
-    catch(err) {
-      console.log(err)
-    }
-  }
+  };
   return (
     <View style={{ padding: 16 }}>
       <View>
@@ -75,7 +80,7 @@ const Menu = () => {
             }}
           ></Image>
         </View>
-        <View onTouchEnd={() => navigation.navigate('profile')}>
+        <View onTouchEnd={() => navigation.navigate("profile")}>
           <Text style={{ color: "#333", fontWeight: "600", fontSize: 24 }}>
             Lương Hoàng
           </Text>
@@ -110,11 +115,10 @@ const Menu = () => {
             display: "flex",
             flexDirection: "row",
             alignItems: "center",
-            justifyContent: "space-between",
           }}
         >
           <Shortcut
-            name="Shortcut 1"
+            name="Friends"
             icon="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHMbNbn5XcHIXV3PoLxkmsKdTQIbNffNpyuQ&usqp=CAU"
           ></Shortcut>
           <Shortcut
@@ -127,7 +131,6 @@ const Menu = () => {
             display: "flex",
             flexDirection: "row",
             alignItems: "center",
-            justifyContent: "space-between",
           }}
         >
           <Shortcut
@@ -138,6 +141,40 @@ const Menu = () => {
             name="Shortcut 4"
             icon="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHMbNbn5XcHIXV3PoLxkmsKdTQIbNffNpyuQ&usqp=CAU"
           ></Shortcut>
+        </View>
+        <View style={{ marginTop: 10 }}>
+          <TouchableOpacity
+            style={{ backgroundColor: "#ccc", borderRadius: 10, padding: 10 }}
+            // onPress={handleLogOut}
+          >
+            <Text
+              style={{
+                color: "#333",
+                fontWeight: "600",
+                fontSize: 18,
+                textAlign: "center",
+              }}
+            >
+              Block list
+            </Text>
+          </TouchableOpacity>
+        </View>
+        <View style={{ marginTop: 10 }}>
+          <TouchableOpacity
+            style={{ backgroundColor: "#ccc", borderRadius: 10, padding: 10 }}
+            // onPress={handleLogOut}
+          >
+            <Text
+              style={{
+                color: "#333",
+                fontWeight: "600",
+                fontSize: 18,
+                textAlign: "center",
+              }}
+            >
+              Change password
+            </Text>
+          </TouchableOpacity>
         </View>
         <View style={{ marginTop: 10 }}>
           <TouchableOpacity
