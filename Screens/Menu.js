@@ -145,7 +145,7 @@ const Menu = () => {
         <View style={{ marginTop: 10 }}>
           <TouchableOpacity
             style={{ backgroundColor: "#ccc", borderRadius: 10, padding: 10 }}
-            // onPress={handleLogOut}
+            onPress={() => navigation.navigate("blocklist")}
           >
             <Text
               style={{
@@ -162,7 +162,7 @@ const Menu = () => {
         <View style={{ marginTop: 10 }}>
           <TouchableOpacity
             style={{ backgroundColor: "#ccc", borderRadius: 10, padding: 10 }}
-            // onPress={handleLogOut}
+            onPress={() => navigation.navigate("changepassword")}
           >
             <Text
               style={{

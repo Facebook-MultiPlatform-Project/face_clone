@@ -16,6 +16,8 @@ import VerifyEmail from "./Screens/VerifyEmail.js";
 import HomePage from "./Components/HomePage.js";
 import Profile from "./Screens/Profile.js";
 import Menu from "./Screens/Menu.js";
+import ChangePassword from "./Screens/ChangePassword.js";
+import Blocklist from "./Screens/Blocklist.js";
 const Stack = createStackNavigator();
 const rootStack = createStackNavigator();
 
@@ -187,6 +189,9 @@ export default function App() {
         <rootStack.Screen component={ProfileTab} name="profile" />
         <rootStack.Screen component={SignupPage} name="signup" />
         <rootStack.Screen component={CreatePost} name="createpost" />
+        <rootStack.Screen component={Menu} name="menu" />
+        <rootStack.Screen component={ChangePassword} name="changepassword" />
+        <rootStack.Screen component={Blocklist} name="blocklist" />
       </rootStack.Navigator>
     </NavigationContainer>
   );
