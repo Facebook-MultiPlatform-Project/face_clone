@@ -15,6 +15,12 @@ import Header from "./Components/Header";
 import VerifyEmail from "./Screens/VerifyEmail.js";
 import HomePage from "./Components/HomePage.js";
 import Profile from "./Screens/Profile.js";
+import UpdateProfile from "./Screens/UpdateProfile.js";
+import BlockList from "./Screens/BlockList.js";
+
+import { Provider } from "react-redux";
+import { store } from "./store/store.js";
+
 const Stack = createStackNavigator();
 const rootStack = createStackNavigator();
 
@@ -158,15 +164,19 @@ export default function App() {
     headerMode: "screen",
   };
   return (
-    <NavigationContainer ref={navigationRef}>
-      <rootStack.Navigator screenOptions={navigationOptions}>
-        <rootStack.Screen component={LoginPage} name="login" />
-        <rootStack.Screen component={VerifyEmail} name="verify" />
-        <rootStack.Screen component={MainTab} name="facebook" />
-        <rootStack.Screen component={ProfileTab} name="profile" />
-        <rootStack.Screen component={SignupPage} name="signup" />
-        <rootStack.Screen component={CreatePost} name="createpost" />
-      </rootStack.Navigator>
-    </NavigationContainer>
+    <Provider store={store}>
+      <NavigationContainer ref={navigationRef}>
+        <rootStack.Navigator screenOptions={navigationOptions}>
+          <rootStack.Screen component={LoginPage} name="login" />
+          <rootStack.Screen component={VerifyEmail} name="verify" />
+          <rootStack.Screen component={MainTab} name="facebook" />
+          <rootStack.Screen component={ProfileTab} name="profile" />
+          <rootStack.Screen component={SignupPage} name="signup" />
+          <rootStack.Screen component={CreatePost} name="createPost" />
+          <rootStack.Screen component={BlockList} name="blockList" />
+          <rootStack.Screen component={UpdateProfile} name="updateProfile" />
+        </rootStack.Navigator>
+      </NavigationContainer>
+    </Provider>
   );
 }

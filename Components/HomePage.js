@@ -5,8 +5,11 @@ import { TextInput, TouchableOpacity } from "react-native-gesture-handler";
 import { navigation } from "../rootNavigation";
 import { Image } from "react-native";
 import { Icon } from "react-native-elements";
+import { useSelector } from "react-redux";
 
 const HomePage = () => {
+  const user = useSelector((state) => state);
+  console.log(user);
   return (
     <View>
       <ScrollView
@@ -15,7 +18,7 @@ const HomePage = () => {
       >
         <TouchableOpacity
           onPress={() => {
-            navigation.navigate("createpost");
+            navigation.navigate("createPost");
           }}
         >
           <View
