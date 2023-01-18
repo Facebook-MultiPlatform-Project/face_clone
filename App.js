@@ -21,6 +21,7 @@ import BlockList from "./Screens/BlockList.js";
 import { Provider } from "react-redux";
 import { store } from "./store/store.js";
 
+import Menu from "./Screens/Menu.js";
 const Stack = createStackNavigator();
 const rootStack = createStackNavigator();
 
@@ -67,6 +68,13 @@ const NotificationTab = () => {
   return (
     <View>
       <Text>notificationTab</Text>
+    </View>
+  );
+};
+const MenuTab = () => {
+  return (
+    <View>
+      <Menu />
     </View>
   );
 };
@@ -152,6 +160,19 @@ export const MainTab = () => {
           }}
           name="Notification"
           component={NotificationTab}
+        />
+        <Tab.Screen
+          options={{
+            tabBarIcon: ({ tintColor, focused }) => (
+              <Icon
+                name="menu"
+                size={25}
+                color={focused ? "#318bfb" : "#ddd"}
+              ></Icon>
+            ),
+          }}
+          name="Menu"
+          component={MenuTab}
         />
       </Tab.Navigator>
     </>
