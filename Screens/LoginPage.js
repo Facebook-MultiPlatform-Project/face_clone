@@ -15,6 +15,8 @@ import { EMAIL_REGEX } from "../common/regex";
 import { getToken } from "../utils/getToken";
 import { navigation } from "../rootNavigation";
 import { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { addUser } from "../store/user";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -23,6 +25,8 @@ const LoginPage = () => {
   const [errMail, setErrMail] = useState("");
   const [errPass, setErrPass] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const dispatch = useDispatch();
 
   useEffect(() => {
     setWidth(Dimensions.get("window").width);
@@ -49,16 +53,14 @@ const LoginPage = () => {
       const data = {
         email: email,
         password: password,
+        uuid: "12312313",
       };
       const res = loginApi.login(data);
       res.then(async (res) => {
         const token = getToken(res.headers["set-cookie"][0]);
-        // console.log(token);
         await SecureStore.setItemAsync("access_token", token.access_token);
         await SecureStore.setItemAsync("refresh_token", token.refresh_token);
-
-        // window.localStorage.setItem("access_token", token.access_token);
-        console.log(res.data);
+        dispatch(addUser(res.data.data.user));
         setIsSubmitting(false);
         navigation.navigate("facebook");
       });
