@@ -1,7 +1,111 @@
 import { View, Text, TouchableOpacity, Image } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { Icon } from "react-native-elements";
+import { useSelector } from "react-redux";
+import { UserApi } from "../apis/User/UserApi";
+import { AvatarApi } from "../apis/Avatar/Avatar";
+import * as ImagePicker from "expo-image-picker";
 
-const UpdateProfile = () => {
+const UpdateProfile = ({ navigation }) => {
+  const user = useSelector((state) => state.user.user);
+  const [avatar, setAvatar] = useState(
+    "https://storage.googleapis.com/facebook-storage.appspot.com/user%2Favatar%2Fdefault.jpg"
+  );
+  const [cover, setCover] = useState(
+    "https://storage.googleapis.com/facebook-storage.appspot.com/user%2Fcover%2Fdefault-cover.png"
+  );
+  const [info, setInfo] = useState({});
+  const permissionRequest = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== "granted") {
+      alert(" k có quyền truy cập!!!");
+      return false;
+    } else return true;
+  };
+  const uploadAvatar = async () => {
+    await permissionRequest();
+    if (permissionRequest()) {
+      let result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: "Images",
+      });
+      console.log(result);
+      setAvatar(result.uri);
+      const data = new FormData();
+      const upload_body = {
+        uri: result["uri"],
+        type: `image/${result["uri"].slice(-4) === "jpeg" ? "jpg" : "png"}`,
+        name:
+          Platform.OS === "ios"
+            ? result["filename"]
+            : `my_profile${Date.now()}.${
+                result["uri"].slice(-4) === "jpeg" ? "jpg" : "png"
+              }`,
+      };
+      data.append("image", upload_body);
+      updateAvatar(data);
+    }
+  };
+
+  const uploadCover = async () => {
+    await permissionRequest();
+    if (permissionRequest()) {
+      let result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: "Images",
+      });
+      console.log(result);
+      setCover(result.uri);
+      const data = new FormData();
+      const upload_body = {
+        uri: result["uri"],
+        type: `image/${result["uri"].slice(-4) === "jpeg" ? "jpg" : "png"}`,
+        name:
+          Platform.OS === "ios"
+            ? result["filename"]
+            : `my_profile${Date.now()}.${
+                result["uri"].slice(-4) === "jpeg" ? "jpg" : "png"
+              }`,
+      };
+      data.append("image", upload_body);
+      updateCover(data);
+    }
+  };
+
+  const updateAvatar = async (data) => {
+    await AvatarApi.updateAvatar(data)
+      .then((res) => {
+        console.log(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+  const updateCover = async (data) => {
+    await AvatarApi.updateCover(data)
+      .then((res) => {
+        console.log(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  const getUserInfo = async () => {
+    await UserApi.getInfo(user.id)
+      .then((res) => {
+        console.log("data", res.data.data);
+        const data = res.data.data;
+        setAvatar(data.avatar);
+        setCover(data.cover);
+        setInfo(data);
+      })
+      .catch((err) => {
+        console.log(12323, err);
+      });
+  };
+  useEffect(() => {
+    getUserInfo();
+  }, []);
+
   return (
     <View
       style={{
@@ -16,8 +120,19 @@ const UpdateProfile = () => {
           paddingBottom: 15,
           borderBottomColor: "#bababa",
           borderBottomWidth: 1,
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "center",
         }}
       >
+        <TouchableOpacity
+          onPress={() => {
+            navigation.goBack();
+          }}
+          style={{ marginRight: 10 }}
+        >
+          <Icon type="material" name="arrow-back"></Icon>
+        </TouchableOpacity>
         <Text
           style={{
             fontSize: 18,
@@ -53,7 +168,7 @@ const UpdateProfile = () => {
             >
               Ảnh đại diện
             </Text>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={uploadAvatar}>
               <Text
                 style={{
                   fontSize: 18,
@@ -79,7 +194,7 @@ const UpdateProfile = () => {
                 borderRadius: 150,
               }}
               source={{
-                uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRRtdBb_F-5FEyDOX0h9cz3lBnUb39fNIW8zg&usqp=CAU",
+                uri: avatar,
               }}
             ></Image>
           </View>
@@ -106,7 +221,7 @@ const UpdateProfile = () => {
             >
               Ảnh bìa
             </Text>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={uploadCover}>
               <Text
                 style={{
                   fontSize: 18,
@@ -129,7 +244,7 @@ const UpdateProfile = () => {
                 borderRadius: 8,
               }}
               source={{
-                uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRRtdBb_F-5FEyDOX0h9cz3lBnUb39fNIW8zg&usqp=CAU",
+                uri: cover,
               }}
             ></Image>
           </View>
@@ -154,7 +269,11 @@ const UpdateProfile = () => {
             >
               Thông tin cá nhân
             </Text>
-            <TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                navigation.navigate("updateDetail");
+              }}
+            >
               <Text
                 style={{
                   fontSize: 18,
@@ -176,7 +295,7 @@ const UpdateProfile = () => {
               <Text style={{ fontSize: 16, width: 100, fontWeight: "600" }}>
                 Tên hiển thị:
               </Text>
-              <Text style={{ fontSize: 16 }}>Nobi Nobita</Text>
+              <Text style={{ fontSize: 16 }}>{info.name}</Text>
             </View>
             <View
               style={{ display: "flex", flexDirection: "row", marginBottom: 5 }}
@@ -184,13 +303,15 @@ const UpdateProfile = () => {
               <Text style={{ fontSize: 16, width: 100, fontWeight: "600" }}>
                 Giới tính:
               </Text>
-              <Text style={{ fontSize: 16 }}>Nam</Text>
+              <Text style={{ fontSize: 16 }}>
+                {info.gender === 0 ? "Nữ" : "Nam"}
+              </Text>
             </View>
             <View style={{ display: "flex", flexDirection: "row" }}>
               <Text style={{ fontSize: 16, width: 100, fontWeight: "600" }}>
                 Ngày sinh:
               </Text>
-              <Text style={{ fontSize: 16 }}>01/01/2001</Text>
+              <Text style={{ fontSize: 16 }}>{info.birthday}</Text>
             </View>
           </View>
         </View>

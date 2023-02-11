@@ -1,7 +1,23 @@
 import { View, Text, ScrollView, Image, TouchableOpacity } from "react-native";
 import React from "react";
+import { useState } from "react";
+import { UserApi } from "../apis/User/UserApi";
+import { Icon } from "react-native-elements";
 
-const BlockList = () => {
+const BlockList = ({ route, navigation }) => {
+  const { userId } = route;
+
+  const [blockList, setBlockList] = useState([]);
+  const getBlockList = async () => {
+    await UserApi.getBlock(userId)
+      .then((res) => {
+        console.log(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
   return (
     <View
       style={{
@@ -16,8 +32,19 @@ const BlockList = () => {
           paddingBottom: 15,
           borderBottomColor: "#bababa",
           borderBottomWidth: 1,
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "center",
         }}
       >
+        <TouchableOpacity
+          onPress={() => {
+            navigation.goBack();
+          }}
+          style={{ marginRight: 10 }}
+        >
+          <Icon type="material" name="arrow-back"></Icon>
+        </TouchableOpacity>
         <Text
           style={{
             fontSize: 18,

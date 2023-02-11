@@ -23,6 +23,8 @@ import { store } from "./store/store.js";
 
 import Menu from "./Screens/Menu.js";
 import CommentPage from "./Screens/Comments.js";
+import { useEffect } from "react";
+import UpdateDetail from "./Screens/updateDetail";
 const Stack = createStackNavigator();
 const rootStack = createStackNavigator();
 
@@ -54,22 +56,22 @@ const FriendTab = () => {
 const ProfileTab = () => {
   return (
     <View>
-      <Profile />
+      <Text>Profile</Text>
     </View>
   );
 };
 const MessengerTab = () => {
   return (
-    // <View>
-    //   <Text>messengerTab</Text>
-    // </View>
-    <Stack.Navigator
-      screenOptions={{
-        headerShown: false,
-      }}
-    >
-      <Stack.Screen name="comment" component={CommentPage} />
-    </Stack.Navigator>
+    <View>
+      <Text>messengerTab</Text>
+    </View>
+    // <Stack.Navigator
+    //   screenOptions={{
+    //     headerShown: false,
+    //   }}
+    // >
+    //   <Stack.Screen name="comment" component={CommentPage} />
+    // </Stack.Navigator>
   );
 };
 const NotificationTab = () => {
@@ -199,12 +201,14 @@ export default function App() {
           <rootStack.Screen component={LoginPage} name="login" />
           <rootStack.Screen component={VerifyEmail} name="verify" />
           <rootStack.Screen component={MainTab} name="facebook" />
-          <rootStack.Screen component={ProfileTab} name="profile" />
+          <rootStack.Screen component={ProfileTab} name="pro" />
+          <rootStack.Screen component={Profile} name="profile" />
           <rootStack.Screen component={SignupPage} name="signup" />
           <rootStack.Screen component={CreatePost} name="createPost" />
           <rootStack.Screen component={BlockList} name="blockList" />
           <rootStack.Screen component={UpdateProfile} name="updateProfile" />
           {/* <rootStack.Screen component={CommentPage} name="comment" /> */}
+          <rootStack.Screen component={UpdateDetail} name="updateDetail" />
         </rootStack.Navigator>
       </NavigationContainer>
     </Provider>
