@@ -6,68 +6,61 @@ import {
   StatusBar,
   TouchableOpacity,
 } from "react-native";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Avatar } from "react-native-paper";
 import Icon from "react-native-vector-icons/FontAwesome";
+import { getAllComment } from "../apis/Comment/getComment";
+import { postComment } from "../apis/Comment/postComment";
+import { Keyboard } from "react-native";
 
-const fake_cmt = [
-  {
-    comment: "acsd",
-    userName: "Username",
-  },
-  {
-    comment: "acsd",
-    userName: "Username",
-  },
-  {
-    comment: "acsd",
-    userName: "Username",
-  },
-  {
-    comment: "acsd",
-    userName: "Username",
-  },
-  {
-    comment: "acsd",
-    userName: "Username",
-  },
-  {
-    comment: "acsd",
-    userName: "Username",
-  },
-  {
-    comment: "acsd",
-    userName: "Username",
-  },
-  {
-    comment: "acsd",
-    userName: "Username",
-  },
-  {
-    comment: "acsd",
-    userName: "Username",
-  },
-  {
-    comment: "acsd",
-    userName: "Username",
-  },
-  {
-    comment: "acsd",
-    userName: "Username",
-  },
-  {
-    comment: "acsd",
-    userName: "Username",
-  },
-  {
-    comment: "acsd",
-    userName: "Username",
-  },
-];
+const CommentPage = (postID) => {
+  postID = "f46c9a93-0a9b-4133-8a1d-9e4e8115aa72";
+  const [data, setData] = useState([]);
+  const [numComments, setNumComments] = useState(data.length);
+  const [cmt, setCmt] = useState("");
 
-const CommentPage = (props) => {
-  const handleSendMeassage = async () => {};
+  const scrollRef = useRef();
 
+  const onPressTouch = () => {
+    scrollRef.current?.scrollTo({
+      y: 0,
+      animated: true,
+    });
+  };
+
+  const param = {
+    postId: postID,
+    take: 100,
+    skip: 0,
+  };
+
+  async function getData() {
+    const res = await getAllComment.post(param);
+    setData(res.data.data);
+    setNumComments(res.data.data.length);
+  }
+  const handleSendMeassage = async (e) => {
+    if (cmt === "") return;
+    const param = {
+      postId: postID,
+      content: cmt,
+      commentAnsweredId: "c75cdf4c-173a-4c19-bfea-d2bf1494de07",
+    };
+    console.log(param);
+    const res = await postComment.post(param);
+    console.log(res);
+    getData();
+    setCmt("");
+    Keyboard.dismiss();
+    onPressTouch();
+  };
+
+  useEffect(() => {
+    getData();
+  }, []);
+  useEffect(() => {
+    console.log(cmt);
+  }, [cmt]);
   return (
     <View
       style={{
@@ -93,20 +86,24 @@ const CommentPage = (props) => {
         }}
       >
         <TouchableOpacity
-        // style={styles.button}
-        // onPress={onPress}
+          // style={styles.button}
+          onPress={() => {}}
         >
           <Icon name="arrow-left" size={20} color="black" />
         </TouchableOpacity>
         <Text style={{ fontSize: 18, fontWeight: "bold", paddingLeft: 20 }}>
-          sth
+          {numComments + " bình luận"}
         </Text>
       </View>
-      <ScrollView style={{ width: "100%" }}>
-        {fake_cmt.map((item) => {
+      <ScrollView style={{ width: "100%" }} ref={scrollRef}>
+        {data?.map((item) => {
           return (
             <View>
-              <CommentBox userName={item.userName} comment={item.comment} />
+              <CommentBox
+                userName={item.user.name}
+                comment={item.content}
+                avatar={item.user.avatar}
+              />
             </View>
           );
         })}
@@ -121,16 +118,22 @@ const CommentPage = (props) => {
       >
         <TextInput
           style={{
-            backgroundColor: "gray",
+            backgroundColor: "#dadada",
             width: "90%",
             borderRadius: 50,
             paddingLeft: 10,
+            paddingRight: 10,
           }}
           placeholder="Enter your comment here"
+          onChangeText={(text) => {
+            console.log(text);
+            setCmt(text);
+          }}
+          value={cmt}
         />
         <TouchableOpacity
-        style={{ padding: 5, width: "10%" }}
-        // onPress={onPress}
+          style={{ padding: 5, width: "10%" }}
+          onPress={handleSendMeassage}
         >
           <Icon
             name="send"
@@ -146,10 +149,6 @@ const CommentPage = (props) => {
 
 export default CommentPage;
 
-// props.author
-// props.comment
-// props.avatar
-// props.Image
 const CommentBox = (props) => {
   return (
     <View
@@ -161,7 +160,7 @@ const CommentBox = (props) => {
         marginLeft: 10,
       }}
     >
-      <Avatar.Image size={40} source={require("../assets/avatar.png")} />
+      <Avatar.Image size={40} source={{uri:props.avatar}} />
 
       <View
         style={{
@@ -185,30 +184,3 @@ const CommentBox = (props) => {
     </View>
   );
 };
-
-// const styles = StyleSheet.create({});
-
-// function MoreLessText({ children, numberOfLines }) {
-//     const [isTruncatedText, setIsTruncatedText] = useState(false)
-//     const [showMore, setShowMore] = useState(true)
-
-//     return isTruncatedText ? (
-//       <>
-//         <Text numberOfLines={showMore ? numberOfLines : 0 } style={{maxWidth:'90%'}}>{children}</Text>
-//         <Text onPress={() => setShowMore(!showMore)} style={{color:'gray',fontWeight:'bold'}}>
-//           {showMore ? 'Read More' : 'Less'}
-//         </Text>
-//       </>
-//     ) : (
-//       <Text
-//         style={{maxWidth:'90%'}}
-//         onTextLayout={(event) => {
-//           const { lines } = event.nativeEvent;
-//         //   console.log(lines);
-//           setIsTruncatedText(lines?.length > numberOfLines)
-//         }}
-//       >
-//         {children}
-//       </Text>
-//     )
-//   }

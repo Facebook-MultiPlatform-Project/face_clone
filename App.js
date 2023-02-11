@@ -22,6 +22,7 @@ import { Provider } from "react-redux";
 import { store } from "./store/store.js";
 
 import Menu from "./Screens/Menu.js";
+import CommentPage from "./Screens/Comments.js";
 import { useEffect } from "react";
 import UpdateDetail from "./Screens/updateDetail";
 const Stack = createStackNavigator();
@@ -64,6 +65,13 @@ const MessengerTab = () => {
     <View>
       <Text>messengerTab</Text>
     </View>
+    // <Stack.Navigator
+    //   screenOptions={{
+    //     headerShown: false,
+    //   }}
+    // >
+    //   <Stack.Screen name="comment" component={CommentPage} />
+    // </Stack.Navigator>
   );
 };
 const NotificationTab = () => {
@@ -199,6 +207,7 @@ export default function App() {
           <rootStack.Screen component={CreatePost} name="createPost" />
           <rootStack.Screen component={BlockList} name="blockList" />
           <rootStack.Screen component={UpdateProfile} name="updateProfile" />
+          {/* <rootStack.Screen component={CommentPage} name="comment" /> */}
           <rootStack.Screen component={UpdateDetail} name="updateDetail" />
         </rootStack.Navigator>
       </NavigationContainer>
