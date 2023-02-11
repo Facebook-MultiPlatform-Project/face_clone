@@ -17,6 +17,16 @@ import HomePage from "./Components/HomePage.js";
 import Profile from "./Screens/Profile.js";
 // import Noti from './Screens/Notifications.js'
 // import Friends from './Screens/Friends.js'
+import UpdateProfile from "./Screens/UpdateProfile.js";
+import BlockList from "./Screens/BlockList.js";
+
+import { Provider } from "react-redux";
+import { store } from "./store/store.js";
+
+import Menu from "./Screens/Menu.js";
+import CommentPage from "./Screens/Comments.js";
+import { useEffect } from "react";
+import UpdateDetail from "./Screens/updateDetail";
 const Stack = createStackNavigator();
 const rootStack = createStackNavigator();
 
@@ -48,7 +58,7 @@ const FriendTab = () => {
 const ProfileTab = () => {
   return (
     <View>
-      <Profile />
+      <Text>Profile</Text>
     </View>
   );
 };
@@ -57,12 +67,26 @@ const MessengerTab = () => {
     <View>
       <Text>messengerTab</Text>
     </View>
+    // <Stack.Navigator
+    //   screenOptions={{
+    //     headerShown: false,
+    //   }}
+    // >
+    //   <Stack.Screen name="comment" component={CommentPage} />
+    // </Stack.Navigator>
   );
 };
 const NotificationTab = () => {
   return (
     <View>
       <Text>notificationTab</Text>
+    </View>
+  );
+};
+const MenuTab = () => {
+  return (
+    <View>
+      <Menu />
     </View>
   );
 };
@@ -149,6 +173,19 @@ export const MainTab = () => {
           name="Notification"
           component={NotificationTab}
         />
+        <Tab.Screen
+          options={{
+            tabBarIcon: ({ tintColor, focused }) => (
+              <Icon
+                name="menu"
+                size={25}
+                color={focused ? "#318bfb" : "#ddd"}
+              ></Icon>
+            ),
+          }}
+          name="Menu"
+          component={MenuTab}
+        />
       </Tab.Navigator>
     </>
   );
@@ -160,17 +197,22 @@ export default function App() {
     headerMode: "screen",
   };
   return (
-    <NavigationContainer ref={navigationRef}>
-      <rootStack.Navigator screenOptions={navigationOptions}>
-        <rootStack.Screen component={LoginPage} name="login" />
-        <rootStack.Screen component={VerifyEmail} name="verify" />
-        <rootStack.Screen component={MainTab} name="facebook" />
-        <rootStack.Screen component={ProfileTab} name="profile" />
-        <rootStack.Screen component={SignupPage} name="signup" />
-        <rootStack.Screen component={CreatePost} name="createpost" />
-        {/* <rootStack.Screen component={Friends} name="notifications" /> */}
-
-      </rootStack.Navigator>
-    </NavigationContainer>
+    <Provider store={store}>
+      <NavigationContainer ref={navigationRef}>
+        <rootStack.Navigator screenOptions={navigationOptions}>
+          <rootStack.Screen component={LoginPage} name="login" />
+          <rootStack.Screen component={VerifyEmail} name="verify" />
+          <rootStack.Screen component={MainTab} name="facebook" />
+          <rootStack.Screen component={ProfileTab} name="pro" />
+          <rootStack.Screen component={Profile} name="profile" />
+          <rootStack.Screen component={SignupPage} name="signup" />
+          <rootStack.Screen component={CreatePost} name="createPost" />
+          <rootStack.Screen component={BlockList} name="blockList" />
+          <rootStack.Screen component={UpdateProfile} name="updateProfile" />
+          {/* <rootStack.Screen component={CommentPage} name="comment" /> */}
+          <rootStack.Screen component={UpdateDetail} name="updateDetail" />
+        </rootStack.Navigator>
+      </NavigationContainer>
+    </Provider>
   );
 }

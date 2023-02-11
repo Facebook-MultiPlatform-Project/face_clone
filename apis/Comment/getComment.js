@@ -1,8 +1,8 @@
 import axiosClient from "../axiosClient";
-
-export const signupApi = {
+export const getAllComment = {
   post: (data) => {
-    const url = "/auth/signup";
+    const url = "/comment/get-comments";
     return axiosClient.post(url, data);
   },
 };
+

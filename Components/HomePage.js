@@ -5,8 +5,24 @@ import { TextInput, TouchableOpacity } from "react-native-gesture-handler";
 import { navigation } from "../rootNavigation";
 import { Image } from "react-native";
 import { Icon } from "react-native-elements";
+import { useSelector } from "react-redux";
+import { useState } from "react";
+import { PostApi } from "../apis/Post/Post";
 
 const HomePage = () => {
+  const user = useSelector((state) => state);
+  const [listPost, setListPost] = useState([]);
+
+  const getListPost = async () => {
+    await PostApi.getAll()
+      .then((res) => {
+        console.log(res);
+      })
+      .then((err) => {
+        console.log(err);
+      });
+  };
+  console.log(user);
   return (
     <View>
       <ScrollView
@@ -15,7 +31,7 @@ const HomePage = () => {
       >
         <TouchableOpacity
           onPress={() => {
-            navigation.navigate("createpost");
+            navigation.navigate("createPost");
           }}
         >
           <View
