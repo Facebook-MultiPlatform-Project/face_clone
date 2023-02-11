@@ -13,11 +13,12 @@ import { Icon, Image } from "react-native-elements";
 import * as ImagePicker from "expo-image-picker";
 import { useState } from "react";
 import { upPostApi } from "../apis/Post/upPostApi";
+import Video from "react-native-video";
 
 const CreatePost = () => {
   const [content, setContent] = useState(null);
   const [image, setImage] = useState([]);
-  const [video, setVideo] = useState(null);
+  const [video, setVideo] = useState({});
   const windowWidth = Dimensions.get("window").width;
 
   const permissionRequest = async () => {
@@ -35,14 +36,15 @@ const CreatePost = () => {
         allowsMultipleSelection: true,
         selectionLimit: 4,
       });
-      console.log(result.selected);
       if (result.selected) {
-        result.selected.map((item) => {
-          console.log(item);
-          setImage([...image, item]);
-        });
+        console.log(result.selected);
+        const arr = image.concat(result.selected);
+        console.log("array", arr);
+        setImage(arr);
       } else {
-        setImage([...image, result]);
+        console.log(result);
+        const a = image.concat([result]);
+        setImage(a);
       }
     }
   };
@@ -86,6 +88,7 @@ const CreatePost = () => {
             : `my_profile${Date.now()}.mp4`,
       });
     }
+    console.log("dadsd");
     const res = upPostApi.post(data);
     res
       .then((res) => {
@@ -170,24 +173,26 @@ const CreatePost = () => {
             style={{ padding: 15, fontSize: 20 }}
           ></TextInput>
         </View>
-        {image[0] ? (
+        {image[0] || video.uri ? (
           <SafeAreaView style={{ minHeight: 380, maxHeight: 570 }}>
             <FlatList
               data={image}
               // style={}
               numColumns={2}
               keyExtractor={(e) => e}
-              renderItem={({ item }) => (
-                <Image
-                  source={{ uri: item.uri }}
-                  containerStyle={{
-                    aspectRatio: 1,
-                    width: "100%",
-                    height: 150,
-                    flex: 1,
-                  }}
-                />
-              )}
+              renderItem={({ item }) => {
+                return (
+                  <Image
+                    source={{ uri: item.uri }}
+                    containerStyle={{
+                      aspectRatio: 1,
+                      width: "100%",
+                      height: 150,
+                      flex: 1,
+                    }}
+                  />
+                );
+              }}
             ></FlatList>
           </SafeAreaView>
         ) : (

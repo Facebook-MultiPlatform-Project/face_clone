@@ -48,6 +48,7 @@ const LoginPage = () => {
     return true;
   };
   const handleSubmit = async () => {
+    console.log("asds");
     if (validate()) {
       setIsSubmitting(true);
       const data = {

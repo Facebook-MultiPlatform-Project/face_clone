@@ -10,6 +10,9 @@ import {
 import React, { useState } from "react";
 import { Icon, Image } from "react-native-elements";
 import { useEffect } from "react";
+import { ScrollView } from "react-native";
+import { navigation } from "../rootNavigation";
+import { useSelector } from "react-redux";
 // import ScaleImage from "./Image";
 
 const Post = () => {
@@ -18,6 +21,7 @@ const Post = () => {
   const [comments, setComments] = useState(200);
 
   const [full, setFull] = useState(false);
+  const user = useSelector((state) => state.user.user);
   useEffect(() => {
     LogBox.ignoreLogs(["VirtualizedLists should never be nested"]);
   }, []);
@@ -25,14 +29,22 @@ const Post = () => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <View style={styles.avatar}>
-          <Image
-            source={{
-              uri: "https://source.unsplash.com/random?sig=10",
-            }}
-            containerStyle={styles.avatar_img}
-          ></Image>
-        </View>
+        <TouchableOpacity
+          onPress={() => {
+            navigation.navigate("profile", {
+              userId: user.id,
+            });
+          }}
+        >
+          <View style={styles.avatar}>
+            <Image
+              source={{
+                uri: "https://source.unsplash.com/random?sig=10",
+              }}
+              containerStyle={styles.avatar_img}
+            ></Image>
+          </View>
+        </TouchableOpacity>
         <View style={{ marginLeft: 10 }}>
           <Text style={{ fontWeight: "500" }}>Nobi Nobita</Text>
         </View>
