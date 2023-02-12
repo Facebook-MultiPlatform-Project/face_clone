@@ -1,52 +1,72 @@
 import { View, Text, TouchableOpacity, Image } from "react-native";
 import * as SecureStore from "expo-secure-store";
 import { logoutApi } from "../apis/Auth/logoutApi";
+import { UserApi } from "../apis/User/UserApi";
 import { navigation } from "../rootNavigation";
+import { useEffect, useState } from "react";
 
 const Shortcut = (props) => {
   const { name, icon, des } = props;
   return (
-    <View
-      style={{
-        backgroundColor: "#fff",
-        flexGrow: 1,
-        borderRadius: 10,
-        padding: 16,
-        margin: 5,
-      }}
-      // onTouchEnd={() => navigation.navigate(des)}
-    >
-      <Image
-        source={{
-          uri: icon,
-        }}
+    <View style={{ width: "50%" }}>
+      <View
         style={{
-          width: 40,
-          height: 40,
-          borderRadius: 100,
+          backgroundColor: "#fff",
+          borderRadius: 10,
+          padding: 16,
+          margin: 5,
         }}
-      ></Image>
-      <Text
-        style={{ color: "#333", fontWeight: "600", fontSize: 18, marginTop: 8 }}
+        // onTouchEnd={() => navigation.navigate(des)}
       >
-        {name}
-      </Text>
+        <Image
+          source={{
+            uri: icon,
+          }}
+          style={{
+            width: 40,
+            height: 40,
+            borderRadius: 100,
+          }}
+        ></Image>
+        <Text
+          style={{
+            color: "#333",
+            fontWeight: "600",
+            fontSize: 18,
+            marginTop: 8,
+          }}
+        >
+          {name}
+        </Text>
+      </View>
     </View>
   );
 };
 
 const Menu = () => {
+  const [user, setUser] = useState();
+  const getUserInfo = async () => {
+    try {
+      const data = await UserApi.getInfo();
+      console.log("data", data.data.data);
+      setUser(data.data.data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+  useEffect(() => {
+    getUserInfo();
+  }, []);
   const handleLogOut = async () => {
     try {
       await logoutApi.logout();
       await SecureStore.deleteItemAsync("access_token");
       await SecureStore.deleteItemAsync("refresh_token");
-      navigation.navigate('login');
+      navigation.navigate("login");
+    } catch (err) {
+      console.log(err);
     }
-    catch(err) {
-      console.log(err)
-    }
-  }
+  };
   return (
     <View style={{ padding: 16 }}>
       <View>
@@ -61,11 +81,12 @@ const Menu = () => {
           marginTop: 10,
           alignItems: "center",
         }}
+        onTouchEnd={() => navigation.navigate("profile", {userId: user.id})}
       >
         <View>
           <Image
             source={{
-              uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHMbNbn5XcHIXV3PoLxkmsKdTQIbNffNpyuQ&usqp=CAU",
+              uri: user.avatar,
             }}
             style={{
               width: 40,
@@ -75,9 +96,9 @@ const Menu = () => {
             }}
           ></Image>
         </View>
-        <View onTouchEnd={() => navigation.navigate('profile')}>
+        <View >
           <Text style={{ color: "#333", fontWeight: "600", fontSize: 24 }}>
-            Lương Hoàng
+            {user.name}
           </Text>
           <Text style={{ color: "#777", fontWeight: "600", fontSize: 18 }}>
             See your profile
@@ -110,11 +131,10 @@ const Menu = () => {
             display: "flex",
             flexDirection: "row",
             alignItems: "center",
-            justifyContent: "space-between",
           }}
         >
           <Shortcut
-            name="Shortcut 1"
+            name="Friends"
             icon="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHMbNbn5XcHIXV3PoLxkmsKdTQIbNffNpyuQ&usqp=CAU"
           ></Shortcut>
           <Shortcut
@@ -127,7 +147,6 @@ const Menu = () => {
             display: "flex",
             flexDirection: "row",
             alignItems: "center",
-            justifyContent: "space-between",
           }}
         >
           <Shortcut
@@ -139,6 +158,40 @@ const Menu = () => {
             icon="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHMbNbn5XcHIXV3PoLxkmsKdTQIbNffNpyuQ&usqp=CAU"
           ></Shortcut>
         </View>
+        <View style={{ marginTop: 10 }}>
+          <TouchableOpacity
+            style={{ backgroundColor: "#ccc", borderRadius: 10, padding: 10 }}
+            onPress={() => navigation.navigate("blockList")}
+          >
+            <Text
+              style={{
+                color: "#333",
+                fontWeight: "600",
+                fontSize: 18,
+                textAlign: "center",
+              }}
+            >
+              Block list
+            </Text>
+          </TouchableOpacity>
+        </View>
+        {/* <View style={{ marginTop: 10 }}>
+          <TouchableOpacity
+            style={{ backgroundColor: "#ccc", borderRadius: 10, padding: 10 }}
+            onPress={() => navigation.navigate("changepassword")}
+          >
+            <Text
+              style={{
+                color: "#333",
+                fontWeight: "600",
+                fontSize: 18,
+                textAlign: "center",
+              }}
+            >
+              Change password
+            </Text>
+          </TouchableOpacity>
+        </View> */}
         <View style={{ marginTop: 10 }}>
           <TouchableOpacity
             style={{ backgroundColor: "#ccc", borderRadius: 10, padding: 10 }}
