@@ -98,32 +98,16 @@ const BlockList = ({ route, navigation }) => {
           này không bao gồm các ứng dụng, trò chơi hay nhóm mà cả bạn và người
           này đều tham gia.
         </Text>
-        {blockList.map((item) => (
+        {blockList.map((user) => (
           <BlockItem
-            userId={"d6ac025d-a37d-469f-879c-27feecc65dfb"}
-            name={"Luong Hoang"}
+            userId={user && user.id}
+            name={user && user.name}
             avatar={
-              "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHMbNbn5XcHIXV3PoLxkmsKdTQIbNffNpyuQ&usqp=CAU"
+              user && user && user.avatar
             }
             getBlockList={getBlockList}
           />
         ))}
-        <BlockItem
-          userId={"d6ac025d-a37d-469f-879c-27feecc65dfb"}
-          name={"Luong Hoang"}
-          avatar={
-            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHMbNbn5XcHIXV3PoLxkmsKdTQIbNffNpyuQ&usqp=CAU"
-          }
-          getBlockList={getBlockList}
-        />
-        <BlockItem
-          userId={"d6ac025d-a37d-469f-879c-27feecc65dfb"}
-          name={"Luong Hoang"}
-          avatar={
-            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHMbNbn5XcHIXV3PoLxkmsKdTQIbNffNpyuQ&usqp=CAU"
-          }
-          getBlockList={getBlockList}
-        />
       </View>
       <View style={{ borderBottomColor: "#CCC", borderBottomWidth: 1 }} />
       {blockList.length === 0 && (
