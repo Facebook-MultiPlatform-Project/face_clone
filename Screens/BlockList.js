@@ -1,128 +1,143 @@
-import { View, Text, ScrollView, Image, TouchableOpacity } from "react-native";
-import React from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { View, Text, Image, TouchableOpacity } from "react-native";
+import Toolbar from "../Components/Toolbar";
 import { UserApi } from "../apis/User/UserApi";
-import { Icon } from "react-native-elements";
+
+const BlockItem = ({ name, avatar, userId, getBlockList }) => {
+  const handleUnblock = async () => {
+    try {
+      await UserApi.setBlock({ userId, type: 0 });
+      await getBlockList();
+    } catch (err) {
+      console.log(err);
+    }
+  };
+  return (
+    <View>
+      <View style={{ borderBottomColor: "#CCC", borderBottomWidth: 1 }} />
+      <View
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "center",
+          paddingBottom: 5,
+          paddingTop: 5,
+        }}
+      >
+        <View
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+          }}
+        >
+          <Image
+            source={{
+              uri: avatar,
+            }}
+            style={{
+              width: 40,
+              height: 40,
+              marginRight: 10,
+            }}
+          ></Image>
+          <Text>{name}</Text>
+        </View>
+        <TouchableOpacity
+          style={{ borderWidth: 1, borderRadius: 5, borderColor: "#AAA" }}
+          onPress={handleUnblock}
+        >
+          <Text
+            style={{
+              padding: 5,
+              color: "#888",
+            }}
+          >
+            BỎ CHẶN
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+};
 
 const BlockList = ({ route, navigation }) => {
-  const { userId } = route;
-
   const [blockList, setBlockList] = useState([]);
   const getBlockList = async () => {
-    await UserApi.getBlock(userId)
+    await UserApi.getBlock()
       .then((res) => {
-        console.log(res.data);
+        setBlockList(res.data.data);
       })
       .catch((err) => {
         console.log(err);
       });
   };
+  useEffect(() => {
+    getBlockList();
+  }, []);
 
   return (
-    <View
-      style={{
-        backgroundColor: "#fff",
-        flex: 1,
-      }}
-    >
-      <View
-        style={{
-          paddingTop: 40,
-          paddingHorizontal: 15,
-          paddingBottom: 15,
-          borderBottomColor: "#bababa",
-          borderBottomWidth: 1,
-          display: "flex",
-          flexDirection: "row",
-          alignItems: "center",
-        }}
-      >
-        <TouchableOpacity
-          onPress={() => {
-            navigation.goBack();
-          }}
-          style={{ marginRight: 10 }}
-        >
-          <Icon type="material" name="arrow-back"></Icon>
-        </TouchableOpacity>
+    <View style={{ backgroundColor: "#FFF", minHeight: "100%" }}>
+      <Toolbar title="Chặn"></Toolbar>
+      <View style={{ padding: 10 }}>
+        <Text style={{ color: "#000", fontWeight: "600", fontSize: 18 }}>
+          Người bị chặn
+        </Text>
         <Text
           style={{
-            fontSize: 18,
+            color: "#888",
+            fontSize: 14,
+            marginTop: 5,
+            marginBottom: 10,
           }}
         >
-          Chặn
+          Một khi bạn đã chặn ai đó, họ sẽ không xem được nội dung bạn tự đăng
+          trên dòng thời gian mình, gắn thẻ bạn, mời bạn tham gia sự kiện hoặc
+          nhóm, bắt đầu cuộc trò chuyện với bạn hay thêm bạn làm bạn bè. Điều
+          này không bao gồm các ứng dụng, trò chơi hay nhóm mà cả bạn và người
+          này đều tham gia.
         </Text>
+        {blockList.map((item) => (
+          <BlockItem
+            userId={"d6ac025d-a37d-469f-879c-27feecc65dfb"}
+            name={"Luong Hoang"}
+            avatar={
+              "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHMbNbn5XcHIXV3PoLxkmsKdTQIbNffNpyuQ&usqp=CAU"
+            }
+            getBlockList={getBlockList}
+          />
+        ))}
+        <BlockItem
+          userId={"d6ac025d-a37d-469f-879c-27feecc65dfb"}
+          name={"Luong Hoang"}
+          avatar={
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHMbNbn5XcHIXV3PoLxkmsKdTQIbNffNpyuQ&usqp=CAU"
+          }
+          getBlockList={getBlockList}
+        />
+        <BlockItem
+          userId={"d6ac025d-a37d-469f-879c-27feecc65dfb"}
+          name={"Luong Hoang"}
+          avatar={
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHMbNbn5XcHIXV3PoLxkmsKdTQIbNffNpyuQ&usqp=CAU"
+          }
+          getBlockList={getBlockList}
+        />
       </View>
-      <View
-        style={{
-          padding: 15,
-        }}
-      >
-        <View
+      <View style={{ borderBottomColor: "#CCC", borderBottomWidth: 1 }} />
+      {blockList.length === 0 && (
+        <Text
           style={{
-            marginBottom: 15,
+            color: "#888",
+            fontSize: 16,
+            textAlign: "center",
+            paddingTop: 20,
           }}
         >
-          <Text
-            style={{
-              fontSize: 16,
-            }}
-          >
-            Người bị chặn
-          </Text>
-          <Text
-            style={{
-              fontSize: 14,
-            }}
-          >
-            Một khi bạn đã chặn ai đó, họ sẽ không xem được nội dung bạn tự đăng
-            trên dòng thời gian mình, gắn thẻ bạn, mời bạn tham gia sự kiện hoặc
-            nhóm, bắt đầu cuộc trò chuyện với bạn hay thêm bạn làm bạn bè. Điều
-            này không bao gồm các ứng dụng, trò chơi hay nhóm mà cả bạn và người
-            này đều tham gia.
-          </Text>
-        </View>
-        <ScrollView
-          style={{
-            borderBottomColor: "#bababa",
-            borderBottomWidth: 1,
-          }}
-        >
-          {[1, 2, 3].map((item) => {
-            return (
-              <View
-                style={{
-                  display: "flex",
-                  flexDirection: "row",
-                  alignItems: "center",
-                  marginBottom: 10,
-                }}
-              >
-                <Image
-                  style={{
-                    width: 40,
-                    height: 40,
-                    marginRight: 10,
-                  }}
-                  source={{
-                    uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRRtdBb_F-5FEyDOX0h9cz3lBnUb39fNIW8zg&usqp=CAU",
-                  }}
-                ></Image>
-                <Text style={{ fontSize: 16, flex: 1 }}>Nobi Nobita</Text>
-                <TouchableOpacity
-                  style={{
-                    marginLeft: 10,
-                  }}
-                >
-                  <Text style={{ fontSize: 16, color: "#bababa" }}>
-                    BỎ CHẶN
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            );
-          })}
-        </ScrollView>
-      </View>
+          Bạn chưa chặn ai.
+        </Text>
+      )}
     </View>
   );
 };
