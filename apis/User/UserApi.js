@@ -13,7 +13,7 @@ export const UserApi = {
   },
   getBlock: () => {
     const url = "/user/block-list";
-    return axiosClient.get(url);
+    return axiosClient.get(url, {params: {take: 10, skip: 0}});
   },
   updateProfile: (data) => {
     const url = "/user/update-profile";

@@ -81,12 +81,12 @@ const Menu = () => {
           marginTop: 10,
           alignItems: "center",
         }}
-        onTouchEnd={() => navigation.navigate("profile", {userId: user.id})}
+        onTouchEnd={() => navigation.navigate("profile", {userId: user && user.id})}
       >
         <View>
           <Image
             source={{
-              uri: user.avatar,
+              uri: user && user.avatar,
             }}
             style={{
               width: 40,
@@ -98,7 +98,7 @@ const Menu = () => {
         </View>
         <View >
           <Text style={{ color: "#333", fontWeight: "600", fontSize: 24 }}>
-            {user.name}
+            {user && user.name}
           </Text>
           <Text style={{ color: "#777", fontWeight: "600", fontSize: 18 }}>
             See your profile
