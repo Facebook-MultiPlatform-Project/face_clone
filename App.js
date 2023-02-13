@@ -19,6 +19,7 @@ import UpdateProfile from "./Screens/UpdateProfile.js";
 import BlockList from "./Screens/BlockList.js";
 import Notifications from "./Screens/Notifications.js";
 import Friends from "./Screens/Friends.js";
+import Messager from "./Screens/Messager.js";
 import { Provider } from "react-redux";
 import { store } from "./store/store.js";
 import Menu from "./Screens/Menu.js";
@@ -151,33 +152,6 @@ export const MainTab = () => {
           options={{
             tabBarIcon: ({ tintColor, focused }) => (
               <Icon
-                name="person"
-                size={25}
-                color={focused ? "#318bfb" : "#ddd"}
-              ></Icon>
-            ),
-            headerShown: true,
-          }}
-          name="Profile"
-          component={ProfileTab}
-        />
-        <Tab.Screen
-          options={{
-            tabBarIcon: ({ tintColor, focused }) => (
-              <Icon
-                name="email"
-                size={25}
-                color={focused ? "#318bfb" : "#ddd"}
-              ></Icon>
-            ),
-          }}
-          name="Messenger"
-          component={MessengerTab}
-        />
-        <Tab.Screen
-          options={{
-            tabBarIcon: ({ tintColor, focused }) => (
-              <Icon
                 name="notifications"
                 size={25}
                 color={focused ? "#318bfb" : "#ddd"}
@@ -225,6 +199,7 @@ export default function App() {
           <rootStack.Screen component={UpdateProfile} name="updateProfile" />
           {/* <rootStack.Screen component={CommentPage} name="comment" /> */}
           <rootStack.Screen component={UpdateDetail} name="updateDetail" />
+          <rootStack.Screen component={Messager} name="messager" />
         </rootStack.Navigator>
       </NavigationContainer>
     </Provider>
