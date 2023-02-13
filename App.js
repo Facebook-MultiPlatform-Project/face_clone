@@ -17,10 +17,10 @@ import HomePage from "./Components/HomePage.js";
 import Profile from "./Screens/Profile.js";
 import UpdateProfile from "./Screens/UpdateProfile.js";
 import BlockList from "./Screens/BlockList.js";
-
+import Notifications from "./Screens/Notifications.js";
+import Friends from "./Screens/Friends.js";
 import { Provider } from "react-redux";
 import { store } from "./store/store.js";
-
 import Menu from "./Screens/Menu.js";
 import CommentPage from "./Screens/Comments.js";
 import { useEffect } from "react";
@@ -47,10 +47,19 @@ const HomeTab = () => {
   );
 };
 const FriendTab = () => {
+  // return (
+  //   <View>
+  //     <Text>friendTab</Text>
+  //   </View>
+  // );
   return (
-    <View>
-      <Text>friendTab</Text>
-    </View>
+    <Stack.Navigator
+      screenOptions={{
+        headerShown: false,
+      }}
+    >
+      <Stack.Screen name="Friends" component={Friends} />
+    </Stack.Navigator>
   );
 };
 const ProfileTab = () => {
@@ -76,9 +85,16 @@ const MessengerTab = () => {
 };
 const NotificationTab = () => {
   return (
-    <View>
-      <Text>notificationTab</Text>
-    </View>
+    // <View>
+    //   <Text>notificationTab</Text>
+    // </View>
+    <Stack.Navigator
+      screenOptions={{
+        headerShown: false,
+      }}
+    >
+      <Stack.Screen name="Noti" component={Notifications} />
+    </Stack.Navigator>
   );
 };
 const MenuTab = () => {
