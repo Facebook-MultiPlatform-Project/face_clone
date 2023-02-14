@@ -1,29 +1,22 @@
-import {
-  Text,
-  View,
-  ScrollView,
-  TextInput,
-  StatusBar,
-  TouchableOpacity,
-  Button,
-} from "react-native";
+import { Text, View, ScrollView, TouchableOpacity } from "react-native";
 import React, { useState, useEffect } from "react";
 import { Avatar } from "react-native-paper";
 import { Divider } from "react-native-elements";
 import { FriendApi } from "../apis/Friend/Friend";
-import { getTimeDisplay } from "../utils";
+import { StatusBar } from "expo-status-bar";
 import { navigation } from "../rootNavigation";
+import { UserApi } from "../apis/User/UserApi";
+import Icon from "react-native-vector-icons/FontAwesome";
+const FriendList = () => {
+  const [friends, setfriends] = useState([]);
 
-const Friends = () => {
-  const [friendsRequests, setFriendsRequests] = useState([]);
-
-  async function getListFriendRequest() {
-    const data = await FriendApi.getRequestFriend();
-    setFriendsRequests(data.data.data);
+  async function getListFriend() {
+    const data = await FriendApi.getListFriend();
+    setfriends(data.data.data);
   }
 
   useEffect(() => {
-    getListFriendRequest();
+    getListFriend();
   }, []);
   return (
     <View
@@ -32,62 +25,79 @@ const Friends = () => {
         flex: 1,
         flexDirection: "column",
         alignItems: "flex-start",
-        // backgroundColor:'red',
-        // paddingTop: StatusBar.currentHeight,
+        paddingTop: StatusBar.currentHeight,
       }}
     >
-      {/* <Text style={{ paddingLeft: 20, fontSize: 30, fontWeight: "bold" }}>
-        {"Lời mời kết bạn"}
-      </Text> */}
-      <View style={{ display: "flex", flexDirection: "row" }}>
-        <Text style={{ paddingLeft: 10, fontSize: 25, fontWeight: "bold" }}>
-          {"Lời mời kết bạn "}
-        </Text>
-        <Text style={{ fontSize: 25, fontWeight: "bold", color: "red" }}>
-          {friendsRequests.length}
-        </Text>
+      <View
+        className="navi"
+        style={{
+          width: "100%",
+          height: 30,
+          borderBottomColor: "black",
+          borderBottomWidth: 1,
+          paddingLeft: 10,
+          // flex:1,
+          flexDirection: "row",
+          flexWrap: "wrap",
+          paddingBottom: 2,
+          //   justifyContent:'center',
+          alignItems: "center",
+        }}
+      >
+        <TouchableOpacity
+          // style={styles.button}
+          onPress={() => {
+            navigation.goBack();
+          }}
+        >
+          <Icon name="arrow-left" size={20} color="black" />
+        </TouchableOpacity>
+        <View style={{ display: "flex", flexDirection: "row" }}>
+          <Text style={{ paddingLeft: 10, fontSize: 20, fontWeight: "bold" }}>
+            {"Bạn bè "}
+          </Text>
+          <Text style={{ fontSize: 20, fontWeight: "bold", color: "red" }}>
+            {friends.length}
+          </Text>
+        </View>
       </View>
       <Divider orientation="horizontal" width={1} />
-      {friendsRequests.length > 0 ? (
-        <ScrollView style={{ width: "100%" }}>
-          {friendsRequests.map((item) => {
-            return (
-              <FriendsItems
-                avatar={item.avatar}
-                name={item.name}
-                id={item.id}
-                time={item.createAt}
-                callBack={getListFriendRequest}
-              />
-            );
-          })}
-        </ScrollView>
-      ) : (
-        <Text style={{ paddingLeft: 10 }}>Hiện không có lời mời nào</Text>
-      )}
+      <ScrollView style={{ width: "100%" }}>
+        {friends.map((item) => {
+          return (
+            <FriendsItems
+              avatar={item.avatar}
+              name={item.name}
+              id={item.id}
+              // time={item.createAt}
+              callBack={getListFriend}
+            />
+          );
+        })}
+      </ScrollView>
     </View>
   );
 };
 
-export default Friends;
+export default FriendList;
 
-const FriendsItems = ({ avatar, name, id, time, callBack }) => {
-  async function handleAccept(id) {
-    const body = {
-      id: id,
-      isAccept: true,
-    };
-    const x = await FriendApi.setAccept(body);
-    // getListFriendRequest();
+const FriendsItems = ({ avatar, name, id }) => {
+  async function handleUnfriend(id) {
+    // const body = {
+    //   'id': id,
+    // };
+    const x = await FriendApi.removeFriend(id);
     callBack();
   }
 
-  async function handleDecline(id) {
-    // const body = {
-    //   id: id,
-    //   // 'isAccept': true,
-    // };
-    const x = await FriendApi.cancelRequest(id);
+  async function handleBlock(id) {
+    const body = {
+      userId: id,
+      type: 1,
+      // 'isAccept': true,
+    };
+    const x = await UserApi.setBlock(body);
+
     // getListFriendRequest();
     callBack();
   }
@@ -140,7 +150,6 @@ const FriendsItems = ({ avatar, name, id, time, callBack }) => {
           >
             {name}
           </Text>
-          <Text>{getTimeDisplay(time)}</Text>
         </View>
         <View
           style={{
@@ -151,7 +160,7 @@ const FriendsItems = ({ avatar, name, id, time, callBack }) => {
         >
           <TouchableOpacity
             style={{
-              backgroundColor: "#0084FF",
+              backgroundColor: "#DC3535",
               padding: 10,
               borderRadius: 10,
               width: "50%",
@@ -160,7 +169,7 @@ const FriendsItems = ({ avatar, name, id, time, callBack }) => {
               flex: 1,
             }}
             onPress={() => {
-              handleAccept(id);
+              handleUnfriend(id);
             }}
           >
             <Text
@@ -169,7 +178,7 @@ const FriendsItems = ({ avatar, name, id, time, callBack }) => {
                 color: "white",
               }}
             >
-              Chấp nhận
+              Huỷ kết bạn
             </Text>
           </TouchableOpacity>
           <View style={{ width: 5 }}></View>
@@ -184,7 +193,7 @@ const FriendsItems = ({ avatar, name, id, time, callBack }) => {
               flex: 1,
             }}
             onPress={() => {
-              handleDecline(id);
+              handleBlock(id);
             }}
           >
             <Text
@@ -192,11 +201,10 @@ const FriendsItems = ({ avatar, name, id, time, callBack }) => {
                 fontSize: 15,
               }}
             >
-              Từ chối
+              Chặn
             </Text>
           </TouchableOpacity>
         </View>
-        {/* <Text style={{fontSize:12,color:'grey'}}>{isRead?'white':"#BFEAF5"}</Text> */}
       </View>
     </TouchableOpacity>
   );

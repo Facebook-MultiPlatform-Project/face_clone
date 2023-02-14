@@ -12,6 +12,8 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import { getAllComment } from "../apis/Comment/getComment";
 import { postComment } from "../apis/Comment/postComment";
 import { Keyboard } from "react-native";
+import { navigation } from "../rootNavigation";
+
 
 const CommentPage = ({ postID = "f46c9a93-0a9b-4133-8a1d-9e4e8115aa72" }) => {
   // postID = "f46c9a93-0a9b-4133-8a1d-9e4e8115aa72";
@@ -87,14 +89,16 @@ const CommentPage = ({ postID = "f46c9a93-0a9b-4133-8a1d-9e4e8115aa72" }) => {
       >
         <TouchableOpacity
           // style={styles.button}
-          onPress={() => {}}
+          onPress={() => {
+            navigation.goBack();
+          }}
         >
           <Icon name="arrow-left" size={20} color="black" />
         </TouchableOpacity>
         <Text style={{ fontSize: 18, fontWeight: "bold", paddingLeft: 20 }}>
           {numComments + " bình luận"}
-        </Text>
-      </View>
+          </Text>
+        </View>
       <ScrollView style={{ width: "100%" }} ref={scrollRef}>
         {data?.map((item) => {
           return (
