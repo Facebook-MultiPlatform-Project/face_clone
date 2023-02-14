@@ -1,12 +1,13 @@
 import { View, Text, TouchableOpacity, Image } from "react-native";
 import React, { useEffect, useState } from "react";
 import { Icon } from "react-native-elements";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { UserApi } from "../apis/User/UserApi";
 import { AvatarApi } from "../apis/Avatar/Avatar";
 import * as ImagePicker from "expo-image-picker";
+import { addUser } from "../store/user";
 
-const UpdateProfile = ({ navigation }) => {
+const UpdateProfile = ({ navigation, route }) => {
   const user = useSelector((state) => state.user.user);
   const [avatar, setAvatar] = useState(
     "https://storage.googleapis.com/facebook-storage.appspot.com/user%2Favatar%2Fdefault.jpg"
@@ -15,6 +16,8 @@ const UpdateProfile = ({ navigation }) => {
     "https://storage.googleapis.com/facebook-storage.appspot.com/user%2Fcover%2Fdefault-cover.png"
   );
   const [info, setInfo] = useState({});
+
+  const dispatch = useDispatch();
   const permissionRequest = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
@@ -28,7 +31,7 @@ const UpdateProfile = ({ navigation }) => {
       let result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: "Images",
       });
-      console.log(result);
+      if (result.cancelled) return;
       setAvatar(result.uri);
       const data = new FormData();
       const upload_body = {
@@ -52,8 +55,8 @@ const UpdateProfile = ({ navigation }) => {
       let result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: "Images",
       });
-      console.log(result);
-      setCover(result.uri);
+      if (result.cancelled) return;
+      // setCover(result.uri);
       const data = new FormData();
       const upload_body = {
         uri: result["uri"],
@@ -73,7 +76,7 @@ const UpdateProfile = ({ navigation }) => {
   const updateAvatar = async (data) => {
     await AvatarApi.updateAvatar(data)
       .then((res) => {
-        console.log(res.data);
+        getUserInfo();
       })
       .catch((err) => {
         console.log(err);
@@ -82,7 +85,7 @@ const UpdateProfile = ({ navigation }) => {
   const updateCover = async (data) => {
     await AvatarApi.updateCover(data)
       .then((res) => {
-        console.log(res.data);
+        getUserInfo();
       })
       .catch((err) => {
         console.log(err);
@@ -98,9 +101,10 @@ const UpdateProfile = ({ navigation }) => {
         setAvatar(data.avatar);
         setCover(data.cover);
         setInfo(data);
+        dispatch(addUser(data));
       })
       .catch((err) => {
-        console.log(12323, err);
+        console.log(err);
       });
   };
   useEffect(() => {
@@ -128,6 +132,7 @@ const UpdateProfile = ({ navigation }) => {
       >
         <TouchableOpacity
           onPress={() => {
+            route.params.updateData();
             navigation.goBack();
           }}
           style={{ marginRight: 10 }}

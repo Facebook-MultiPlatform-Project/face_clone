@@ -17,6 +17,7 @@ import { useState } from "react";
 import { PostApi } from "../apis/Post/Post";
 import { useEffect } from "react";
 
+
 const HomePage = () => {
   const user = useSelector((state) => state.user.user);
   const [listPost, setListPost] = useState([]);
@@ -55,6 +56,7 @@ const HomePage = () => {
           <View
             style={{
               flexDirection: "row",
+              width: "100%",
               paddingHorizontal: 20,
               paddingVertical: 10,
               backgroundColor: "#fff",
@@ -92,7 +94,7 @@ const HomePage = () => {
                 placeholder="Bạn đang nghĩ gì..."
                 style={{
                   borderRadius: 100,
-                  width: 270,
+                  width: 240,
                   borderWidth: 1,
                   borderColor: "#CFCFD5",
                   paddingHorizontal: 20,

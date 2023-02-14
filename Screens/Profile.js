@@ -38,6 +38,10 @@ const Profile = ({ route, navigation }) => {
       });
   };
 
+  const handleUpdate = () => {
+    getUserInfo();
+  };
+
   const getListPost = async () => {
     await PostApi.getPostByUser({ id: userId, take: 10, skip: 0 })
       .then((res) => {
@@ -231,7 +235,10 @@ const Profile = ({ route, navigation }) => {
               {userId === user.id ? (
                 <TouchableOpacity
                   onPress={() => {
-                    navigation.navigate({ name: "updateProfile" });
+                    navigation.navigate({
+                      name: "updateProfile",
+                      params: { updateData: handleUpdate },
+                    });
                   }}
                   style={{
                     height: 30,
