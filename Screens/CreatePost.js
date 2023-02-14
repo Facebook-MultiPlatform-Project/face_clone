@@ -39,18 +39,18 @@ const CreatePost = ({ route, navigation }) => {
         allowsMultipleSelection: true,
         selectionLimit: 4,
       });
-      if (result.selected) {
-        console.log(result.selected);
-        if (result.selected.length + image.length > 4)
-          alert("Chỉ có thể up 4 ảnh!!!");
-        else {
-          const arr = image.concat(result.selected);
-          setImage(arr);
+      if (!result.cancelled) {
+        if (result.selected) {
+          if (result.selected.length + image.length > 4)
+            alert("Chỉ có thể up 4 ảnh!!!");
+          else {
+            const arr = image.concat(result.selected);
+            setImage(arr);
+          }
+        } else {
+          const a = image.concat([result]);
+          setImage(a);
         }
-      } else {
-        console.log(result);
-        const a = image.concat([result]);
-        setImage(a);
       }
     }
   };
@@ -67,8 +67,7 @@ const CreatePost = ({ route, navigation }) => {
         let result = await ImagePicker.launchImageLibraryAsync({
           mediaTypes: "Videos",
         });
-        console.log(result);
-        setVideo(result);
+        if (!result.cancelled) setVideo(result);
       }
     }
   };
@@ -98,7 +97,6 @@ const CreatePost = ({ route, navigation }) => {
             : `my_profile${Date.now()}.mp4`,
       });
     }
-    console.log("dadsd");
     const res = upPostApi.post(data);
     res
       .then((res) => {
@@ -106,10 +104,6 @@ const CreatePost = ({ route, navigation }) => {
       })
       .catch((err) => console.log("err", err));
   };
-  useEffect(() => {
-    console.log(route);
-  }, [route]);
-
   return (
     <View
       style={{
@@ -121,7 +115,8 @@ const CreatePost = ({ route, navigation }) => {
         style={{
           flexDirection: "row",
           justifyContent: "space-between",
-          paddingHorizontal: 20,
+          paddingRight: 20,
+          paddingLeft: 10,
           paddingTop: 40,
           paddingBottom: 10,
           borderBottomColor: "#aaa",
@@ -202,12 +197,14 @@ const CreatePost = ({ route, navigation }) => {
             style={{ padding: 15, fontSize: 20 }}
           ></TextInput>
         </View>
-        {video.uri && (
+        {video.uri ? (
           <Video
             source={{ uri: video.uri }}
             style={{ width: "100%", height: 300, bottom: 0 }}
             isLooping
           ></Video>
+        ) : (
+          <View style={{ height: 0 }}></View>
         )}
         {image[0] || video.uri ? (
           <SafeAreaView style={{ minHeight: 380, maxHeight: 570 }}>
@@ -269,8 +266,8 @@ const CreatePost = ({ route, navigation }) => {
             alignItems: "center",
           }}
           onPress={() => {
-            navigation.navigate("listEmoji",{
-              onGoBack
+            navigation.navigate("listEmoji", {
+              onGoBack,
             });
           }}
         >
