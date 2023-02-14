@@ -7,7 +7,7 @@ const RoomItem = ({ item }) => {
   return (
     <TouchableOpacity
       onPress={() => {
-        // navigation.navigate();
+        navigation.navigate("chat", { userId: item.id });
       }}
       style={{
         flexDirection: "row",

@@ -33,6 +33,7 @@ import * as SecureStore from "expo-secure-store";
 import { useRef } from "react";
 import WaitingPage from "./Screens/WaitingPage.js";
 import Search from "./Screens/Search.js";
+import Chat from "./Screens/Chat.js";
 const Stack = createStackNavigator();
 const rootStack = createStackNavigator();
 
@@ -262,6 +263,7 @@ export default function App() {
           <rootStack.Screen component={Messager} name="messager" />
           <rootStack.Screen component={FriendList} name="friendList" />
           <rootStack.Screen component={Search} name="search" />
+          <rootStack.Screen component={Chat} name="chat" />
         </rootStack.Navigator>
       </NavigationContainer>
       <Toast />
