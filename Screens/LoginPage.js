@@ -60,6 +60,7 @@ const LoginPage = () => {
         const token = getToken(res.headers["set-cookie"][0]);
         await SecureStore.setItemAsync("access_token", token.access_token);
         await SecureStore.setItemAsync("refresh_token", token.refresh_token);
+        await SecureStore.setItemAsync("user_id", res.data.data.user.id);
         dispatch(addUser(res.data.data.user));
         setIsSubmitting(false);
         navigation.navigate("facebook");

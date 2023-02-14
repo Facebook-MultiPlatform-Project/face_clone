@@ -13,52 +13,52 @@ export const constant = {
     {
       value: "1",
       img: "🙂",
-      text: "Hạnh phúc",
+      text: "hạnh phúc",
     },
     {
       value: "2",
       img: "😆",
-      text: "Sung sướng",
+      text: "sung sướng",
     },
     {
       value: "3",
       img: "🙁",
-      text: "Buồn",
+      text: "buồn",
     },
     {
       value: "4",
-      img: "🙁",
-      text: "Đáng yêu",
+      img: "😍",
+      text: "đáng yêu",
     },
     {
       value: "5",
       img: "😤",
-      text: "Bực mình",
+      text: "bực mình",
     },
     {
       value: "6",
       img: "😠",
-      text: "Tức giận",
+      text: "tức giận",
     },
     {
       value: "7",
       img: "😵",
-      text: "Mệt mỏi",
+      text: "mệt mỏi",
     },
     {
       value: "8",
       img: "😋",
-      text: "Ngon miệng",
+      text: "ngon miệng",
     },
     {
       value: "9",
       img: "😴",
-      text: "Buồn ngủ",
+      text: "buồn ngủ",
     },
     {
       value: "10",
       img: "😎",
-      text: "Tuyệt",
+      text: "tuyệt",
     },
   ],
 };

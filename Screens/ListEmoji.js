@@ -1,8 +1,13 @@
 import { View, Text, TouchableOpacity } from "react-native";
 import React, { useState } from "react";
 import { Icon } from "react-native-elements";
+import { constant } from "../utils/constant";
 
-const ListEmoji = ({ navigation }) => {
+const ListEmoji = ({ navigation, route }) => {
+  const handleChoose = (value) => {
+    route.params.updateData(value);
+    navigation.goBack();
+  };
   return (
     <View
       style={{
@@ -24,7 +29,7 @@ const ListEmoji = ({ navigation }) => {
       >
         <TouchableOpacity
           onPress={() => {
-            navigation.goBack({ value: 133121 });
+            navigation.goBack();
           }}
           style={{ marginRight: 10 }}
         >
@@ -35,8 +40,45 @@ const ListEmoji = ({ navigation }) => {
             fontSize: 18,
           }}
         >
-          Cảm xúc
+          Bạn đang cảm thấy thế nào?
         </Text>
+      </View>
+      <View
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          flexWrap: "wrap",
+        }}
+      >
+        {constant.EMOJI.map((item) => {
+          return (
+            <View
+              key={item.value}
+              style={{
+                width: "50%",
+                borderWidth: 1,
+                borderColor: "#bababa",
+              }}
+            >
+              <TouchableOpacity
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  padding: 10,
+                }}
+                onPress={() => {
+                  handleChoose(item.value);
+                }}
+              >
+                <Text style={{ fontSize: 30, marginRight: 10 }}>
+                  {item.img}
+                </Text>
+                <Text style={{ fontSize: 16 }}>{item.text}</Text>
+              </TouchableOpacity>
+            </View>
+          );
+        })}
       </View>
     </View>
   );
