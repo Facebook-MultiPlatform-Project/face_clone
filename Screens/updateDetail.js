@@ -8,7 +8,7 @@ import { parseTime } from "../utils";
 import { useEffect } from "react";
 import { UserApi } from "../apis/User/UserApi";
 
-const UpdateDetail = ({ navigation }) => {
+const UpdateDetail = ({ navigation, route }) => {
   const user = useSelector((state) => state.user.user);
   const [gender, setGender] = useState(0);
   const [name, setName] = useState("");
@@ -44,6 +44,7 @@ const UpdateDetail = ({ navigation }) => {
     await UserApi.updateProfile(data)
       .then((res) => {
         console.log(res.data);
+        route.params.updateData();
         navigation.goBack();
       })
       .catch((err) => {

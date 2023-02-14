@@ -20,6 +20,8 @@ import { constant } from "../utils/constant";
 const Profile = ({ route, navigation }) => {
   const userId = route.params.userId;
   const [listPost, setListPost] = useState([]);
+  const [listFriend, setListFriend] = useState([]);
+  const [listFriendRender, setListFriendRender] = useState([]);
   const [info, setInfo] = useState({});
   const [isFriend, setIsFriend] = useState(false);
   const [status, setStatus] = useState(null);
@@ -119,10 +121,26 @@ const Profile = ({ route, navigation }) => {
       });
   };
 
+  const getListFriend = async () => {
+    await FriendApi.getListFriend()
+      .then((res) => {
+        setListFriend(res.data.data);
+        setListFriendRender(
+          res.data.data.length <= 6 ? res.data.data : res.data.data.slice(0, 5)
+        );
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
   useEffect(() => {
     getUserInfo();
     getListPost();
     checkFriend();
+    if (userId === user.id) {
+      getListFriend();
+    }
   }, []);
 
   return (
@@ -338,82 +356,90 @@ const Profile = ({ route, navigation }) => {
             </View>
           </View>
         </View>
-        <View
-          style={{
-            backgroundColor: "#fff",
-            marginTop: 10,
-            paddingVertical: 10,
-            paddingHorizontal: 15,
-          }}
-        >
-          <View>
-            <Text style={{ fontSize: 20, fontWeight: "700" }}>Bạn bè</Text>
-            <Text>244 người bạn</Text>
-          </View>
-          <View>
-            <View
-              style={{
-                display: "flex",
-                flexWrap: "wrap",
-                justifyContent: "space-between",
-                flexDirection: "row",
-                gap: 10,
-              }}
-            >
-              {[1, 2, 3, 4, 5, 6].map((item) => {
-                return (
-                  <TouchableOpacity>
-                    <View
-                      style={{
-                        marginBottom: 5,
-                      }}
-                    >
-                      <Image
-                        style={{ width: 115, height: 115, borderRadius: 10 }}
-                        source={{
-                          uri: "https://source.unsplash.com/random?sig=10",
-                        }}
-                      ></Image>
-                      <Text
-                        style={{
-                          marginLeft: 5,
-                          marginTop: 5,
-                          overflow: "hidden",
-                          fontSize: 16,
-                          fontWeight: "600",
-                        }}
-                      >
-                        Nobita
-                      </Text>
-                    </View>
-                  </TouchableOpacity>
-                );
-              })}
+        {userId === user.id && (
+          <View
+            style={{
+              backgroundColor: "#fff",
+              marginTop: 10,
+              paddingVertical: 10,
+              paddingHorizontal: 15,
+            }}
+          >
+            <View style={{ marginBottom: 10 }}>
+              <Text style={{ fontSize: 20, fontWeight: "700" }}>Bạn bè</Text>
+              <Text>{listFriend.length} người bạn</Text>
             </View>
             <View>
-              <TouchableOpacity
+              <View
                 style={{
-                  width: "100%",
-                  marginTop: 10,
-                  paddingVertical: 5,
-                  borderRadius: 8,
-                  backgroundColor: "#e4e4e4",
+                  display: "flex",
+                  flexWrap: "wrap",
+                  justifyContent: "space-between",
+                  flexDirection: "row",
+                  gap: 10,
                 }}
               >
-                <Text
-                  style={{
-                    textAlign: "center",
-                    fontSize: 16,
-                    fontWeight: "600",
-                  }}
-                >
-                  {" "}
-                  Xem tất cả bạn bè
-                </Text>
-              </TouchableOpacity>
+                {listFriendRender.map((item) => {
+                  return (
+                    <TouchableOpacity style={{ width: "33%" }} key={item.id}>
+                      <View
+                        style={{
+                          marginBottom: 5,
+                          width: "95%",
+                        }}
+                      >
+                        <Image
+                          style={{
+                            width: "100%",
+                            height: 115,
+                            borderRadius: 10,
+                          }}
+                          source={{
+                            uri: item.avatar,
+                          }}
+                        ></Image>
+                        <Text
+                          style={{
+                            marginLeft: 5,
+                            marginTop: 5,
+                            overflow: "hidden",
+                            fontSize: 16,
+                            fontWeight: "600",
+                          }}
+                        >
+                          {item.name}
+                        </Text>
+                      </View>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+              <View>
+                {listFriend.length > 6 && (
+                  <TouchableOpacity
+                    style={{
+                      width: "100%",
+                      marginTop: 10,
+                      paddingVertical: 5,
+                      borderRadius: 8,
+                      backgroundColor: "#e4e4e4",
+                    }}
+                  >
+                    <Text
+                      style={{
+                        textAlign: "center",
+                        fontSize: 16,
+                        fontWeight: "600",
+                      }}
+                    >
+                      Xem tất cả bạn bè
+                    </Text>
+                  </TouchableOpacity>
+                )}
+              </View>
             </View>
           </View>
-        </View>
+        )}
         <View>
           {listPost.map((item) => (
             <Post id={item.id} />

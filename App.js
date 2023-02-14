@@ -30,6 +30,7 @@ import ListEmoji from "./Screens/ListEmoji.js";
 import { io } from "socket.io-client";
 import * as SecureStore from "expo-secure-store";
 import { useRef } from "react";
+import WaitingPage from "./Screens/WaitingPage.js";
 const Stack = createStackNavigator();
 const rootStack = createStackNavigator();
 
@@ -243,6 +244,7 @@ export default function App() {
     <Provider store={store}>
       <NavigationContainer ref={navigationRef}>
         <rootStack.Navigator screenOptions={navigationOptions}>
+          <rootStack.Screen component={WaitingPage} name="waiting" />
           <rootStack.Screen component={LoginPage} name="login" />
           <rootStack.Screen component={VerifyEmail} name="verify" />
           <rootStack.Screen component={MainTab} name="facebook" />

@@ -16,13 +16,19 @@ import { upPostApi } from "../apis/Post/upPostApi";
 import { Video } from "expo-av";
 import { useSelector } from "react-redux";
 import { useEffect } from "react";
+import { constant } from "../utils/constant";
 
 const CreatePost = ({ route, navigation }) => {
   const [content, setContent] = useState(null);
   const [image, setImage] = useState([]);
   const [video, setVideo] = useState({});
+  const [mood, setMood] = useState(null);
   const windowWidth = Dimensions.get("window").width;
   const user = useSelector((state) => state.user.user);
+
+  const updateMood = (value) => {
+    setMood(value);
+  };
 
   const permissionRequest = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -97,6 +103,10 @@ const CreatePost = ({ route, navigation }) => {
             : `my_profile${Date.now()}.mp4`,
       });
     }
+    if (mood) {
+      data.append("status", mood);
+    }
+    console.log(data);
     const res = upPostApi.post(data);
     res
       .then((res) => {
@@ -186,7 +196,15 @@ const CreatePost = ({ route, navigation }) => {
               marginRight: 10,
             }}
           ></Image>
-          <Text style={{ fontSize: 15 }}>{user.name}</Text>
+          <Text style={{ fontSize: 18, fontWeight: "600" }}>{user.name}</Text>
+          <Text style={{ fontSize: 16, lineHeight: 24 }}>
+            {mood &&
+              ` - Đang ${
+                constant.EMOJI.find((item) => item.value === mood).img
+              } cảm thấy ${
+                constant.EMOJI.find((item) => item.value === mood).text
+              }.`}
+          </Text>
         </View>
         <View>
           <TextInput
@@ -267,7 +285,7 @@ const CreatePost = ({ route, navigation }) => {
           }}
           onPress={() => {
             navigation.navigate("listEmoji", {
-              onGoBack,
+              updateData: updateMood,
             });
           }}
         >

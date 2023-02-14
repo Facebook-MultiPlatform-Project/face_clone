@@ -13,6 +13,7 @@ import { useEffect } from "react";
 import { navigation } from "../rootNavigation";
 import { useSelector } from "react-redux";
 import { PostApi } from "../apis/Post/Post";
+import { constant } from "../utils/constant";
 
 const Post = ({ id }) => {
   const [postData, setPostData] = useState({});
@@ -24,6 +25,7 @@ const Post = ({ id }) => {
   const getPostData = async () => {
     await PostApi.getPost(id)
       .then((res) => {
+        console.log(res.data.data);
         setPostData(res.data.data);
         setAuthor(res.data.data.author);
       })
@@ -67,7 +69,18 @@ const Post = ({ id }) => {
             </View>
           </TouchableOpacity>
           <View style={{ marginLeft: 10 }}>
-            <Text style={{ fontWeight: "500" }}>{author.name}</Text>
+            <Text style={{ fontWeight: "600", fontSize: 17 }}>
+              {author.name}
+            </Text>
+            {postData.status && (
+              <Text style={{ fontSize: 15 }}>{` - Đang ${
+                constant.EMOJI.find((item) => item.value === postData.status)
+                  .img
+              } cảm thấy ${
+                constant.EMOJI.find((item) => item.value === postData.status)
+                  .text
+              }.`}</Text>
+            )}
           </View>
           <View style={{ marginLeft: "auto" }}>
             <Icon name="ellipsis-horizontal" type="ionicon"></Icon>
@@ -75,10 +88,10 @@ const Post = ({ id }) => {
         </View>
         <View style={styles.content}>
           <View style={[styles.description]}>
-            <Text>{postData.content}</Text>
+            <Text style={{ fontSize: 16 }}>{postData.content}</Text>
           </View>
-          <SafeAreaView style={{ minHeight: 380, maxHeight: 570 }}>
-            {postData.medias[0] && postData.medias[0].type === "0" && (
+          {postData.medias[0] && postData.medias[0].type === "0" ? (
+            <SafeAreaView style={{ minHeight: 380, maxHeight: 570 }}>
               <FlatList
                 data={postData.medias}
                 scrollEnabled={false}
@@ -96,9 +109,10 @@ const Post = ({ id }) => {
                   />
                 )}
               />
-            )}
-            {}
-          </SafeAreaView>
+            </SafeAreaView>
+          ) : (
+            <View style={{ height: 10 }}></View>
+          )}
         </View>
         <View>
           <View
@@ -194,6 +208,7 @@ const styles = StyleSheet.create({
     borderColor: "#bababa",
   },
   description: {
-    marginBottom: 5,
+    marginVertical: 5,
+    paddingHorizontal: 5,
   },
 });

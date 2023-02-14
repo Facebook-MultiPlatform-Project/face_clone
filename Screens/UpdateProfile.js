@@ -88,11 +88,12 @@ const UpdateProfile = ({ navigation }) => {
         console.log(err);
       });
   };
-
+  const onGoBack = () => {
+    getUserInfo();
+  };
   const getUserInfo = async () => {
     await UserApi.getInfo(user.id)
       .then((res) => {
-        console.log("data", res.data.data);
         const data = res.data.data;
         setAvatar(data.avatar);
         setCover(data.cover);
@@ -271,7 +272,7 @@ const UpdateProfile = ({ navigation }) => {
             </Text>
             <TouchableOpacity
               onPress={() => {
-                navigation.navigate("updateDetail");
+                navigation.navigate("updateDetail", { updateData: onGoBack });
               }}
             >
               <Text
