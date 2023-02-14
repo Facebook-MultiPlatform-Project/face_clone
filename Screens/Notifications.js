@@ -12,6 +12,7 @@ import { NotificationApi } from "../apis/Notification/notificationApi";
 import { getTimeDisplay } from "../utils";
 
 const NotiItems = ({ avatar, content, isRead, createdAt }) => {
+
   return (
     <TouchableOpacity
       style={{
