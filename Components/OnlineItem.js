@@ -6,7 +6,7 @@ const OnlineItem = ({ item }) => {
   return (
     <TouchableOpacity
       onPress={() => {
-        navigation.navigate();
+        navigation.navigate("chat", { userId: item.id });
       }}
       style={{
         marginRight: 10,
