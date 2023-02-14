@@ -29,4 +29,8 @@ export const FriendApi = {
     const url = "/friends/get-user-friends";
     return axiosClient.get(url);
   },
+  getRequestFriend: ()=>{
+    const url = '/friends/get-requested-friends'
+    return axiosClient.get(url)
+  }
 };
