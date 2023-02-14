@@ -13,8 +13,8 @@ import { getAllComment } from "../apis/Comment/getComment";
 import { postComment } from "../apis/Comment/postComment";
 import { Keyboard } from "react-native";
 
-const CommentPage = (postID) => {
-  postID = "f46c9a93-0a9b-4133-8a1d-9e4e8115aa72";
+const CommentPage = ({ postID = "f46c9a93-0a9b-4133-8a1d-9e4e8115aa72" }) => {
+  // postID = "f46c9a93-0a9b-4133-8a1d-9e4e8115aa72";
   const [data, setData] = useState([]);
   const [numComments, setNumComments] = useState(data.length);
   const [cmt, setCmt] = useState("");
@@ -160,7 +160,7 @@ const CommentBox = (props) => {
         marginLeft: 10,
       }}
     >
-      <Avatar.Image size={40} source={{uri:props.avatar}} />
+      <Avatar.Image size={40} source={{ uri: props.avatar }} />
 
       <View
         style={{

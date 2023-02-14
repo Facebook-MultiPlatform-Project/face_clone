@@ -9,7 +9,6 @@ import React, { useState } from "react";
 import { Icon, Input } from "react-native-elements";
 import { EMAIL_REGEX } from "../common/regex";
 import { signupApi } from "../apis/Auth/signupApi";
-import axios from "axios";
 import { navigation } from "../rootNavigation";
 
 const LoginPage = () => {

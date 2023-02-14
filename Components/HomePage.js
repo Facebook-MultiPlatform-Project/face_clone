@@ -8,44 +8,50 @@ import { Icon } from "react-native-elements";
 import { useSelector } from "react-redux";
 import { useState } from "react";
 import { PostApi } from "../apis/Post/Post";
+import { useEffect } from "react";
 
 const HomePage = () => {
-  const user = useSelector((state) => state);
+  const user = useSelector((state) => state.user.user);
+  console.log(2222, user);
   const [listPost, setListPost] = useState([]);
 
   const getListPost = async () => {
-    await PostApi.getAll()
-      .then((res) => {
-        console.log(res);
-      })
-      .then((err) => {
-        console.log(err);
-      });
+    setTimeout(async () => {
+      await PostApi.getAll()
+        .then((res) => {
+          setListPost(res.data.data.map((item) => item.id));
+        })
+        .then((err) => {
+          console.log(err);
+        });
+    }, 1000);
   };
-  console.log(user);
+  useEffect(() => {
+    getListPost();
+  }, [user]);
   return (
     <View>
       <ScrollView
         horizontal={false}
         style={{ display: "flex", flexDirection: "column" }}
       >
-        <TouchableOpacity
-          onPress={() => {
-            navigation.navigate("createPost");
+        <View
+          style={{
+            flexDirection: "row",
+            paddingHorizontal: 20,
+            paddingVertical: 10,
+            backgroundColor: "#fff",
+            alignItems: "center",
           }}
         >
-          <View
-            style={{
-              flexDirection: "row",
-              paddingHorizontal: 20,
-              paddingVertical: 10,
-              backgroundColor: "#fff",
-              alignItems: "center",
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate("profile", { userId: user.id });
             }}
           >
             <Image
               source={{
-                uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHMbNbn5XcHIXV3PoLxkmsKdTQIbNffNpyuQ&usqp=CAU",
+                uri: user.avatar,
               }}
               style={{
                 width: 40,
@@ -54,11 +60,22 @@ const HomePage = () => {
                 marginRight: 10,
               }}
             ></Image>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+            }}
+            onPress={() => {
+              navigation.navigate("createPost");
+            }}
+          >
             <TextInput
               placeholder="Bạn đang nghĩ gì..."
               style={{
                 borderRadius: 100,
-                flex: 1,
+                width: 270,
                 borderWidth: 1,
                 borderColor: "#CFCFD5",
                 paddingHorizontal: 20,
@@ -67,13 +84,13 @@ const HomePage = () => {
               }}
             ></TextInput>
             <Icon type="ionicon" name="images" color={"#58C472"}></Icon>
-          </View>
-        </TouchableOpacity>
+          </TouchableOpacity>
+        </View>
 
-        <Post />
-        <Post />
-        <Post />
-        <Post />
+        {listPost[0] &&
+          listPost.map((item) => {
+            return <Post id={item} key={item} />;
+          })}
       </ScrollView>
     </View>
   );
