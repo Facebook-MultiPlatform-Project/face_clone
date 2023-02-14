@@ -26,7 +26,6 @@ import Menu from "./Screens/Menu.js";
 import CommentPage from "./Screens/Comments.js";
 import { useEffect } from "react";
 import UpdateDetail from "./Screens/updateDetail";
-import Notifications from "./Screens/Notifications.js";
 import { io } from "socket.io-client";
 import * as SecureStore from "expo-secure-store";
 import { useRef } from "react";
