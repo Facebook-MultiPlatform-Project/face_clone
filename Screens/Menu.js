@@ -47,7 +47,7 @@ const Menu = () => {
   const [user, setUser] = useState();
   const getUserInfo = async () => {
     try {
-      const data = await UserApi.getInfo();
+      const data = await UserApi.getProfile();
       setUser(data.data.data);
     } catch (err) {
       console.log(err);
