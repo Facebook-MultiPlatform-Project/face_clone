@@ -187,33 +187,6 @@ export const MainTab = () => {
         <Tab.Screen
           options={{
             tabBarIcon: ({ tintColor, focused }) => (
-              <Icon
-                name="person"
-                size={25}
-                color={focused ? "#318bfb" : "#ddd"}
-              ></Icon>
-            ),
-            headerShown: true,
-          }}
-          name="Profile"
-          component={ProfileTab}
-        />
-        <Tab.Screen
-          options={{
-            tabBarIcon: ({ tintColor, focused }) => (
-              <Icon
-                name="email"
-                size={25}
-                color={focused ? "#318bfb" : "#ddd"}
-              ></Icon>
-            ),
-          }}
-          name="Messenger"
-          component={MessengerTab}
-        />
-        <Tab.Screen
-          options={{
-            tabBarIcon: ({ tintColor, focused }) => (
               <View>
                 <Icon
                   name="notifications"
