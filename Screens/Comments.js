@@ -13,8 +13,10 @@ import { getAllComment } from "../apis/Comment/getComment";
 import { postComment } from "../apis/Comment/postComment";
 import { Keyboard } from "react-native";
 import { navigation } from "../rootNavigation";
-const CommentPage = ({ postID = "f46c9a93-0a9b-4133-8a1d-9e4e8115aa72" }) => {
 
+
+const CommentPage = ({ postID = "f46c9a93-0a9b-4133-8a1d-9e4e8115aa72" }) => {
+  // postID = "f46c9a93-0a9b-4133-8a1d-9e4e8115aa72";
   const [data, setData] = useState([]);
   const [numComments, setNumComments] = useState(data.length);
   const [cmt, setCmt] = useState("");

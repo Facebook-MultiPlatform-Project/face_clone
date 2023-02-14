@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import React, { useState } from "react";
 import * as SecureStore from "expo-secure-store";
-import { Icon, Input } from "react-native-elements";
+import { Input } from "react-native-elements";
 import { loginApi } from "../apis/Auth/loginApi";
 import { EMAIL_REGEX } from "../common/regex";
 import { getToken } from "../utils/getToken";
@@ -48,7 +48,6 @@ const LoginPage = () => {
     return true;
   };
   const handleSubmit = async () => {
-    console.log("asds");
     if (validate()) {
       setIsSubmitting(true);
       const data = {

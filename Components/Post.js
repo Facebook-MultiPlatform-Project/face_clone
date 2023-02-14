@@ -10,111 +10,141 @@ import {
 import React, { useState } from "react";
 import { Icon, Image } from "react-native-elements";
 import { useEffect } from "react";
-import { ScrollView } from "react-native";
 import { navigation } from "../rootNavigation";
 import { useSelector } from "react-redux";
-// import ScaleImage from "./Image";
+import { PostApi } from "../apis/Post/Post";
 
-const Post = () => {
-  const BASE_URI = "https://source.unsplash.com/random?sig=";
-  const [likes, setLikes] = useState(100);
-  const [comments, setComments] = useState(200);
+const Post = ({ id }) => {
+  const [postData, setPostData] = useState({});
+  const [author, setAuthor] = useState({});
 
   const [full, setFull] = useState(false);
   const user = useSelector((state) => state.user.user);
+
+  const getPostData = async () => {
+    await PostApi.getPost(id)
+      .then((res) => {
+        setPostData(res.data.data);
+        setAuthor(res.data.data.author);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+  const likePost = async () => {
+    await PostApi.likePost(id)
+      .then((res) => {
+        getPostData();
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
   useEffect(() => {
     LogBox.ignoreLogs(["VirtualizedLists should never be nested"]);
+    getPostData();
   }, []);
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => {
-            navigation.navigate("profile", {
-              userId: user.id,
-            });
-          }}
-        >
-          <View style={styles.avatar}>
-            <Image
-              source={{
-                uri: "https://source.unsplash.com/random?sig=10",
-              }}
-              containerStyle={styles.avatar_img}
-            ></Image>
-          </View>
-        </TouchableOpacity>
-        <View style={{ marginLeft: 10 }}>
-          <Text style={{ fontWeight: "500" }}>Nobi Nobita</Text>
-        </View>
-        <View style={{ marginLeft: "auto" }}>
-          <Icon name="ellipsis-horizontal" type="ionicon"></Icon>
-        </View>
-      </View>
-
-      <View style={styles.content}>
-        <View style={full ? styles.desc_full : styles.desc_short}>
-          <Text>
-            Tại trận chung kết, các vận động viên đều đã biểu diễn hết sức mình
-            để phô ra những ván bóng đẹp mắt làm hài lòng khán giả. Set đấu đầu
-            tiên chỉ chứng kiến sự chênh lệch 2 điểm với chiến thắng nghiêng về
-            VĐV Nguyễn Trọng Hiếu. Trong khi đó, VĐV Nguyễn Vũ Tuấn cũng đã
-            chứng tỏ bản lĩnh khi vươn lên dẫn trước 2-1 ở set thứ 3. Ở 2 set
-            đấu cuối cùng kết quả chia đều cho 2 bên với chiến thắng chung cuộc
-            dành cho VĐV Nguyễn Vũ Tuấn.
-          </Text>
-        </View>
-        <SafeAreaView style={{ minHeight: 380, maxHeight: 570 }}>
-          <FlatList
-            data={[...new Array(4)].map((_, i) => i.toString())}
-            // style={}
-            scrollEnabled={false}
-            numColumns={2}
-            keyExtractor={(e) => e}
-            renderItem={({ item }) => (
+    postData.id && (
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate("profile", {
+                userId: author.id,
+              });
+            }}
+          >
+            <View style={styles.avatar}>
               <Image
-                source={{ uri: BASE_URI + item }}
-                containerStyle={{
-                  aspectRatio: 1,
-                  width: "100%",
-                  height: 150,
-                  flex: 1,
+                source={{
+                  uri: author.avatar,
                 }}
+                containerStyle={styles.avatar_img}
+              ></Image>
+            </View>
+          </TouchableOpacity>
+          <View style={{ marginLeft: 10 }}>
+            <Text style={{ fontWeight: "500" }}>{author.name}</Text>
+          </View>
+          <View style={{ marginLeft: "auto" }}>
+            <Icon name="ellipsis-horizontal" type="ionicon"></Icon>
+          </View>
+        </View>
+        <View style={styles.content}>
+          <View style={[styles.description]}>
+            <Text>{postData.content}</Text>
+          </View>
+          <SafeAreaView style={{ minHeight: 380, maxHeight: 570 }}>
+            {postData.medias[0] && postData.medias[0].type === "0" && (
+              <FlatList
+                data={postData.medias}
+                scrollEnabled={false}
+                numColumns={2}
+                keyExtractor={(e) => e.id}
+                renderItem={({ item }) => (
+                  <Image
+                    source={{ uri: item.name }}
+                    containerStyle={{
+                      aspectRatio: 1,
+                      width: "100%",
+                      height: 150,
+                      flex: 1,
+                    }}
+                  />
+                )}
               />
             )}
-          />
-        </SafeAreaView>
-      </View>
-      <View style={{}}>
-        <View
-          style={{
-            flexDirection: "row",
-            paddingHorizontal: 10,
-            paddingVertical: 10,
-            justifyContent: "space-between",
-          }}
-        >
-          <Text style={{ fontWeight: "500" }}>{likes} likes</Text>
-          <Text style={{ fontWeight: "500" }}>{comments} Bình luận</Text>
+            {}
+          </SafeAreaView>
         </View>
-        <View
-          style={{
-            flexDirection: "row",
-            paddingHorizontal: 5,
-          }}
-        >
-          <TouchableOpacity style={styles.button}>
-            <Icon name="thumbs-up" type="font-awesome"></Icon>
-            <Text style={{ marginLeft: 10 }}>Thích</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.button}>
-            <Icon name="comment" type="font-awesome"></Icon>
-            <Text style={{ marginLeft: 10 }}>Bình luận</Text>
-          </TouchableOpacity>
+        <View>
+          <View
+            style={{
+              flexDirection: "row",
+              paddingHorizontal: 10,
+              paddingVertical: 10,
+              justifyContent: "space-between",
+            }}
+          >
+            <Text style={{ fontWeight: "500" }}>{postData.numLikes} likes</Text>
+            <Text style={{ fontWeight: "500" }}>
+              {postData.numComments} Bình luận
+            </Text>
+          </View>
+          <View
+            style={{
+              flexDirection: "row",
+              paddingHorizontal: 5,
+            }}
+          >
+            {postData.is_liked ? (
+              <TouchableOpacity style={styles.button}>
+                <Icon color="#4292FF" name="thumb-up" type="material" />
+                <Text style={{ marginLeft: 10, color: "#4292FF" }}>Thích</Text>
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity style={styles.button} onPress={likePost}>
+                <Icon type="material" name="thumb-up" color="#000"></Icon>
+                <Text style={{ marginLeft: 10 }}>Thích</Text>
+              </TouchableOpacity>
+            )}
+
+            <TouchableOpacity
+              style={styles.button}
+              // onPress={() => {
+              //   navigation.navigate("comment");
+              // }}
+            >
+              <Icon type="primary" name="chat-bubble"></Icon>
+              <Text style={{ marginLeft: 10 }}>Bình luận</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
-    </View>
+    )
   );
 };
 
@@ -162,5 +192,8 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     borderTopWidth: 1,
     borderColor: "#bababa",
+  },
+  description: {
+    marginBottom: 5,
   },
 });

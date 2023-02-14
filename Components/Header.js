@@ -40,8 +40,7 @@ const HeaderOut = () => {
       >
         <TouchableOpacity
           onPress={() => {
-            //find user navigate
-            console.log("log");
+            navigation.navigate("search");
           }}
           style={{
             backgroundColor: "#eeeeee",
