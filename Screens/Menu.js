@@ -48,7 +48,6 @@ const Menu = () => {
   const getUserInfo = async () => {
     try {
       const data = await UserApi.getInfo();
-      console.log("data", data.data.data);
       setUser(data.data.data);
     } catch (err) {
       console.log(err);
@@ -96,7 +95,7 @@ const Menu = () => {
             }}
           ></Image>
         </View>
-        <View >
+        <View>
           <Text style={{ color: "#333", fontWeight: "600", fontSize: 24 }}>
             {user && user.name}
           </Text>

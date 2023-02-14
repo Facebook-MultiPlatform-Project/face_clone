@@ -13,13 +13,16 @@ import { Icon, Image } from "react-native-elements";
 import * as ImagePicker from "expo-image-picker";
 import { useState } from "react";
 import { upPostApi } from "../apis/Post/upPostApi";
-import Video from "react-native-video";
+import { Video } from "expo-av";
+import { useSelector } from "react-redux";
+import { useEffect } from "react";
 
-const CreatePost = () => {
+const CreatePost = ({ route, navigation }) => {
   const [content, setContent] = useState(null);
   const [image, setImage] = useState([]);
   const [video, setVideo] = useState({});
   const windowWidth = Dimensions.get("window").width;
+  const user = useSelector((state) => state.user.user);
 
   const permissionRequest = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -36,30 +39,36 @@ const CreatePost = () => {
         allowsMultipleSelection: true,
         selectionLimit: 4,
       });
-      if (result.selected) {
-        console.log(result.selected);
-        const arr = image.concat(result.selected);
-        console.log("array", arr);
-        setImage(arr);
-      } else {
-        console.log(result);
-        const a = image.concat([result]);
-        setImage(a);
+      if (!result.cancelled) {
+        if (result.selected) {
+          if (result.selected.length + image.length > 4)
+            alert("Chỉ có thể up 4 ảnh!!!");
+          else {
+            const arr = image.concat(result.selected);
+            setImage(arr);
+          }
+        } else {
+          const a = image.concat([result]);
+          setImage(a);
+        }
       }
     }
   };
   const handleAddImage = () => {
-    if (image.length < 4) uploadImage();
-    else alert("chỉ dược up tối đa 4 ảnh");
+    if (video.uri) alert("Chỉ được up 4 ảnh hoặc 1 video");
+    else if (image.length < 4) uploadImage();
+    else alert("Chỉ dược up tối đa 4 ảnh!!!");
   };
   const handleUploadVideo = async () => {
-    await permissionRequest();
-    if (permissionRequest()) {
-      let result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: "Videos",
-      });
-      console.log(result);
-      setVideo(result);
+    if (image[0] || video.uri) alert("Chỉ được up 4 ảnh hoặc 1 video");
+    else {
+      await permissionRequest();
+      if (permissionRequest()) {
+        let result = await ImagePicker.launchImageLibraryAsync({
+          mediaTypes: "Videos",
+        });
+        if (!result.cancelled) setVideo(result);
+      }
     }
   };
   const handleSubmit = async () => {
@@ -88,15 +97,13 @@ const CreatePost = () => {
             : `my_profile${Date.now()}.mp4`,
       });
     }
-    console.log("dadsd");
     const res = upPostApi.post(data);
     res
       .then((res) => {
-        console.log("asdad", res.data);
+        navigation.navigate("facebook");
       })
       .catch((err) => console.log("err", err));
   };
-
   return (
     <View
       style={{
@@ -108,21 +115,38 @@ const CreatePost = () => {
         style={{
           flexDirection: "row",
           justifyContent: "space-between",
-          paddingHorizontal: 20,
+          paddingRight: 20,
+          paddingLeft: 10,
           paddingTop: 40,
           paddingBottom: 10,
           borderBottomColor: "#aaa",
           borderBottomWidth: 1,
         }}
       >
-        <Text
+        <View
           style={{
-            fontSize: 20,
-            fontWeight: "600",
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
           }}
         >
-          Tạo bài viết
-        </Text>
+          <TouchableOpacity
+            onPress={() => {
+              navigation.goBack();
+            }}
+            style={{ marginRight: 10 }}
+          >
+            <Icon type="material" name="arrow-back"></Icon>
+          </TouchableOpacity>
+          <Text
+            style={{
+              fontSize: 20,
+              fontWeight: "600",
+            }}
+          >
+            Tạo bài viết
+          </Text>
+        </View>
         <TouchableOpacity
           onPress={handleSubmit}
           style={{
@@ -153,7 +177,7 @@ const CreatePost = () => {
         >
           <Image
             source={{
-              uri: "https://source.unsplash.com/random?sig=10",
+              uri: user.avatar,
             }}
             style={{
               width: 40,
@@ -162,7 +186,7 @@ const CreatePost = () => {
               marginRight: 10,
             }}
           ></Image>
-          <Text style={{ fontSize: 15 }}>Nobi Nobita</Text>
+          <Text style={{ fontSize: 15 }}>{user.name}</Text>
         </View>
         <View>
           <TextInput
@@ -173,13 +197,21 @@ const CreatePost = () => {
             style={{ padding: 15, fontSize: 20 }}
           ></TextInput>
         </View>
+        {video.uri ? (
+          <Video
+            source={{ uri: video.uri }}
+            style={{ width: "100%", height: 300, bottom: 0 }}
+            isLooping
+          ></Video>
+        ) : (
+          <View style={{ height: 0 }}></View>
+        )}
         {image[0] || video.uri ? (
           <SafeAreaView style={{ minHeight: 380, maxHeight: 570 }}>
             <FlatList
               data={image}
-              // style={}
               numColumns={2}
-              keyExtractor={(e) => e}
+              keyExtractor={(e) => e.uri}
               renderItem={({ item }) => {
                 return (
                   <Image
@@ -233,7 +265,11 @@ const CreatePost = () => {
             width: "25%",
             alignItems: "center",
           }}
-          onPress={handleUploadVideo}
+          onPress={() => {
+            navigation.navigate("listEmoji", {
+              onGoBack,
+            });
+          }}
         >
           <Icon type="material" name="mood" color={"#F8C03E"}></Icon>
         </TouchableOpacity>

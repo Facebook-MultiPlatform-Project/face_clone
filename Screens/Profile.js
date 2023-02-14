@@ -10,24 +10,25 @@ import React from "react";
 import { useSelector } from "react-redux";
 import Post from "../Components/Post";
 import { Icon } from "react-native-elements";
-import { navigation } from "../rootNavigation";
 import { useState } from "react";
 import { useEffect } from "react";
 import { PostApi } from "../apis/Post/Post";
 import { UserApi } from "../apis/User/UserApi";
 import { FriendApi } from "../apis/Friend/Friend";
+import { constant } from "../utils/constant";
 
 const Profile = ({ route, navigation }) => {
   const userId = route.params.userId;
-  console.log(userId);
   const [listPost, setListPost] = useState([]);
   const [info, setInfo] = useState({});
   const [isFriend, setIsFriend] = useState(false);
+  const [status, setStatus] = useState(null);
+  const [isSender, setIsSender] = useState(false);
   const user = useSelector((state) => state.user.user);
   const getUserInfo = async () => {
     await UserApi.getInfo(userId)
       .then((res) => {
-        console.log(res.data);
+        console.log("info", res.data);
         setInfo(res.data.data);
       })
       .catch((err) => {
@@ -36,9 +37,8 @@ const Profile = ({ route, navigation }) => {
   };
 
   const getListPost = async () => {
-    await PostApi.getPostByUser({ author: userId, take: 10, skip: 0 })
+    await PostApi.getPostByUser({ id: userId, take: 10, skip: 0 })
       .then((res) => {
-        console.log(res);
         setListPost(res.data.data.items);
       })
       .catch((err) => {
@@ -50,6 +50,9 @@ const Profile = ({ route, navigation }) => {
     await FriendApi.checkFriend(userId)
       .then((res) => {
         console.log(res.data);
+        setIsFriend(res.data.data.isFriend);
+        setIsSender(res.data.data.isSender);
+        setStatus(res.data.data.status);
       })
       .catch((err) => {
         console.log(err);
@@ -60,16 +63,18 @@ const Profile = ({ route, navigation }) => {
     await FriendApi.sendRequest(userId)
       .then((res) => {
         console.log(res.data);
+        setIsSender(true);
+        setStatus("0");
       })
       .catch((err) => {
         console.log(err);
       });
   };
 
-  const setAccept = async () => {
+  const setAccept = async (isAccept) => {
     const data = {
       id: userId,
-      isAccept: true,
+      isAccept,
     };
     await FriendApi.setAccept(data)
       .then((res) => {
@@ -79,10 +84,11 @@ const Profile = ({ route, navigation }) => {
         console.log(err);
       });
   };
-  const cancelAccept = async () => {
+  const cancelRequest = async () => {
     await FriendApi.cancelRequest(userId)
       .then((res) => {
         console.log(res.data);
+        setStatus("2");
       })
       .catch((err) => {
         console.log(err);
@@ -116,6 +122,7 @@ const Profile = ({ route, navigation }) => {
   useEffect(() => {
     getUserInfo();
     getListPost();
+    checkFriend();
   }, []);
 
   return (
@@ -196,25 +203,139 @@ const Profile = ({ route, navigation }) => {
             }}
           >
             <Text style={{ fontSize: 25, fontWeight: "700" }}>{info.name}</Text>
-            {userId === user.id && (
-              <TouchableOpacity
-                onPress={() => {
-                  navigation.navigate({ name: "updateProfile" });
-                }}
-                style={{
-                  height: 30,
-                  width: 30,
-                  borderRadius: 4,
-                  display: "flex",
-                  justifyContent: "center",
-                  flexDirection: "row",
-                  alignItems: "center",
-                  backgroundColor: "#3982E4",
-                }}
-              >
-                <Icon name="edit" type="material" color="#fff"></Icon>
-              </TouchableOpacity>
-            )}
+            <View
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "flex-end",
+              }}
+            >
+              {userId === user.id ? (
+                <TouchableOpacity
+                  onPress={() => {
+                    navigation.navigate({ name: "updateProfile" });
+                  }}
+                  style={{
+                    height: 30,
+                    width: 30,
+                    borderRadius: 4,
+                    display: "flex",
+                    justifyContent: "center",
+                    flexDirection: "row",
+                    alignItems: "center",
+                    backgroundColor: "#3982E4",
+                  }}
+                >
+                  <Icon name="edit" type="material" color="#fff"></Icon>
+                </TouchableOpacity>
+              ) : isFriend ? (
+                <TouchableOpacity
+                  onPress={removeFriend}
+                  style={{
+                    height: 30,
+                    width: 100,
+                    borderRadius: 4,
+                    display: "flex",
+                    justifyContent: "center",
+                    flexDirection: "row",
+                    alignItems: "center",
+                    backgroundColor: "#3982E4",
+                  }}
+                >
+                  <Text style={{ color: "#fff" }}>Hủy kết bạn</Text>
+                </TouchableOpacity>
+              ) : status !== constant.FRIEND_STATUS.SEND_REQUEST ? (
+                <TouchableOpacity
+                  onPress={sendRequest}
+                  style={{
+                    height: 30,
+                    width: 140,
+                    borderRadius: 4,
+                    display: "flex",
+                    justifyContent: "center",
+                    flexDirection: "row",
+                    alignItems: "center",
+                    backgroundColor: "#3982E4",
+                  }}
+                >
+                  <Text style={{ color: "#fff" }}>Yêu cầu kết bạn</Text>
+                </TouchableOpacity>
+              ) : status === constant.FRIEND_STATUS.SEND_REQUEST && isSender ? (
+                <TouchableOpacity
+                  onPress={cancelRequest}
+                  style={{
+                    height: 30,
+                    width: 100,
+                    borderRadius: 4,
+                    display: "flex",
+                    justifyContent: "center",
+                    flexDirection: "row",
+                    alignItems: "center",
+                    backgroundColor: "#3982E4",
+                  }}
+                >
+                  <Text style={{ color: "#fff" }}>Hủy yêu cầu</Text>
+                </TouchableOpacity>
+              ) : status === constant.FRIEND_STATUS.SEND_REQUEST &&
+                !isSender ? (
+                <View>
+                  <TouchableOpacity
+                    onPress={() => {
+                      setAccept(true);
+                    }}
+                    style={{
+                      height: 30,
+                      width: 100,
+                      borderRadius: 4,
+                      display: "flex",
+                      justifyContent: "center",
+                      flexDirection: "row",
+                      alignItems: "center",
+                      backgroundColor: "#3982E4",
+                    }}
+                  >
+                    <Text style={{ color: "#fff" }}>Đồng ý</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => {
+                      setAccept(false);
+                    }}
+                    style={{
+                      height: 30,
+                      width: 100,
+                      borderRadius: 4,
+                      display: "flex",
+                      justifyContent: "center",
+                      flexDirection: "row",
+                      alignItems: "center",
+                      backgroundColor: "#E4E5EA",
+                    }}
+                  >
+                    <Text style={{ color: "#000" }}>Xóa</Text>
+                  </TouchableOpacity>
+                </View>
+              ) : (
+                <></>
+              )}
+              {userId !== user.id && (
+                <TouchableOpacity
+                  onPress={setBlock}
+                  style={{
+                    marginTop: 10,
+                    height: 30,
+                    width: 100,
+                    borderRadius: 4,
+                    display: "flex",
+                    justifyContent: "center",
+                    flexDirection: "row",
+                    alignItems: "center",
+                    backgroundColor: "#E4E5EA",
+                  }}
+                >
+                  <Text style={{ color: "#000", fontWeight: "500" }}>Chặn</Text>
+                </TouchableOpacity>
+              )}
+            </View>
           </View>
         </View>
         <View
@@ -294,10 +415,9 @@ const Profile = ({ route, navigation }) => {
           </View>
         </View>
         <View>
-          <Post />
-          <Post />
-          <Post />
-          <Post />
+          {listPost.map((item) => (
+            <Post id={item.id} />
+          ))}
         </View>
       </ScrollView>
     </View>

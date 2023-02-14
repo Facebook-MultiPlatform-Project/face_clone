@@ -26,6 +26,7 @@ import Menu from "./Screens/Menu.js";
 import CommentPage from "./Screens/Comments.js";
 import { useEffect } from "react";
 import UpdateDetail from "./Screens/updateDetail";
+import ListEmoji from "./Screens/ListEmoji.js";
 import { io } from "socket.io-client";
 import * as SecureStore from "expo-secure-store";
 import { useRef } from "react";
@@ -251,8 +252,9 @@ export default function App() {
           <rootStack.Screen component={CreatePost} name="createPost" />
           <rootStack.Screen component={BlockList} name="blockList" />
           <rootStack.Screen component={UpdateProfile} name="updateProfile" />
-          {/* <rootStack.Screen component={CommentPage} name="comment" /> */}
+          <rootStack.Screen component={CommentPage} name="comment" />
           <rootStack.Screen component={UpdateDetail} name="updateDetail" />
+          <rootStack.Screen component={ListEmoji} name="listEmoji" />
           <rootStack.Screen component={Messager} name="messager" />
         </rootStack.Navigator>
       </NavigationContainer>
