@@ -4,7 +4,7 @@ import LoginPage from "./Screens/LoginPage.js";
 import SignupPage from "./Screens/SignupPage.js";
 import * as React from "react";
 
-import { Icon } from "react-native-elements";
+import { Icon, Badge } from "react-native-elements";
 
 import { navigationRef } from "./rootNavigation";
 import { NavigationContainer } from "@react-navigation/native";
@@ -25,6 +25,10 @@ import Menu from "./Screens/Menu.js";
 import CommentPage from "./Screens/Comments.js";
 import { useEffect } from "react";
 import UpdateDetail from "./Screens/updateDetail";
+import Notifications from "./Screens/Notifications.js";
+import { io } from "socket.io-client";
+import * as SecureStore from "expo-secure-store";
+import { useRef } from "react";
 const Stack = createStackNavigator();
 const rootStack = createStackNavigator();
 
@@ -76,9 +80,13 @@ const MessengerTab = () => {
 };
 const NotificationTab = () => {
   return (
-    <View>
-      <Text>notificationTab</Text>
-    </View>
+    <Stack.Navigator
+      screenOptions={{
+        headerShown: false,
+      }}
+    >
+      <Stack.Screen name="Notification" component={Notifications} />
+    </Stack.Navigator>
   );
 };
 const MenuTab = () => {
@@ -97,6 +105,42 @@ export const MainTab = () => {
     tabBarShowIcon: true,
     tabBarShowLabel: false,
   };
+  var access_token = "";
+  var socket;
+  const numOfNotification = useRef(2);
+  const setupSocket = async () => {
+    try {
+      access_token = await SecureStore.getItemAsync("access_token");
+      socket = io("https://facebook-api-production.up.railway.app", {
+        extraHeaders: {
+          Authorization: access_token,
+        },
+      });
+      socket.on("connect", () => {
+        console.log("socket connected");
+      });
+      socket.on("disconnect", () => {
+        console.log("socket disconnected");
+      });
+      socket.on("notification", (notification) => {
+        notification.current = notification.current + 1;
+        console.log("socket notification", notification);
+      });
+      socket.on("error", (err) => {
+        console.log("socket error", err);
+      });
+    } catch (err) {
+      console.log("setup socket", err);
+    }
+  };
+  useEffect(() => {
+    setupSocket();
+    return () => {
+      socket.off("connect");
+      socket.off("error");
+      socket.off("notification");
+    };
+  }, []);
   return (
     <>
       <Header></Header>
@@ -161,13 +205,31 @@ export const MainTab = () => {
         <Tab.Screen
           options={{
             tabBarIcon: ({ tintColor, focused }) => (
-              <Icon
-                name="notifications"
-                size={25}
-                color={focused ? "#318bfb" : "#ddd"}
-              ></Icon>
+              <View>
+                <Icon
+                  name="notifications"
+                  size={25}
+                  color={focused ? "#318bfb" : "#ddd"}
+                ></Icon>
+                {numOfNotification.current > 0 && (
+                  <Badge
+                    value={numOfNotification.current}
+                    status="error"
+                    containerStyle={{
+                      position: "absolute",
+                      top: -4,
+                      right: -4,
+                    }}
+                  />
+                )}
+              </View>
             ),
           }}
+          listeners={({ navigation, route }) => ({
+            focus: (e) => {
+              numOfNotification.current = 0;
+            },
+          })}
           name="Notification"
           component={NotificationTab}
         />
