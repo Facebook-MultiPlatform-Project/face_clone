@@ -158,9 +158,9 @@ const Post = ({ id }) => {
 
             <TouchableOpacity
               style={styles.button}
-              // onPress={() => {
-              //   navigation.navigate("comment");
-              // }}
+              onPress={() => {
+                navigation.navigate("comment", { postId: postData.id });
+              }}
             >
               <Icon type="primary" name="chat-bubble"></Icon>
               <Text style={{ marginLeft: 10 }}>Bình luận</Text>
