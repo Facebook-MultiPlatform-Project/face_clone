@@ -7,6 +7,7 @@ import {
   SafeAreaView,
   TouchableOpacity,
   Dimensions,
+  ActivityIndicator,
 } from "react-native";
 import React from "react";
 import { Icon, Image } from "react-native-elements";
@@ -15,14 +16,15 @@ import { useState } from "react";
 import { upPostApi } from "../apis/Post/upPostApi";
 import { Video } from "expo-av";
 import { useSelector } from "react-redux";
-import { useEffect } from "react";
 import { constant } from "../utils/constant";
+import Toast from "react-native-toast-message";
 
 const CreatePost = ({ route, navigation }) => {
   const [content, setContent] = useState(null);
   const [image, setImage] = useState([]);
   const [video, setVideo] = useState({});
   const [mood, setMood] = useState(null);
+  const [loading, setLoading] = useState(false);
   const windowWidth = Dimensions.get("window").width;
   const user = useSelector((state) => state.user.user);
 
@@ -61,11 +63,13 @@ const CreatePost = ({ route, navigation }) => {
     }
   };
   const handleAddImage = () => {
+    if (loading) return;
     if (video.uri) alert("Chỉ được up 4 ảnh hoặc 1 video");
     else if (image.length < 4) uploadImage();
     else alert("Chỉ dược up tối đa 4 ảnh!!!");
   };
   const handleUploadVideo = async () => {
+    if (loading) return;
     if (image[0] || video.uri) alert("Chỉ được up 4 ảnh hoặc 1 video");
     else {
       await permissionRequest();
@@ -78,6 +82,8 @@ const CreatePost = ({ route, navigation }) => {
     }
   };
   const handleSubmit = async () => {
+    if (loading) return;
+    setLoading(true);
     const data = new FormData();
     data.append("content", content);
     for (let i = 0; i < image.length; i++) {
@@ -106,13 +112,26 @@ const CreatePost = ({ route, navigation }) => {
     if (mood) {
       data.append("status", mood);
     }
-    console.log(data);
     const res = upPostApi.post(data);
     res
       .then((res) => {
+        Toast.show({
+          type: "success",
+          text1: "Đăng bài thành công!!!",
+          visibilityTime: 1000,
+        });
         navigation.navigate("facebook");
       })
-      .catch((err) => console.log("err", err));
+      .catch((err) =>
+        Toast.show({
+          type: "error",
+          text1: err.message,
+          visibilityTime: 1000,
+        })
+      )
+      .finally(() => {
+        setLoading(false);
+      });
   };
   return (
     <View
@@ -121,6 +140,17 @@ const CreatePost = ({ route, navigation }) => {
         width: windowWidth,
       }}
     >
+      {loading && (
+        <ActivityIndicator
+          style={{
+            position: "absolute",
+            top: "49%",
+            left: "48%",
+            zIndex: 9999,
+          }}
+          size="large"
+        ></ActivityIndicator>
+      )}
       <View
         style={{
           flexDirection: "row",
@@ -219,7 +249,7 @@ const CreatePost = ({ route, navigation }) => {
           <Video
             source={{ uri: video.uri }}
             style={{ width: "100%", height: 300, bottom: 0 }}
-            isLooping
+            useNativeControls
           ></Video>
         ) : (
           <View style={{ height: 0 }}></View>
@@ -284,6 +314,7 @@ const CreatePost = ({ route, navigation }) => {
             alignItems: "center",
           }}
           onPress={() => {
+            if (loading) return;
             navigation.navigate("listEmoji", {
               updateData: updateMood,
             });

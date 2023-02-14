@@ -4,13 +4,13 @@ import * as SecureStore from "expo-secure-store";
 import { UserApi } from "../apis/User/UserApi";
 import { useDispatch } from "react-redux";
 import { navigation } from "../rootNavigation";
+import { addUser } from "../store/user";
 
 const WaitingPage = () => {
   const dispatch = useDispatch();
 
   const getUserProfile = async () => {
     const token = await SecureStore.getItemAsync("acess_token");
-    console.log(token);
     if (!token) {
       navigation.navigate("login");
       return;

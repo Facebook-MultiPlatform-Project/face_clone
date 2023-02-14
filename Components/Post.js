@@ -14,6 +14,7 @@ import { navigation } from "../rootNavigation";
 import { useSelector } from "react-redux";
 import { PostApi } from "../apis/Post/Post";
 import { constant } from "../utils/constant";
+import { Video } from "expo-av";
 
 const Post = ({ id }) => {
   const [postData, setPostData] = useState({});
@@ -25,7 +26,7 @@ const Post = ({ id }) => {
   const getPostData = async () => {
     await PostApi.getPost(id)
       .then((res) => {
-        console.log(res.data.data);
+        console.log(111, res.data.data);
         setPostData(res.data.data);
         setAuthor(res.data.data.author);
       })
@@ -112,6 +113,15 @@ const Post = ({ id }) => {
             </SafeAreaView>
           ) : (
             <View style={{ height: 10 }}></View>
+          )}
+          {postData.medias[0] && postData.medias[0].type === "1" ? (
+            <Video
+              source={{ uri: postData.medias[0].name }}
+              style={{ width: "100%", height: 300, bottom: 0 }}
+              useNativeControls
+            ></Video>
+          ) : (
+            <View style={{ height: 0 }}></View>
           )}
         </View>
         <View>

@@ -5,7 +5,7 @@ import SignupPage from "./Screens/SignupPage.js";
 import * as React from "react";
 
 import { Icon, Badge } from "react-native-elements";
-
+import Toast from "react-native-toast-message";
 import { navigationRef } from "./rootNavigation";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -264,6 +264,7 @@ export default function App() {
           <rootStack.Screen component={Search} name="search" />
         </rootStack.Navigator>
       </NavigationContainer>
+      <Toast />
     </Provider>
   );
 }
