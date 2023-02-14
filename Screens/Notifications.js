@@ -2,15 +2,81 @@ import {
   Text,
   View,
   ScrollView,
-  TextInput,
-  StatusBar,
+  RefreshControl,
   TouchableOpacity,
 } from "react-native";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Avatar } from "react-native-paper";
-import { Divider } from "react-native-elements";
-// const arr = Array.from({ length: 5 }, (v, i) => i);
+import { Icon } from "react-native-elements";
+import { NotificationApi } from "../apis/Notification/notificationApi";
+import { getTimeDisplay } from "../utils";
+
+const NotiItems = ({ avatar, content, isRead, createdAt }) => {
+
+  return (
+    <TouchableOpacity
+      style={{
+        backgroundColor: isRead ? "white" : "#BFEAF5",
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "center",
+        padding: 10,
+        maxWidth: "100%",
+      }}
+    >
+      <Avatar.Image
+        size={75}
+        source={{
+          uri: avatar,
+        }}
+      />
+      <View
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          flex: 1,
+          marginLeft: 10,
+          marginRight: 20,
+        }}
+      >
+        <Text
+          style={{ flex: 1, flexWrap: "wrap", maxWidth: "100%", fontSize: 16 }}
+          numberOfLines={3}
+        >
+          {content}
+        </Text>
+        <Text style={{ fontSize: 14, color: "grey" }}>
+          {getTimeDisplay(createdAt)}
+        </Text>
+      </View>
+      <TouchableOpacity style={{ marginBottom: 50 }}>
+        <Icon name="dots-three-horizontal" type="entypo" size={20}></Icon>
+      </TouchableOpacity>
+    </TouchableOpacity>
+  );
+};
+
 const Notifications = () => {
+  const [notificationList, setNotificationList] = useState([]);
+  const [refreshing, setRefreshing] = useState(false);
+  const getNotification = async () => {
+    try {
+      const data = await NotificationApi.getAll();
+      setNotificationList[data.data.data];
+    } catch (err) {
+      console.log("notification", err);
+    }
+  };
+  useEffect(() => {
+    getNotification();
+  }, []);
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    getNotification();
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 2000);
+  }, []);
   return (
     <View
       style={{
@@ -18,54 +84,50 @@ const Notifications = () => {
         flex: 1,
         flexDirection: "column",
         alignItems: "flex-start",
-        // backgroundColor:'red',
-        paddingTop: StatusBar.currentHeight,
       }}
     >
-      {/* <Text>hello</Text> */}
-      <Text style={{ paddingLeft: 20, fontSize: 30, fontWeight: "bold" }}>
-        Thông báo
-      </Text>
-      <Divider orientation="horizontal" width={1} />
-      <ScrollView style={{ width: "100%" }}>
-        <NotiItems isRead={false} />
-        <NotiItems isRead={true} />
+      <ScrollView
+        style={{ width: "100%" }}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
+        {notificationList.length > 0 &&
+          notificationList.map((item) => (
+            <NotiItems
+              isRead={item.read}
+              content={item.content}
+              avatar={item.avatar}
+              createdAt={item.createdAt}
+            />
+          ))}
+        <NotiItems
+          isRead={false}
+          avatar="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHMbNbn5XcHIXV3PoLxkmsKdTQIbNffNpyuQ&usqp=CAU"
+          content="sssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss"
+          createdAt="2023-02-13 17:19:25"
+        />
+        <NotiItems
+          isRead={false}
+          avatar="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHMbNbn5XcHIXV3PoLxkmsKdTQIbNffNpyuQ&usqp=CAU"
+          content="sssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss"
+          createdAt="2023-02-13 17:19:25"
+        />
+        <NotiItems
+          isRead={false}
+          avatar="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHMbNbn5XcHIXV3PoLxkmsKdTQIbNffNpyuQ&usqp=CAU"
+          content="sssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss"
+          createdAt="2023-02-13 17:19:25"
+        />
+        <NotiItems
+          isRead={false}
+          avatar="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHMbNbn5XcHIXV3PoLxkmsKdTQIbNffNpyuQ&usqp=CAU"
+          content="sssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss"
+          createdAt="2023-02-13 17:19:25"
+        />
       </ScrollView>
     </View>
   );
 };
 
 export default Notifications;
-
-const NotiItems = ({avatar, content, isRead}) => {
-  return (
-    <TouchableOpacity
-      style={{
-        backgroundColor: isRead ? "white" : "#BFEAF5",
-        display: "flex",
-        flexDirection: "row",
-        paddingLeft: 20,
-        maxWidth: "100%",
-        marginBottom: 3,
-      }}
-    >
-      <Avatar.Image size={70} source={require("../assets/icon.png")} />
-
-      <View style={{ width: 30 }}></View>
-      <View style={{ display: "flex", flexDirection: "column", flex: 1 }}>
-        <Text
-          style={{ flex: 1, flexWrap: "wrap", maxWidth: "100%", fontSize: 15 }}
-          numberOfLines={3}
-        >
-          sssdaasdasdsssssssssssssssssssssssssssssaaaaaaaaaaaassssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss
-        </Text>
-        <Text style={{ fontSize: 12, color: "grey" }}>
-          {/* {isRead ? "white" : "#BFEAF5"} */}
-          {isRead}
-        </Text>
-      </View>
-      {/* <View style={{ width: 5 }}></View> */}
-      <Divider orientation="horizontal" width={1} />
-    </TouchableOpacity>
-  );
-};
