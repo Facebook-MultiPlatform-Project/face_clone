@@ -11,6 +11,10 @@ export const UserApi = {
     const url = "/user/user";
     return axiosClient.get(url, { params });
   },
+  getProfile: () => {
+    const url = "/user/get-profile";
+    return axiosClient.get(url);
+  },
   getBlock: () => {
     const url = "/user/block-list";
     return axiosClient.get(url, {params: {take: 10, skip: 0}});

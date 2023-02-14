@@ -1,8 +1,8 @@
 import axiosClient from "../axiosClient";
 
-export const verifyApi = {
-  post: (data) => {
-    const url = "/auth/confirm";
+export const SearchApi = {
+  search: (data) => {
+    const url = "/search/search";
     return axiosClient.post(url, data);
   },
-};
+}

@@ -49,6 +49,7 @@ const VerifyEmail = () => {
           navigation.navigate("login");
         })
         .catch((err) => {
+          console.log('verify email', err)
           setErrVerify("err");
         });
     }
