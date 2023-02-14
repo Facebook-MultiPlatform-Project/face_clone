@@ -19,6 +19,7 @@ import UpdateProfile from "./Screens/UpdateProfile.js";
 import BlockList from "./Screens/BlockList.js";
 import Notifications from "./Screens/Notifications.js";
 import Friends from "./Screens/Friends.js";
+import FriendList from "./Screens/FriendList.js";
 import Messager from "./Screens/Messager.js";
 import { Provider } from "react-redux";
 import { store } from "./store/store.js";
@@ -182,7 +183,7 @@ export const MainTab = () => {
             headerShown: true,
           }}
           name="Friend"
-          component={FriendTab}
+          component={Friends}
         />
         <Tab.Screen
           options={{
@@ -254,6 +255,7 @@ export default function App() {
           {/* <rootStack.Screen component={CommentPage} name="comment" /> */}
           <rootStack.Screen component={UpdateDetail} name="updateDetail" />
           <rootStack.Screen component={Messager} name="messager" />
+          <rootStack.Screen component={FriendList} name="friendList" />
         </rootStack.Navigator>
       </NavigationContainer>
     </Provider>
