@@ -29,6 +29,7 @@ import UpdateDetail from "./Screens/updateDetail";
 import { io } from "socket.io-client";
 import * as SecureStore from "expo-secure-store";
 import { useRef } from "react";
+import Search from "./Screens/Search.js";
 const Stack = createStackNavigator();
 const rootStack = createStackNavigator();
 
@@ -254,6 +255,7 @@ export default function App() {
           {/* <rootStack.Screen component={CommentPage} name="comment" /> */}
           <rootStack.Screen component={UpdateDetail} name="updateDetail" />
           <rootStack.Screen component={Messager} name="messager" />
+          <rootStack.Screen component={Search} name="search" />
         </rootStack.Navigator>
       </NavigationContainer>
     </Provider>
