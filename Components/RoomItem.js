@@ -1,17 +1,51 @@
 import * as React from "react";
 import { View, Image, TouchableOpacity, Text } from "react-native";
+import { useSelector } from "react-redux";
 import { navigation } from "../rootNavigation";
 
 const RoomItem = ({ item }) => {
-  const userID = 2;
+  const user = useSelector((state) => state.user.user);
+  const nameUser = user.name || "pham thao";
+  const userID = user.id || "ceb34d32-6634-4f3c-bb40-dd44825a8f26";
+
+  const isRead = item && item.lastMessage && item.lastMessage.read;
+
+  const getNameRoom = () => {
+    const name = item && item.name && item.name.split(";");
+    return name[0] === nameUser ? name[1] : name[0];
+  };
+  const getUriRoom = () => {
+    const listUsers = item && item.listUsers;
+    return listUsers[0].id === userID
+      ? listUsers[1].avatar
+      : listUsers[0].avatar;
+  };
+  const getChat = () => {
+    const lastMessage = item && item.lastMessage;
+    if (!lastMessage) return "Nhắn tin ngay bây giờ";
+    if (lastMessage.id === userID)
+      return `Bạn: ${
+        lastMessage.content.length > 20
+          ? `${lastMessage.content.slice(0, 20)} ...`
+          : lastMessage.content
+      }`;
+    return lastMessage.content.length > 24
+      ? `${lastMessage.content.slice(0, 24)} ...`
+      : lastMessage.content;
+  };
+  const OtherId = () => {
+    const listUsers = item && item.listUsers;
+    return listUsers[0].id === userID ? listUsers[1].id : listUsers[0].id;
+  };
   return (
     <TouchableOpacity
       onPress={() => {
-        navigation.navigate("chat", { userId: item.id });
+        navigation.navigate("chat", { roomId: item.id, otherId: OtherId() });
       }}
       style={{
         flexDirection: "row",
         width: "100%",
+        marginBottom: 4,
       }}
     >
       <View
@@ -29,7 +63,7 @@ const RoomItem = ({ item }) => {
             height: 60,
             borderRadius: 100,
           }}
-          source={{ uri: item.uri }}
+          source={{ uri: getUriRoom() }}
         ></Image>
         <View
           style={{
@@ -65,25 +99,23 @@ const RoomItem = ({ item }) => {
           style={{
             fontSize: 17,
             color: "#5b5b5b",
-            fontWeight:
-              item.isRead || userID === item.idsender ? "300" : "bold",
+            fontWeight: item.isRead ? "300" : "bold",
             position: "absolute",
             top: 5,
           }}
         >
-          {item.name}
+          {getNameRoom()}
         </Text>
         <Text
           style={{
             fontSize: 13,
             color: "#5b5b5b",
-            fontWeight:
-              item.isRead || userID === item.idsender ? "300" : "bold",
+            fontWeight: isRead ? "300" : "bold",
             position: "absolute",
             bottom: 10,
           }}
         >
-          {userID === item.idsender ? `Bạn: ${item.chat}` : item.chat}
+          {getChat()}
         </Text>
       </View>
     </TouchableOpacity>

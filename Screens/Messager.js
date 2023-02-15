@@ -1,17 +1,17 @@
 import {
   View,
   Text,
-  Image,
   TouchableOpacity,
   ScrollView,
-  TextInput,
   StatusBar,
 } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { Icon } from "react-native-elements";
 import { navigation } from "../rootNavigation";
 import OnlineItem from "../Components/OnlineItem";
 import RoomItem from "../Components/RoomItem";
+import { MessageApi } from "../apis/Message/messageApi";
 
 const online = [
   {
@@ -51,75 +51,24 @@ const online = [
   },
 ];
 
-const room = [
-  {
-    id: 1,
-    uri: "https://source.unsplash.com/random?sig=10",
-    name: "haha haha",
-    chat: "oki oki",
-    isRead: false,
-    idsender: 2,
-  },
-  {
-    id: 2,
-    uri: "https://source.unsplash.com/random?sig=10",
-    name: "tranlam",
-    chat: "sap xong chua",
-    isRead: true,
-    idsender: 2,
-  },
-  {
-    id: 3,
-    uri: "https://source.unsplash.com/random?sig=10",
-    name: "tranlam",
-    chat: "sap xong chua",
-    isRead: false,
-  },
-  {
-    id: 4,
-    uri: "https://source.unsplash.com/random?sig=10",
-    name: "tranlam",
-    chat: "sap xong chua",
-    isRead: true,
-  },
-  {
-    id: 5,
-    uri: "https://source.unsplash.com/random?sig=10",
-    name: "tranlam",
-    chat: "sap xong chua",
-    isRead: true,
-  },
-  {
-    id: 6,
-    uri: "https://source.unsplash.com/random?sig=10",
-    name: "tranlam",
-    chat: "sap xong chua",
-    isRead: true,
-  },
-  {
-    id: 7,
-    uri: "https://source.unsplash.com/random?sig=10",
-    name: "tranlam",
-    chat: "sap xong chua",
-    isRead: true,
-  },
-  {
-    id: 8,
-    uri: "https://source.unsplash.com/random?sig=10",
-    name: "tranlam",
-    chat: "sap xong chua",
-    isRead: true,
-  },
-  {
-    id: 9,
-    uri: "https://source.unsplash.com/random?sig=10",
-    name: "tranlam",
-    chat: "sap xong chua",
-    isRead: true,
-  },
-];
+
 
 const Messager = () => {
+  const user = useSelector((state) => state.user.user);
+  const nameUser = user.name || "pham thao";
+
+  const [listRoom, setListRoom] = useState([]);
+
+  useEffect(() => {
+    getListRoom();
+  }, []);
+
+  const getListRoom = async () => {
+    try {
+      const res = await MessageApi.listRoom();
+      setListRoom(res.data.data);
+    } catch (error) {}
+  };
   return (
     <View style={{ paddingTop: StatusBar.currentHeight }}>
       <View
@@ -236,8 +185,10 @@ const Messager = () => {
             ))}
         </ScrollView>
         <View style={{ marginBottom: 100 }}>
-          {room &&
-            room.map((item) => <RoomItem item={item} key={item.id}></RoomItem>)}
+          {listRoom &&
+            listRoom.map((item) => (
+              <RoomItem item={item} key={item.id}></RoomItem>
+            ))}
         </View>
       </ScrollView>
     </View>
