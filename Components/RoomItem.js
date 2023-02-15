@@ -7,7 +7,6 @@ const RoomItem = ({ item }) => {
   const user = useSelector((state) => state.user.user);
   const nameUser = user.name || "pham thao";
   const userID = user.id || "ceb34d32-6634-4f3c-bb40-dd44825a8f26";
-
   const isRead = item && item.lastMessage && item.lastMessage.read;
 
   const getNameRoom = () => {
@@ -23,7 +22,7 @@ const RoomItem = ({ item }) => {
   const getChat = () => {
     const lastMessage = item && item.lastMessage;
     if (!lastMessage) return "Nhắn tin ngay bây giờ";
-    if (lastMessage.id === userID)
+    if (lastMessage.user.id === userID)
       return `Bạn: ${
         lastMessage.content.length > 20
           ? `${lastMessage.content.slice(0, 20)} ...`
@@ -40,7 +39,7 @@ const RoomItem = ({ item }) => {
   return (
     <TouchableOpacity
       onPress={() => {
-        navigation.navigate("chat", { roomId: item.id, otherId: OtherId() });
+        navigation.navigate("chat", { otherId: OtherId() });
       }}
       style={{
         flexDirection: "row",

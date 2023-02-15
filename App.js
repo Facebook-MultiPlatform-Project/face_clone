@@ -41,6 +41,7 @@ const Stack = createStackNavigator();
 const rootStack = createStackNavigator();
 import { LogBox } from "react-native";
 import DetailPost from "./Screens/DetailPost.js";
+import socketClient from "./utils/socketClient.js";
 
 LogBox.ignoreLogs([
   "Non-serializable values were found in the navigation state",
@@ -170,9 +171,10 @@ export const MainTab = () => {
   };
   const readNotification = async () => {
     try {
-      if (unreadNotificationList.length > 0) await NotificationApi.read({
-        notificationIds: unreadNotificationList.map((item) => item.id),
-      });
+      if (unreadNotificationList.length > 0)
+        await NotificationApi.read({
+          notificationIds: unreadNotificationList.map((item) => item.id),
+        });
       setUnreadNotificationList([]);
       setNumOfNotification(0);
     } catch (err) {
@@ -188,6 +190,7 @@ export const MainTab = () => {
       socket.off("notification");
     };
   }, []);
+
   return (
     <>
       <Header></Header>
@@ -285,6 +288,9 @@ export const MainTab = () => {
 };
 
 export default function App() {
+  useEffect(() => {
+    socketClient.initializeSocket();
+  }, []);
   const navigationOptions = {
     headerShown: false,
     headerMode: "screen",

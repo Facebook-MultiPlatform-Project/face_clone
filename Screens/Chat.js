@@ -12,54 +12,72 @@ import {
 import { Icon } from "react-native-elements";
 import ChatItem from "../Components/ChatItem";
 import { navigation } from "../rootNavigation";
+import { MessageApi } from "../apis/Message/messageApi";
+import { useSelector } from "react-redux";
+import socketClient from "../utils/socketClient";
 
-const uri = "https://source.unsplash.com/random?sig=10";
-const data = [
-  {
-    id: 1,
-    uri: "https://source.unsplash.com/random?sig=10",
-    mess: "helohdfhaksdjfkjasdfkwejrkjwerjwqojrwoierqwerjqwerjowerjwoierj",
-    idsend: 1,
-  },
-  {
-    id: 2,
-    uri: "https://source.unsplash.com/random?sig=10",
-    mess: "helofdsfasdfwkerqkwbrjasbfkjasfdasdfasdfasdfasdf",
-    idsend: 2,
-  },
-  {
-    id: 3,
-    uri: "https://source.unsplash.com/random?sig=10",
-    mess: "helfasdfasdfsadfsdfasedfasdfasdrwerqwerwerqwo",
-    idsend: 1,
-  },
-  {
-    id: 4,
-    uri: "https://source.unsplash.com/random?sig=10",
-    mess: "helfasdfasdfsadffdasdfasdfasdsdfasedfasdfasdrwerqwerwerqwo",
-    idsend: 1,
-  },
-  {
-    id: 5,
-    uri: "https://source.unsplash.com/random?sig=10",
-    mess: "helfasdfasdfsadffdasdfasdfasdsdfasedfasdfasdrwerqwerwerqwo",
-    idsend: 2,
-  },
-  {
-    id: 6,
-    uri: "https://source.unsplash.com/random?sig=10",
-    mess: "helfasdfasdfsadffdasdfasdfasdsdfasedfasdfasdrwerqwerwerqwo",
-    idsend: 2,
-  },
-];
-const userid = 1;
-var id = 7;
+const Chat = ({ route, navigation }) => {
+  const otherId = route.params.otherId || null;
 
-const Chat = ({ route }) => {
-  const [listMess, setListMess] = useState(data);
-  const [mess, setMess] = useState("");
+  const user = useSelector((state) => state.user.user);
+  const userid = user.id || "ceb34d32-6634-4f3c-bb40-dd44825a8f26";
+
+  const [listMess, setListMess] = useState([]);
+  const [message, setMess] = useState("");
+  const [roomId, setRoomId] = useState(null);
+  const [otherInfo, setOtherInfo] = useState(null);
 
   const scrollRef = useRef();
+  var arr = [];
+
+  useEffect(() => {
+    if (otherId) {
+      createRoomChat();
+    } else {
+      navigation.goBack();
+    }
+  }, []);
+
+  useEffect(() => {
+    socketClient.on("new-message", (messobj) => {
+      let clone = [...listMess];
+      setListMess(clone.concat(messobj));
+      onPressTouch();
+    });
+  }, [listMess]);
+
+  const createRoomChat = async () => {
+    try {
+      const res = await MessageApi.creatRoom(otherId);
+      if (res.data.data.id) {
+        setRoomId(res.data.data.id);
+        socketClient.emit("join-room", { roomId: res.data.data.id });
+        socketClient.emit("request-join-room", {
+          roomId: res.data.data.id,
+          userId: otherId,
+        });
+      }
+
+      if (!res.data.success && res.data.data.id) {
+        await getListMess(res.data.data.id);
+      }
+      if (res.data.data.users) {
+        getOtherInfo(res.data.data.users);
+      }
+    } catch (error) {}
+  };
+  const getListMess = async (roomId) => {
+    try {
+      const res = await MessageApi.getMessages(roomId);
+      setListMess(res.data.data.reverse());
+    } catch (error) {}
+    onPressTouch();
+  };
+  const getOtherInfo = (users) => {
+    if (users[0].id === userid) {
+      setOtherInfo(users[1]);
+    } else setOtherInfo(users[0]);
+  };
 
   const onPressTouch = () => {
     scrollRef.current?.scrollToEnd({
@@ -68,16 +86,12 @@ const Chat = ({ route }) => {
   };
 
   const handleSendMeassage = () => {
-    const pushdata = {
-      id: id++,
-      uri: "https://source.unsplash.com/random?sig=10",
-      mess: mess,
-      idsend: userid,
-    };
-    setListMess([...listMess, pushdata]);
-    setMess("");
-    Keyboard.dismiss();
-    onPressTouch();
+    if (message && message.length > 0) {
+      socketClient.emit("send-message", { roomId, message });
+      arr = [...listMess];
+      setMess("");
+      Keyboard.dismiss();
+    }
   };
   return (
     <View
@@ -138,7 +152,7 @@ const Chat = ({ route }) => {
                   height: 60,
                   borderRadius: 100,
                 }}
-                source={{ uri: uri }}
+                source={{ uri: otherInfo && otherInfo.avatar }}
               ></Image>
               <View
                 style={{
@@ -179,7 +193,7 @@ const Chat = ({ route }) => {
                   top: 5,
                 }}
               >
-                name
+                {otherInfo && otherInfo.name}
               </Text>
               <Text
                 style={{
@@ -241,6 +255,7 @@ const Chat = ({ route }) => {
               item={item}
               itemNext={index === listMess.length ? null : listMess[index + 1]}
               key={item.id}
+              otherUri={otherInfo && otherInfo.avatar}
             ></ChatItem>
           );
         })}
@@ -266,7 +281,7 @@ const Chat = ({ route }) => {
           onChangeText={(text) => {
             setMess(text);
           }}
-          value={mess}
+          value={message}
         />
         <TouchableOpacity
           style={{ padding: 5, width: "10%" }}

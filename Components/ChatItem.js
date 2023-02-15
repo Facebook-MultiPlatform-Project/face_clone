@@ -1,13 +1,16 @@
 import { Image } from "react-native";
 import { Text, View } from "react-native";
+import { useSelector } from "react-redux";
 
-const ChatItem = ({ itemPrev, item, itemNext }) => {
-  const userid = 1;
+const ChatItem = ({ itemPrev, item, itemNext, otherUri }) => {
+  const user = useSelector((state) => state.user.user);
+  const userID = user.id || "ceb34d32-6634-4f3c-bb40-dd44825a8f26";
+
   const marginBot = () => {
-    if (itemNext && item.idsend === itemNext.idsend) return 2;
+    if (itemNext && item.user.id === itemNext.user.id) return 2;
     return 12;
   };
-  return item.idsend === userid ? (
+  return item.user.id === userID ? (
     <View
       style={{
         flexDirection: "row",
@@ -30,14 +33,14 @@ const ChatItem = ({ itemPrev, item, itemNext }) => {
             borderTopLeftRadius: 10,
             borderBottomLeftRadius: 10,
             borderTopRightRadius:
-              itemPrev && itemPrev.idsend === item.idsend ? 0 : 10,
+              itemPrev && itemPrev.user.id === item.user.id ? 0 : 10,
             borderBottomRightRadius:
-              itemNext && itemNext.idsend === item.idsend ? 0 : 10,
+              itemNext && itemNext.user.id === item.user.id ? 0 : 10,
             fontSize: 15,
             color: "white",
           }}
         >
-          {item.mess}
+          {item && item.content}
         </Text>
       </View>
     </View>
@@ -70,7 +73,7 @@ const ChatItem = ({ itemPrev, item, itemNext }) => {
             }}
             source={{
               uri:
-                itemNext && itemNext.idsend === item.idsend ? null : item.uri,
+                itemNext && itemNext.user.id === item.user.id ? null : otherUri,
             }}
           ></Image>
         </View>
@@ -81,15 +84,15 @@ const ChatItem = ({ itemPrev, item, itemNext }) => {
             backgroundColor: "#dadada",
             padding: 8,
             borderTopLeftRadius:
-              itemPrev && itemPrev.idsend === item.idsend ? 0 : 10,
+              itemPrev && itemPrev.user.id === item.user.id ? 0 : 10,
             borderBottomRightRadius: 10,
             borderTopRightRadius: 10,
             borderBottomLeftRadius:
-              itemNext && itemNext.idsend === item.idsend ? 0 : 10,
+              itemNext && itemNext.user.id === item.user.id ? 0 : 10,
             fontSize: 15,
           }}
         >
-          {item.mess}
+          {item && item.content}
         </Text>
       </View>
     </View>

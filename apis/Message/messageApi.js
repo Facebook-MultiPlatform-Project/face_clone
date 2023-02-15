@@ -1,9 +1,9 @@
 import axiosClient from "../axiosClient";
 
 export const MessageApi = {
-  creatRoom: (userId) => {
+  creatRoom: (id) => {
     const url = "/room/create";
-    return axiosClient.post(url, userId);
+    return axiosClient.post(url, { id });
   },
   listRoom: () => {
     const url = "/room/list-rooms";
