@@ -40,6 +40,7 @@ import ChangePassword from "./Screens/ChangePassword.js";
 const Stack = createStackNavigator();
 const rootStack = createStackNavigator();
 import { LogBox } from "react-native";
+import DetailPost from "./Screens/DetailPost.js";
 
 LogBox.ignoreLogs([
   "Non-serializable values were found in the navigation state",
@@ -313,6 +314,7 @@ export default function App() {
           <rootStack.Screen component={Search} name="search" />
           <rootStack.Screen component={ChangePassword} name="changePassword" />
           <rootStack.Screen component={Chat} name="chat" />
+          <rootStack.Screen component={DetailPost} name="detailPost" />
         </rootStack.Navigator>
       </NavigationContainer>
     </Provider>

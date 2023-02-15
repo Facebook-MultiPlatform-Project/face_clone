@@ -119,7 +119,7 @@ const LoginPage = () => {
         gender:gender,
         uuid:'00000000-54b3-e7c7-0000-000046bffd57'
       };
-      console.log(data)
+      
       const res = signupApi.post(data);
       res
         .then((response) => {
