@@ -12,6 +12,7 @@ import { navigation } from "../rootNavigation";
 import OnlineItem from "../Components/OnlineItem";
 import RoomItem from "../Components/RoomItem";
 import { MessageApi } from "../apis/Message/messageApi";
+import socketClient from "../utils/socketClient";
 
 const online = [
   {
@@ -51,17 +52,23 @@ const online = [
   },
 ];
 
-
-
-const Messager = () => {
+const Messager = ({ navigation }) => {
   const user = useSelector((state) => state.user.user);
-  const nameUser = user.name || "pham thao";
 
   const [listRoom, setListRoom] = useState([]);
 
   useEffect(() => {
-    getListRoom();
-  }, []);
+    const focusHandler = navigation.addListener("focus", () => {
+      getListRoom();
+    });
+    return focusHandler;
+  }, [navigation]);
+
+  useEffect(() => {
+    socketClient.on("new-message", (messobj) => {
+      getListRoom();
+    });
+  }, [navigation]);
 
   const getListRoom = async () => {
     try {
