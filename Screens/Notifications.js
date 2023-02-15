@@ -10,24 +10,53 @@ import { Avatar } from "react-native-paper";
 import { Icon } from "react-native-elements";
 import { NotificationApi } from "../apis/Notification/notificationApi";
 import { getTimeDisplay } from "../utils";
+import { navigation } from "../rootNavigation";
 
-const NotiItems = ({ avatar, content, isRead, createdAt }) => {
+const SECURITY = "0";
+const POST = "1";
+const REQ_FRIEND = "2";
+const ACCEPT_FRIEND = "3";
 
+const NotiItems = ({
+  id,
+  avatar,
+  content,
+  active,
+  createdAt,
+  type,
+  getNotification,
+}) => {
   return (
     <TouchableOpacity
       style={{
-        backgroundColor: isRead ? "white" : "#BFEAF5",
+        backgroundColor: active ? "#BFEAF5" : "white",
         display: "flex",
         flexDirection: "row",
         alignItems: "center",
         padding: 10,
         maxWidth: "100%",
       }}
+      onPress={async () => {
+        try {
+          await NotificationApi.active(id);
+          await getNotification();
+          switch (type) {
+            case REQ_FRIEND:
+            case ACCEPT_FRIEND:
+              navigation.navigate("profile", {
+                userId: "d537d44a-4de3-4407-b25c-3b0d193fc96d",
+              });
+            default:
+          }
+        } catch (err) {
+          console.log("active notification", err);
+        }
+      }}
     >
       <Avatar.Image
         size={75}
         source={{
-          uri: avatar,
+          uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHMbNbn5XcHIXV3PoLxkmsKdTQIbNffNpyuQ&usqp=CAU",
         }}
       />
       <View
@@ -62,7 +91,8 @@ const Notifications = () => {
   const getNotification = async () => {
     try {
       const data = await NotificationApi.getAll();
-      setNotificationList[data.data.data];
+      console.log("data", data.data.data);
+      setNotificationList(data.data.data);
     } catch (err) {
       console.log("notification", err);
     }
@@ -73,10 +103,9 @@ const Notifications = () => {
   const onRefresh = useCallback(() => {
     setRefreshing(true);
     getNotification();
-    setTimeout(() => {
-      setRefreshing(false);
-    }, 2000);
-  }, []);
+
+    setRefreshing(false);
+  });
   return (
     <View
       style={{
@@ -92,39 +121,9 @@ const Notifications = () => {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
-        {notificationList.length > 0 &&
-          notificationList.map((item) => (
-            <NotiItems
-              isRead={item.read}
-              content={item.content}
-              avatar={item.avatar}
-              createdAt={item.createdAt}
-            />
-          ))}
-        <NotiItems
-          isRead={false}
-          avatar="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHMbNbn5XcHIXV3PoLxkmsKdTQIbNffNpyuQ&usqp=CAU"
-          content="sssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss"
-          createdAt="2023-02-13 17:19:25"
-        />
-        <NotiItems
-          isRead={false}
-          avatar="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHMbNbn5XcHIXV3PoLxkmsKdTQIbNffNpyuQ&usqp=CAU"
-          content="sssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss"
-          createdAt="2023-02-13 17:19:25"
-        />
-        <NotiItems
-          isRead={false}
-          avatar="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHMbNbn5XcHIXV3PoLxkmsKdTQIbNffNpyuQ&usqp=CAU"
-          content="sssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss"
-          createdAt="2023-02-13 17:19:25"
-        />
-        <NotiItems
-          isRead={false}
-          avatar="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHMbNbn5XcHIXV3PoLxkmsKdTQIbNffNpyuQ&usqp=CAU"
-          content="sssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss"
-          createdAt="2023-02-13 17:19:25"
-        />
+        {notificationList.map((item) => (
+          <NotiItems {...item} getNotification={getNotification} />
+        ))}
       </ScrollView>
     </View>
   );

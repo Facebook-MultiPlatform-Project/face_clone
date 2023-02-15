@@ -76,14 +76,14 @@ const HeaderOut = () => {
 };
 
 const Header = () => {
-  const [isHome, setIsHome] = useState(true);
+  // const [isHome, setIsHome] = useState(true);
 
-  useEffect(() => {
-    const routeName = navigationRef.current?.getCurrentRoute()
-      ? navigationRef.current?.getCurrentRoute().name
-      : "Home";
-    setIsHome(routeName === "Home");
-  }, [navigationRef.current?.getCurrentRoute()]);
+  // useEffect(() => {
+  //   const routeName = navigationRef.current?.getCurrentRoute()
+  //     ? navigationRef.current?.getCurrentRoute().name
+  //     : "Home";
+  //   setIsHome(routeName === "Home");
+  // }, [navigationRef.current?.getCurrentRoute()]);
 
   return (
     <View
@@ -92,7 +92,8 @@ const Header = () => {
         paddingTop: StatusBar.currentHeight,
       }}
     >
-      {isHome ? <HeaderOut></HeaderOut> : <View></View>}
+      {/* {isHome ? <HeaderOut></HeaderOut> : <View></View>} */}
+      <HeaderOut/>
     </View>
   );
 };

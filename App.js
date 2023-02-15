@@ -30,10 +30,11 @@ import UpdateDetail from "./Screens/updateDetail";
 import ListEmoji from "./Screens/ListEmoji.js";
 import { io } from "socket.io-client";
 import * as SecureStore from "expo-secure-store";
-import { useRef } from "react";
 import WaitingPage from "./Screens/WaitingPage.js";
 import Search from "./Screens/Search.js";
 import Chat from "./Screens/Chat.js";
+import { useState } from "react";
+import { NotificationApi } from "./apis/Notification/notificationApi.js";
 const Stack = createStackNavigator();
 const rootStack = createStackNavigator();
 
@@ -121,7 +122,8 @@ export const MainTab = () => {
   };
   var access_token = "";
   var socket;
-  const numOfNotification = useRef(2);
+  const [numOfNotification,setNumOfNotification] = useState(0);
+  const [unreadNotificationList, setUnreadNotificationList] = useState([]);
   const setupSocket = async () => {
     try {
       access_token = await SecureStore.getItemAsync("access_token");
@@ -137,7 +139,7 @@ export const MainTab = () => {
         console.log("socket disconnected");
       });
       socket.on("notification", (notification) => {
-        notification.current = notification.current + 1;
+        setNumOfNotification((value) => value + 1)
         console.log("socket notification", notification);
       });
       socket.on("error", (err) => {
@@ -147,7 +149,28 @@ export const MainTab = () => {
       console.log("setup socket", err);
     }
   };
+  const getUnreadNotification = async () => {
+    try {
+      const data = await NotificationApi.getAll();
+      const list = data.data.data.filter((item) => Boolean(item.read) === false);
+      setUnreadNotificationList(list);
+      setNumOfNotification(list.length)
+    } catch (err) {
+      console.log("get notification", err);
+    }
+  };
+  const readNotification = async () => {
+    try {
+      console.log({notificationIds: unreadNotificationList.map(item => item.id)})
+      await NotificationApi.read({notificationIds: unreadNotificationList.map(item => item.id)});
+      setUnreadNotificationList([]);
+      setNumOfNotification(0)
+    } catch (err) {
+      console.log("read notification", err.response.data.message);
+    }
+  };
   useEffect(() => {
+    getUnreadNotification()
     setupSocket();
     return () => {
       socket.off("connect");
@@ -198,9 +221,9 @@ export const MainTab = () => {
                   size={25}
                   color={focused ? "#318bfb" : "#ddd"}
                 ></Icon>
-                {numOfNotification.current > 0 && (
+                {numOfNotification > 0 && (
                   <Badge
-                    value={numOfNotification.current}
+                    value={numOfNotification}
                     status="error"
                     containerStyle={{
                       position: "absolute",
@@ -213,8 +236,8 @@ export const MainTab = () => {
             ),
           }}
           listeners={({ navigation, route }) => ({
-            focus: (e) => {
-              numOfNotification.current = 0;
+            focus: async (e) => {
+              await readNotification();
             },
           })}
           name="Notification"

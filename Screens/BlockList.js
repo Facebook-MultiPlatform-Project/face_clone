@@ -98,8 +98,9 @@ const BlockList = ({ route, navigation }) => {
           này không bao gồm các ứng dụng, trò chơi hay nhóm mà cả bạn và người
           này đều tham gia.
         </Text>
-        {blockList.map((user) => (
+        {blockList.map((user, index) => (
           <BlockItem
+            key={index}
             userId={user && user.id}
             name={user && user.name}
             avatar={
