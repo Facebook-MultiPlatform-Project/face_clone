@@ -19,17 +19,17 @@ const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [gender, setGender] = useState("0");
+  // const [gender, setGender] = useState("0");
   const [errFirstName, setErrFirstName] = useState("");
   const [errLastName, setErrLastName] = useState("");
   const [errEmail, setErrEmail] = useState("");
   const [errPassword, setErrPassword] = useState("");
   const [errConfirmPassword, setErrConfirmPassword] = useState("");
-  const [errGender, setErrGender] = useState("");
+  // const [errGender, setErrGender] = useState("");
   const [show, setShow] = useState(false);
   const [hidePassword, setHidePassword] = useState(true);
   const [activeSignup, setActiveSignup] = useState(false);
-  const [birthday, setBirthday] = useState(new Date());
+  // const [birthday, setBirthday] = useState(new Date());
 
   const onChange = (event, selectedDate) => {
     setShow(false);
@@ -60,7 +60,7 @@ const LoginPage = () => {
     setErrConfirmPassword("");
     setErrEmail("");
     setErrFirstName("");
-    setErrGender("");
+    // setErrGender("");
     setErrPassword("");
     setErrLastName("");
   };
@@ -99,10 +99,10 @@ const LoginPage = () => {
       setErrEmail("Invalid Email");
       return false;
     }
-    if (gender == "Unknown") {
-      setErrGender("Bạn phải lựa chọn giới tính");
-      return false;
-    }
+    // if (gender == "Unknown") {
+    //   setErrGender("Bạn phải lựa chọn giới tính");
+    //   return false;
+    // }
     if (firstName && lastName && email && password && confirmPassword)
       return true;
     else return false;
@@ -115,11 +115,11 @@ const LoginPage = () => {
         email: email,
         name: name,
         password: password,
-        birthday:parseTime(birthday,"{y}/{m}/{d}"),
-        gender:gender,
-        uuid:'00000000-54b3-e7c7-0000-000046bffd57'
+        // birthday:parseTime(birthday,"{y}/{m}/{d}"),
+        // gender:gender,
+        uuid: "00000000-54b3-e7c7-0000-000046bffd57",
       };
-      
+
       const res = signupApi.post(data);
       res
         .then((response) => {
@@ -160,7 +160,7 @@ const LoginPage = () => {
           </View>
         </View>
 
-        <View
+        {/* <View
           style={{
             marginBottom: 10,
             marginLeft: 10,
@@ -170,7 +170,6 @@ const LoginPage = () => {
             alignItems: "center",
           }}
         >
-          {/* <Text style={{ fontSize: 18, marginRight: 10 }}>Ngày sinh:</Text> */}
           <TouchableOpacity
             onPress={() => setShow(true)}
             style={{
@@ -195,9 +194,9 @@ const LoginPage = () => {
               onChange={onChange}
             />
           )}
-        </View>
+        </View> */}
 
-        <View
+        {/* <View
           style={{
             borderBottomWidth: 0.3,
             marginBottom: 20,
@@ -217,7 +216,7 @@ const LoginPage = () => {
         </View>
         {errGender && (
           <Text style={{ color: "red", paddingLeft: 10 }}>{errGender}</Text>
-        )}
+        )} */}
         <View style={styles.form_item}>
           <Input
             style={styles.input}

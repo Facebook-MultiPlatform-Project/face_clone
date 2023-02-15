@@ -17,13 +17,18 @@ import { useState } from "react";
 import { PostApi } from "../apis/Post/Post";
 import { useEffect } from "react";
 
-
 const HomePage = () => {
   const user = useSelector((state) => state.user.user);
   const [listPost, setListPost] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
 
   const onRefresh = () => {
+    getListPost();
+  };
+
+  const deletePost = async (id) => {
+    setRefreshing(true);
+    await PostApi.deletePost(id);
     getListPost();
   };
 
@@ -107,7 +112,15 @@ const HomePage = () => {
           </View>
           {listPost[0] &&
             listPost.map((item) => {
-              return <Post id={item} key={item} />;
+              return (
+                <Post
+                  id={item}
+                  key={item}
+                  onDelete={() => {
+                    deletePost(item);
+                  }}
+                />
+              );
             })}
         </ScrollView>
       </SafeAreaView>

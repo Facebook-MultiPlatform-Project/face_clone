@@ -9,4 +9,12 @@ export const upPostApi = {
       },
     });
   },
+  edit: (data) => {
+    const url = "/posts/edit";
+    return axiosClient.post(url, data, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+  },
 };

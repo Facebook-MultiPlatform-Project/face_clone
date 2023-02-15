@@ -19,16 +19,29 @@ import { Video } from "expo-av";
 import { useSelector } from "react-redux";
 import { constant } from "../utils/constant";
 import Toast from "react-native-toast-message";
+import { useEffect } from "react";
 
-const CreatePost = ({ route, navigation }) => {
-  const [content, setContent] = useState(null);
+const EditPost = ({ route, navigation }) => {
+  //   console.log(route.params.data);
+
+  const [content, setContent] = useState(route.params.data.content);
   const [image, setImage] = useState([]);
   const [video, setVideo] = useState({});
-  const [mood, setMood] = useState(null);
+  const [mood, setMood] = useState(route.params.data.status);
   const [loading, setLoading] = useState(false);
   const windowWidth = Dimensions.get("window").width;
   const user = useSelector((state) => state.user.user);
-
+  const checkMedia = () => {
+    let media = route.params.data.medias;
+    if (media.length === 0) return;
+    if (media.length > 1) {
+      setImage(media);
+      return;
+    }
+    if (media[0].name[-3] === "mp4") {
+      setVideo(media);
+    }
+  };
   const updateMood = (value) => {
     setMood(value);
   };
@@ -90,6 +103,7 @@ const CreatePost = ({ route, navigation }) => {
     if (loading) return;
     setLoading(true);
     const data = new FormData();
+    data.append("postId", route.params.data.id);
     data.append("content", content);
     for (let i = 0; i < image.length; i++) {
       const upload_body = {
@@ -117,13 +131,16 @@ const CreatePost = ({ route, navigation }) => {
     if (mood) {
       data.append("status", mood);
     }
-    
-    const res = upPostApi.post(data);
-    res
+    // console.log(data);
+    // console.log(data);
+    // const res = upPostApi.edit(data);
+    // console.log(res)
+    upPostApi
+      .edit(data)
       .then((res) => {
         Toast.show({
           type: "success",
-          text1: "Đăng bài thành công!!!",
+          text1: "Sửa bài thành công!!!",
           visibilityTime: 1000,
         });
         navigation.navigate("facebook");
@@ -139,6 +156,9 @@ const CreatePost = ({ route, navigation }) => {
         setLoading(false);
       });
   };
+  useEffect(() => {
+    checkMedia();
+  }, []);
   return (
     <View
       style={{
@@ -211,7 +231,7 @@ const CreatePost = ({ route, navigation }) => {
               fontWeight: "500",
             }}
           >
-            Đăng
+            Lưu
           </Text>
         </TouchableOpacity>
       </View>
@@ -380,6 +400,6 @@ const CreatePost = ({ route, navigation }) => {
   );
 };
 
-export default CreatePost;
+export default EditPost;
 
 const styles = StyleSheet.create({});
