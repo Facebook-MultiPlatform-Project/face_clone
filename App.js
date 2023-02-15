@@ -294,6 +294,7 @@ export default function App() {
     <Provider store={store}>
       <NavigationContainer ref={navigationRef}>
         <rootStack.Navigator screenOptions={navigationOptions}>
+          <rootStack.Screen component={WaitingPage} name="waiting" />
           <rootStack.Screen component={LoginPage} name="login" />
           <rootStack.Screen component={VerifyEmail} name="verify" />
           <rootStack.Screen component={MainTab} name="facebook" />

@@ -46,9 +46,9 @@ const CommentPage = ({ route, navigation }) => {
       content: cmt,
       commentAnsweredId: "c75cdf4c-173a-4c19-bfea-d2bf1494de07",
     };
-    console.log(param);
+    // console.log(param);
     const res = await postComment.post(param);
-    console.log(res);
+    // console.log(res);
     getData();
     setCmt("");
     Keyboard.dismiss();
@@ -58,9 +58,7 @@ const CommentPage = ({ route, navigation }) => {
   useEffect(() => {
     getData();
   }, []);
-  useEffect(() => {
-    console.log(cmt);
-  }, [cmt]);
+
   return (
     <View
       style={{
@@ -128,7 +126,6 @@ const CommentPage = ({ route, navigation }) => {
           }}
           placeholder="Enter your comment here"
           onChangeText={(text) => {
-            console.log(text);
             setCmt(text);
           }}
           value={cmt}
