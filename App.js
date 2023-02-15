@@ -37,7 +37,11 @@ import { useState } from "react";
 import { NotificationApi } from "./apis/Notification/notificationApi.js";
 const Stack = createStackNavigator();
 const rootStack = createStackNavigator();
+import { LogBox } from "react-native";
 
+LogBox.ignoreLogs([
+  "Non-serializable values were found in the navigation state",
+]);
 const Home = () => {
   return (
     <View>
@@ -122,7 +126,7 @@ export const MainTab = () => {
   };
   var access_token = "";
   var socket;
-  const [numOfNotification,setNumOfNotification] = useState(0);
+  const [numOfNotification, setNumOfNotification] = useState(0);
   const [unreadNotificationList, setUnreadNotificationList] = useState([]);
   const setupSocket = async () => {
     try {
@@ -139,7 +143,7 @@ export const MainTab = () => {
         console.log("socket disconnected");
       });
       socket.on("notification", (notification) => {
-        setNumOfNotification((value) => value + 1)
+        setNumOfNotification((value) => value + 1);
         console.log("socket notification", notification);
       });
       socket.on("error", (err) => {
@@ -152,25 +156,31 @@ export const MainTab = () => {
   const getUnreadNotification = async () => {
     try {
       const data = await NotificationApi.getAll();
-      const list = data.data.data.filter((item) => Boolean(item.read) === false);
+      const list = data.data.data.filter(
+        (item) => Boolean(item.read) === false
+      );
       setUnreadNotificationList(list);
-      setNumOfNotification(list.length)
+      setNumOfNotification(list.length);
     } catch (err) {
       console.log("get notification", err);
     }
   };
   const readNotification = async () => {
     try {
-      console.log({notificationIds: unreadNotificationList.map(item => item.id)})
-      await NotificationApi.read({notificationIds: unreadNotificationList.map(item => item.id)});
+      console.log({
+        notificationIds: unreadNotificationList.map((item) => item.id),
+      });
+      await NotificationApi.read({
+        notificationIds: unreadNotificationList.map((item) => item.id),
+      });
       setUnreadNotificationList([]);
-      setNumOfNotification(0)
+      setNumOfNotification(0);
     } catch (err) {
       console.log("read notification", err.response.data.message);
     }
   };
   useEffect(() => {
-    getUnreadNotification()
+    getUnreadNotification();
     setupSocket();
     return () => {
       socket.off("connect");
@@ -240,7 +250,7 @@ export const MainTab = () => {
               await readNotification();
             },
           })}
-          name="Notification"
+          name="Notifications"
           component={NotificationTab}
         />
         <Tab.Screen

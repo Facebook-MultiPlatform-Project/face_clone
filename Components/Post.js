@@ -92,7 +92,7 @@ const Post = ({ id }) => {
             <Text style={{ fontSize: 16 }}>{postData.content}</Text>
           </View>
           {postData.medias[0] && postData.medias[0].type === "0" ? (
-            <SafeAreaView style={{ minHeight: 380, maxHeight: 570 }}>
+            <SafeAreaView style={{ maxHeight: 570 }}>
               <FlatList
                 data={postData.medias}
                 scrollEnabled={false}
