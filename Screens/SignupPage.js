@@ -116,7 +116,7 @@ const LoginPage = () => {
         name: name,
         password: password,
       };
-
+      
       const res = signupApi.post(data);
       res
         .then((response) => {

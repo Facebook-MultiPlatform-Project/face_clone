@@ -7,7 +7,7 @@ import {
   SafeAreaView,
   TouchableOpacity,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { Icon, Image } from "react-native-elements";
 import { useEffect } from "react";
 import { navigation } from "../rootNavigation";
@@ -19,14 +19,20 @@ import { Video } from "expo-av";
 const Post = ({ id }) => {
   const [postData, setPostData] = useState({});
   const [author, setAuthor] = useState({});
+  const [textShown, setTextShown] = useState(false);
+  const [lengthMore, setLengthMore] = useState(false);
+  const toggleNumberOfLines = () => {
+    setTextShown(!textShown);
+  };
+  const onTextLayout = useCallback((e) => {
+    setLengthMore(e.nativeEvent.lines.length >= 2);
+  }, []);
 
-  const [full, setFull] = useState(false);
   const user = useSelector((state) => state.user.user);
 
   const getPostData = async () => {
     await PostApi.getPost(id)
       .then((res) => {
-        console.log(111, res.data.data);
         setPostData(res.data.data);
         setAuthor(res.data.data.author);
       })
@@ -87,43 +93,63 @@ const Post = ({ id }) => {
             <Icon name="ellipsis-horizontal" type="ionicon"></Icon>
           </View>
         </View>
-        <View style={styles.content}>
-          <View style={[styles.description]}>
-            <Text style={{ fontSize: 16 }}>{postData.content}</Text>
+        <TouchableOpacity
+          onPress={() => {
+            navigation.navigate("detailPost", { postId: id });
+          }}
+        >
+          <View style={styles.content}>
+            <View style={[styles.description]}>
+              <Text
+                style={{ fontSize: 16 }}
+                onTextLayout={onTextLayout}
+                numberOfLines={textShown ? undefined : 2}
+              >
+                {postData.content}
+              </Text>
+              {lengthMore ? (
+                <Text
+                  onPress={toggleNumberOfLines}
+                  style={{ lineHeight: 21, marginTop: 5 }}
+                >
+                  {textShown ? "Ẩn bớt..." : "Xem thêm..."}
+                </Text>
+              ) : null}
+            </View>
+            {postData.medias[0] && postData.medias[0].type === "0" ? (
+              <SafeAreaView style={{ maxHeight: 570 }}>
+                <FlatList
+                  data={postData.medias}
+                  scrollEnabled={false}
+                  numColumns={2}
+                  keyExtractor={(e) => e.id}
+                  renderItem={({ item }) => (
+                    <Image
+                      source={{ uri: item.name }}
+                      containerStyle={{
+                        aspectRatio: 1,
+                        width: "100%",
+                        height: 150,
+                        flex: 1,
+                      }}
+                    />
+                  )}
+                />
+              </SafeAreaView>
+            ) : (
+              <View style={{ height: 10 }}></View>
+            )}
+            {postData.medias[0] && postData.medias[0].type === "1" ? (
+              <Video
+                source={{ uri: postData.medias[0].name }}
+                style={{ width: "100%", height: 300, bottom: 0 }}
+                useNativeControls
+              ></Video>
+            ) : (
+              <View style={{ height: 0 }}></View>
+            )}
           </View>
-          {postData.medias[0] && postData.medias[0].type === "0" ? (
-            <SafeAreaView style={{ maxHeight: 570 }}>
-              <FlatList
-                data={postData.medias}
-                scrollEnabled={false}
-                numColumns={2}
-                keyExtractor={(e) => e.id}
-                renderItem={({ item }) => (
-                  <Image
-                    source={{ uri: item.name }}
-                    containerStyle={{
-                      aspectRatio: 1,
-                      width: "100%",
-                      height: 150,
-                      flex: 1,
-                    }}
-                  />
-                )}
-              />
-            </SafeAreaView>
-          ) : (
-            <View style={{ height: 10 }}></View>
-          )}
-          {postData.medias[0] && postData.medias[0].type === "1" ? (
-            <Video
-              source={{ uri: postData.medias[0].name }}
-              style={{ width: "100%", height: 300, bottom: 0 }}
-              useNativeControls
-            ></Video>
-          ) : (
-            <View style={{ height: 0 }}></View>
-          )}
-        </View>
+        </TouchableOpacity>
         <View>
           <View
             style={{
