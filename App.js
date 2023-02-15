@@ -146,7 +146,7 @@ export const MainTab = () => {
         console.log("socket disconnected");
       });
       socket.on("notification", (notification) => {
-        setNumOfNotification((value) => value + 1);
+        getUnreadNotification();
         console.log("socket notification", notification);
       });
       socket.on("error", (err) => {
@@ -170,10 +170,7 @@ export const MainTab = () => {
   };
   const readNotification = async () => {
     try {
-      console.log({
-        notificationIds: unreadNotificationList.map((item) => item.id),
-      });
-      await NotificationApi.read({
+      if (unreadNotificationList.length > 0) await NotificationApi.read({
         notificationIds: unreadNotificationList.map((item) => item.id),
       });
       setUnreadNotificationList([]);
