@@ -5,36 +5,40 @@ import {
   Image,
   Modal,
   Dimensions,
+  RefreshControl,
 } from "react-native";
 import * as SecureStore from "expo-secure-store";
 import { logoutApi } from "../apis/Auth/logoutApi";
 import { UserApi } from "../apis/User/UserApi";
 import { navigation } from "../rootNavigation";
 import { useEffect, useState } from "react";
+import { Icon } from "react-native-elements";
+import { ScrollView } from "react-native-gesture-handler";
 
 const Shortcut = (props) => {
-  const { name, icon, des } = props;
+  const { name, des, iconName, iconType } = props;
   return (
-    <View style={{ width: "50%" }}>
+    <TouchableOpacity
+      onPress={() => {
+        navigation.navigate(des);
+      }}
+      style={{ width: "50%" }}
+    >
       <View
         style={{
           backgroundColor: "#fff",
           borderRadius: 10,
           padding: 16,
           margin: 5,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
         }}
-        // onTouchEnd={() => navigation.navigate(des)}
+        onTouchEnd={() => {
+          if (name === "Friends") navigation.navigate(des);
+        }}
       >
-        <Image
-          source={{
-            uri: icon,
-          }}
-          style={{
-            width: 40,
-            height: 40,
-            borderRadius: 100,
-          }}
-        ></Image>
+        <Icon name={iconName} type={iconType} size={25} color="#06f"></Icon>
         <Text
           style={{
             color: "#333",
@@ -46,7 +50,7 @@ const Shortcut = (props) => {
           {name}
         </Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 
@@ -55,12 +59,24 @@ const Menu = () => {
   const [showModal, setShowModal] = useState(false);
   const windowWidth = Dimensions.get("window").width;
   const windowHeight = Dimensions.get("window").height;
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    getUserInfo();
+    // if (userId === user.id) {
+    //   getListFriend();
+    // }
+  };
+
   const getUserInfo = async () => {
     try {
       const data = await UserApi.getProfile();
       setUser(data.data.data);
     } catch (err) {
       console.log(err);
+    } finally {
+      setRefreshing(false);
     }
   };
   useEffect(() => {
@@ -79,7 +95,12 @@ const Menu = () => {
     }
   };
   return (
-    <View style={{ padding: 16, height: "100%" }}>
+    <ScrollView
+      style={{ padding: 16, height: "100%" }}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+    >
       <View>
         <Text style={{ color: "#000", fontWeight: "700", fontSize: 30 }}>
           Menu
@@ -148,11 +169,14 @@ const Menu = () => {
         >
           <Shortcut
             name="Friends"
-            icon="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHMbNbn5XcHIXV3PoLxkmsKdTQIbNffNpyuQ&usqp=CAU"
+            iconName="user-friends"
+            iconType="font-awesome-5"
+            des="friendList"
           ></Shortcut>
           <Shortcut
             name="Shortcut 2"
-            icon="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHMbNbn5XcHIXV3PoLxkmsKdTQIbNffNpyuQ&usqp=CAU"
+            iconName="user-friends"
+            iconType="font-awesome-5"
           ></Shortcut>
         </View>
         <View
@@ -164,11 +188,13 @@ const Menu = () => {
         >
           <Shortcut
             name="Shortcut 3"
-            icon="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHMbNbn5XcHIXV3PoLxkmsKdTQIbNffNpyuQ&usqp=CAU"
+            iconName="user-friends"
+            iconType="font-awesome-5"
           ></Shortcut>
           <Shortcut
             name="Shortcut 4"
-            icon="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHMbNbn5XcHIXV3PoLxkmsKdTQIbNffNpyuQ&usqp=CAU"
+            iconName="user-friends"
+            iconType="font-awesome-5"
           ></Shortcut>
         </View>
         <View style={{ marginTop: 10 }}>
@@ -188,10 +214,10 @@ const Menu = () => {
             </Text>
           </TouchableOpacity>
         </View>
-        {/* <View style={{ marginTop: 10 }}>
+        <View style={{ marginTop: 10 }}>
           <TouchableOpacity
             style={{ backgroundColor: "#ccc", borderRadius: 10, padding: 10 }}
-            onPress={() => navigation.navigate("changepassword")}
+            onPress={() => navigation.navigate("changePassword")}
           >
             <Text
               style={{
@@ -204,7 +230,7 @@ const Menu = () => {
               Change password
             </Text>
           </TouchableOpacity>
-        </View> */}
+        </View>
         <View style={{ marginTop: 10 }}>
           <TouchableOpacity
             style={{ backgroundColor: "#ccc", borderRadius: 10, padding: 10 }}
@@ -240,7 +266,7 @@ const Menu = () => {
             // width: windowWidth / 1.05,
             // height: windowHeight / 5,
             // backgroundColor:'red'
-            backgroundColor: 'rgba(0,0,0,0.5)'
+            backgroundColor: "rgba(0,0,0,0.5)",
           }}
         >
           <View
@@ -302,7 +328,7 @@ const Menu = () => {
           </View>
         </View>
       </Modal>
-    </View>
+    </ScrollView>
   );
 };
 

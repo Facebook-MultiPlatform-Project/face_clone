@@ -36,6 +36,7 @@ import Search from "./Screens/Search.js";
 import Chat from "./Screens/Chat.js";
 import { useState } from "react";
 import { NotificationApi } from "./apis/Notification/notificationApi.js";
+import ChangePassword from "./Screens/ChangePassword.js";
 const Stack = createStackNavigator();
 const rootStack = createStackNavigator();
 import { LogBox } from "react-native";
@@ -295,6 +296,7 @@ export default function App() {
     <Provider store={store}>
       <NavigationContainer ref={navigationRef}>
         <rootStack.Navigator screenOptions={navigationOptions}>
+          <rootStack.Screen component={WaitingPage} name="waiting" />
           <rootStack.Screen component={LoginPage} name="login" />
           <rootStack.Screen component={VerifyEmail} name="verify" />
           <rootStack.Screen component={MainTab} name="facebook" />
@@ -310,6 +312,7 @@ export default function App() {
           <rootStack.Screen component={Messager} name="messager" />
           <rootStack.Screen component={FriendList} name="friendList" />
           <rootStack.Screen component={Search} name="search" />
+          <rootStack.Screen component={ChangePassword} name="changePassword" />
           <rootStack.Screen component={Chat} name="chat" />
           <rootStack.Screen component={DetailPost} name="detailPost" />
         </rootStack.Navigator>
