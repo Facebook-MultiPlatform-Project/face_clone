@@ -449,7 +449,7 @@ const Profile = ({ route, navigation }) => {
         )}
         <View>
           {listPost.map((item) => (
-            <Post id={item.id} />
+            <Post id={item.id} key={item.id} />
           ))}
         </View>
       </ScrollView>

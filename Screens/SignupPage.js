@@ -92,13 +92,13 @@ const LoginPage = () => {
         email: email,
         name: name,
         password: password,
+        uuid: "12313123",
       };
       console.log(data);
       const res = signupApi.post(data);
       res
         .then((response) => {
-          console.log("res:", response.data);
-          navigation.navigate("verify");
+          navigation.navigate("verify", { email: email });
           setActiveSignup(false);
         })
         .catch((err) => {
