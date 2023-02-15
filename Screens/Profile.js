@@ -5,6 +5,8 @@ import {
   TouchableOpacity,
   ScrollView,
   TextInput,
+  Dimensions,
+  RefreshControl,
 } from "react-native";
 import React from "react";
 import { useSelector } from "react-redux";
@@ -16,6 +18,7 @@ import { PostApi } from "../apis/Post/Post";
 import { UserApi } from "../apis/User/UserApi";
 import { FriendApi } from "../apis/Friend/Friend";
 import { constant } from "../utils/constant";
+import { SafeAreaView } from "react-native";
 
 const Profile = ({ route, navigation }) => {
   const userId = route.params.userId;
@@ -26,11 +29,24 @@ const Profile = ({ route, navigation }) => {
   const [isFriend, setIsFriend] = useState(false);
   const [status, setStatus] = useState(null);
   const [isSender, setIsSender] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const user = useSelector((state) => state.user.user);
+
+  const windowHeight = Dimensions.get("window").height;
+  const scrollHeight = windowHeight - 55;
+
+  const onRefresh = () => {
+    getUserInfo();
+    getListPost();
+    checkFriend();
+    if (userId === user.id) {
+      getListFriend();
+    }
+  };
+
   const getUserInfo = async () => {
     await UserApi.getInfo(userId)
       .then((res) => {
-        console.log("info", res.data);
         setInfo(res.data.data);
       })
       .catch((err) => {
@@ -69,8 +85,7 @@ const Profile = ({ route, navigation }) => {
     await FriendApi.sendRequest(userId)
       .then((res) => {
         console.log(res.data);
-        setIsSender(true);
-        setStatus("0");
+        checkFriend();
       })
       .catch((err) => {
         console.log(err);
@@ -85,6 +100,7 @@ const Profile = ({ route, navigation }) => {
     await FriendApi.setAccept(data)
       .then((res) => {
         console.log(res.data);
+        checkFriend();
       })
       .catch((err) => {
         console.log(err);
@@ -94,7 +110,7 @@ const Profile = ({ route, navigation }) => {
     await FriendApi.cancelRequest(userId)
       .then((res) => {
         console.log(res.data);
-        setStatus("2");
+        checkFriend();
       })
       .catch((err) => {
         console.log(err);
@@ -109,6 +125,7 @@ const Profile = ({ route, navigation }) => {
     await UserApi.setBlock(data)
       .then((res) => {
         console.log(res.data);
+        navigation.navigate("facebook");
       })
       .catch((err) => {
         console.log(err);
@@ -118,7 +135,7 @@ const Profile = ({ route, navigation }) => {
   const removeFriend = async () => {
     await FriendApi.removeFriend(userId)
       .then((res) => {
-        console.log(res.data);
+        checkFriend();
       })
       .catch((err) => {
         console.log(err);
@@ -183,131 +200,90 @@ const Profile = ({ route, navigation }) => {
           }}
         ></TextInput>
       </View>
-      <ScrollView>
-        <View style={{ position: "relative", backgroundColor: "#fff" }}>
-          <View>
-            <Image
-              style={{ height: 230, width: "100%" }}
-              source={{ uri: info.cover }}
-            ></Image>
-          </View>
-          <View
-            style={{
-              position: "absolute",
-              bottom: 50,
-              left: 10,
-              backgroundColor: "#fff",
-              borderRadius: 100,
-              width: 150,
-              height: 150,
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <Image
-              style={{
-                height: 140,
-                width: 140,
-                borderRadius: 100,
-              }}
-              source={{ uri: info.avatar }}
-            ></Image>
-          </View>
-          <View
-            style={{
-              marginTop: 50,
-              marginBottom: 10,
-              paddingHorizontal: 20,
-              display: "flex",
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <Text style={{ fontSize: 25, fontWeight: "700" }}>{info.name}</Text>
+      <SafeAreaView
+        style={{
+          height: scrollHeight,
+        }}
+      >
+        <ScrollView
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+        >
+          <View style={{ position: "relative", backgroundColor: "#fff" }}>
+            <View>
+              <Image
+                style={{ height: 230, width: "100%" }}
+                source={{ uri: info.cover }}
+              ></Image>
+            </View>
             <View
               style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "flex-end",
+                position: "absolute",
+                top: 140,
+                left: 10,
+                backgroundColor: "#fff",
+                borderRadius: 100,
+                width: 150,
+                height: 150,
+                justifyContent: "center",
+                alignItems: "center",
               }}
             >
-              {userId === user.id ? (
-                <TouchableOpacity
-                  onPress={() => {
-                    navigation.navigate({
-                      name: "updateProfile",
-                      params: { updateData: handleUpdate },
-                    });
-                  }}
-                  style={{
-                    height: 30,
-                    width: 30,
-                    borderRadius: 4,
-                    display: "flex",
-                    justifyContent: "center",
-                    flexDirection: "row",
-                    alignItems: "center",
-                    backgroundColor: "#3982E4",
-                  }}
-                >
-                  <Icon name="edit" type="material" color="#fff"></Icon>
-                </TouchableOpacity>
-              ) : isFriend ? (
-                <TouchableOpacity
-                  onPress={removeFriend}
-                  style={{
-                    height: 30,
-                    width: 100,
-                    borderRadius: 4,
-                    display: "flex",
-                    justifyContent: "center",
-                    flexDirection: "row",
-                    alignItems: "center",
-                    backgroundColor: "#3982E4",
-                  }}
-                >
-                  <Text style={{ color: "#fff" }}>Hủy kết bạn</Text>
-                </TouchableOpacity>
-              ) : status !== constant.FRIEND_STATUS.SEND_REQUEST ? (
-                <TouchableOpacity
-                  onPress={sendRequest}
-                  style={{
-                    height: 30,
-                    width: 140,
-                    borderRadius: 4,
-                    display: "flex",
-                    justifyContent: "center",
-                    flexDirection: "row",
-                    alignItems: "center",
-                    backgroundColor: "#3982E4",
-                  }}
-                >
-                  <Text style={{ color: "#fff" }}>Yêu cầu kết bạn</Text>
-                </TouchableOpacity>
-              ) : status === constant.FRIEND_STATUS.SEND_REQUEST && isSender ? (
-                <TouchableOpacity
-                  onPress={cancelRequest}
-                  style={{
-                    height: 30,
-                    width: 100,
-                    borderRadius: 4,
-                    display: "flex",
-                    justifyContent: "center",
-                    flexDirection: "row",
-                    alignItems: "center",
-                    backgroundColor: "#3982E4",
-                  }}
-                >
-                  <Text style={{ color: "#fff" }}>Hủy yêu cầu</Text>
-                </TouchableOpacity>
-              ) : status === constant.FRIEND_STATUS.SEND_REQUEST &&
-                !isSender ? (
-                <View>
+              <Image
+                style={{
+                  height: 140,
+                  width: 140,
+                  borderRadius: 100,
+                }}
+                source={{ uri: info.avatar }}
+              ></Image>
+            </View>
+            <View
+              style={{
+                marginTop: 50,
+                marginBottom: 10,
+                paddingHorizontal: 20,
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <Text style={{ fontSize: 25, fontWeight: "700" }}>
+                {info.name}
+              </Text>
+              <View
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "flex-end",
+                }}
+              >
+                {userId === user.id ? (
                   <TouchableOpacity
                     onPress={() => {
-                      setAccept(true);
+                      navigation.navigate({
+                        name: "updateProfile",
+                        params: { updateData: handleUpdate },
+                      });
                     }}
+                    style={{
+                      height: 30,
+                      width: 30,
+                      borderRadius: 4,
+                      display: "flex",
+                      justifyContent: "center",
+                      flexDirection: "row",
+                      alignItems: "center",
+                      backgroundColor: "#3982E4",
+                    }}
+                  >
+                    <Icon name="edit" type="material" color="#fff"></Icon>
+                  </TouchableOpacity>
+                ) : isFriend ? (
+                  <TouchableOpacity
+                    onPress={removeFriend}
                     style={{
                       height: 30,
                       width: 100,
@@ -319,13 +295,87 @@ const Profile = ({ route, navigation }) => {
                       backgroundColor: "#3982E4",
                     }}
                   >
-                    <Text style={{ color: "#fff" }}>Đồng ý</Text>
+                    <Text style={{ color: "#fff" }}>Hủy kết bạn</Text>
                   </TouchableOpacity>
+                ) : status !== constant.FRIEND_STATUS.SEND_REQUEST ? (
                   <TouchableOpacity
-                    onPress={() => {
-                      setAccept(false);
-                    }}
+                    onPress={sendRequest}
                     style={{
+                      height: 30,
+                      width: 140,
+                      borderRadius: 4,
+                      display: "flex",
+                      justifyContent: "center",
+                      flexDirection: "row",
+                      alignItems: "center",
+                      backgroundColor: "#3982E4",
+                    }}
+                  >
+                    <Text style={{ color: "#fff" }}>Yêu cầu kết bạn</Text>
+                  </TouchableOpacity>
+                ) : status === constant.FRIEND_STATUS.SEND_REQUEST &&
+                  isSender ? (
+                  <TouchableOpacity
+                    onPress={cancelRequest}
+                    style={{
+                      height: 30,
+                      width: 100,
+                      borderRadius: 4,
+                      display: "flex",
+                      justifyContent: "center",
+                      flexDirection: "row",
+                      alignItems: "center",
+                      backgroundColor: "#3982E4",
+                    }}
+                  >
+                    <Text style={{ color: "#fff" }}>Hủy yêu cầu</Text>
+                  </TouchableOpacity>
+                ) : status === constant.FRIEND_STATUS.SEND_REQUEST &&
+                  !isSender ? (
+                  <View>
+                    <TouchableOpacity
+                      onPress={() => {
+                        setAccept(true);
+                      }}
+                      style={{
+                        height: 30,
+                        width: 100,
+                        borderRadius: 4,
+                        display: "flex",
+                        justifyContent: "center",
+                        flexDirection: "row",
+                        alignItems: "center",
+                        backgroundColor: "#3982E4",
+                      }}
+                    >
+                      <Text style={{ color: "#fff" }}>Đồng ý</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={() => {
+                        setAccept(false);
+                      }}
+                      style={{
+                        height: 30,
+                        width: 100,
+                        borderRadius: 4,
+                        display: "flex",
+                        justifyContent: "center",
+                        flexDirection: "row",
+                        alignItems: "center",
+                        backgroundColor: "#E4E5EA",
+                      }}
+                    >
+                      <Text style={{ color: "#000" }}>Xóa</Text>
+                    </TouchableOpacity>
+                  </View>
+                ) : (
+                  <></>
+                )}
+                {userId !== user.id && (
+                  <TouchableOpacity
+                    onPress={setBlock}
+                    style={{
+                      marginTop: 10,
                       height: 30,
                       width: 100,
                       borderRadius: 4,
@@ -336,123 +386,105 @@ const Profile = ({ route, navigation }) => {
                       backgroundColor: "#E4E5EA",
                     }}
                   >
-                    <Text style={{ color: "#000" }}>Xóa</Text>
-                  </TouchableOpacity>
-                </View>
-              ) : (
-                <></>
-              )}
-              {userId !== user.id && (
-                <TouchableOpacity
-                  onPress={setBlock}
-                  style={{
-                    marginTop: 10,
-                    height: 30,
-                    width: 100,
-                    borderRadius: 4,
-                    display: "flex",
-                    justifyContent: "center",
-                    flexDirection: "row",
-                    alignItems: "center",
-                    backgroundColor: "#E4E5EA",
-                  }}
-                >
-                  <Text style={{ color: "#000", fontWeight: "500" }}>Chặn</Text>
-                </TouchableOpacity>
-              )}
-            </View>
-          </View>
-        </View>
-        {userId === user.id && (
-          <View
-            style={{
-              backgroundColor: "#fff",
-              marginTop: 10,
-              paddingVertical: 10,
-              paddingHorizontal: 15,
-            }}
-          >
-            <View style={{ marginBottom: 10 }}>
-              <Text style={{ fontSize: 20, fontWeight: "700" }}>Bạn bè</Text>
-              <Text>{listFriend.length} người bạn</Text>
-            </View>
-            <View>
-              <View
-                style={{
-                  display: "flex",
-                  flexWrap: "wrap",
-                  justifyContent: "space-between",
-                  flexDirection: "row",
-                  gap: 10,
-                }}
-              >
-                {listFriendRender.map((item) => {
-                  return (
-                    <TouchableOpacity style={{ width: "33%" }} key={item.id}>
-                      <View
-                        style={{
-                          marginBottom: 5,
-                          width: "95%",
-                        }}
-                      >
-                        <Image
-                          style={{
-                            width: "100%",
-                            height: 115,
-                            borderRadius: 10,
-                          }}
-                          source={{
-                            uri: item.avatar,
-                          }}
-                        ></Image>
-                        <Text
-                          style={{
-                            marginLeft: 5,
-                            marginTop: 5,
-                            overflow: "hidden",
-                            fontSize: 16,
-                            fontWeight: "600",
-                          }}
-                        >
-                          {item.name}
-                        </Text>
-                      </View>
-                    </TouchableOpacity>
-                  );
-                })}
-              </View>
-              <View>
-                {listFriend.length > 6 && (
-                  <TouchableOpacity
-                    style={{
-                      width: "100%",
-                      marginTop: 10,
-                      paddingVertical: 5,
-                      borderRadius: 8,
-                      backgroundColor: "#e4e4e4",
-                    }}
-                  >
-                    <Text
-                      style={{
-                        textAlign: "center",
-                        fontSize: 16,
-                        fontWeight: "600",
-                      }}
-                    >
-                      Xem tất cả bạn bè
+                    <Text style={{ color: "#000", fontWeight: "500" }}>
+                      Chặn
                     </Text>
                   </TouchableOpacity>
                 )}
               </View>
             </View>
           </View>
-        )}
-        <View>
-          {listPost.map((item) => (
-            <Post id={item.id} key={item.id} />
-          ))}
-        </View>
-      </ScrollView>
+          {userId === user.id && (
+            <View
+              style={{
+                backgroundColor: "#fff",
+                marginTop: 10,
+                paddingVertical: 10,
+                paddingHorizontal: 15,
+              }}
+            >
+              <View style={{ marginBottom: 10 }}>
+                <Text style={{ fontSize: 20, fontWeight: "700" }}>Bạn bè</Text>
+                <Text>{listFriend.length} người bạn</Text>
+              </View>
+              <View>
+                <View
+                  style={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    justifyContent: "space-between",
+                    flexDirection: "row",
+                    gap: 10,
+                  }}
+                >
+                  {listFriendRender.map((item) => {
+                    return (
+                      <TouchableOpacity style={{ width: "33%" }} key={item.id}>
+                        <View
+                          style={{
+                            marginBottom: 5,
+                            width: "95%",
+                          }}
+                        >
+                          <Image
+                            style={{
+                              width: "100%",
+                              height: 115,
+                              borderRadius: 10,
+                            }}
+                            source={{
+                              uri: item.avatar,
+                            }}
+                          ></Image>
+                          <Text
+                            style={{
+                              marginLeft: 5,
+                              marginTop: 5,
+                              overflow: "hidden",
+                              fontSize: 16,
+                              fontWeight: "600",
+                            }}
+                          >
+                            {item.name}
+                          </Text>
+                        </View>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+                <View>
+                  {listFriend.length > 6 && (
+                    <TouchableOpacity
+                      style={{
+                        width: "100%",
+                        marginTop: 10,
+                        paddingVertical: 5,
+                        borderRadius: 8,
+                        backgroundColor: "#e4e4e4",
+                      }}
+                    >
+                      <Text
+                        style={{
+                          textAlign: "center",
+                          fontSize: 16,
+                          fontWeight: "600",
+                        }}
+                      >
+                        Xem tất cả bạn bè
+                      </Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
+              </View>
+            </View>
+          )}
+          <View>
+            {listPost.map((item) => (
+              <Post id={item.id} key={item.id} />
+            ))}
+          </View>
+        </ScrollView>
+      </SafeAreaView>
     </View>
   );
 };
