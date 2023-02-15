@@ -10,23 +10,33 @@ import { Icon, Input } from "react-native-elements";
 import { EMAIL_REGEX } from "../common/regex";
 import { signupApi } from "../apis/Auth/signupApi";
 import { navigation } from "../rootNavigation";
-
+import { Picker } from "@react-native-picker/picker";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import { parseTime } from "../utils";
 const LoginPage = () => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-
+  const [gender, setGender] = useState("0");
   const [errFirstName, setErrFirstName] = useState("");
   const [errLastName, setErrLastName] = useState("");
   const [errEmail, setErrEmail] = useState("");
   const [errPassword, setErrPassword] = useState("");
   const [errConfirmPassword, setErrConfirmPassword] = useState("");
-
+  const [errGender, setErrGender] = useState("");
+  const [show, setShow] = useState(false);
   const [hidePassword, setHidePassword] = useState(true);
   const [activeSignup, setActiveSignup] = useState(false);
+  const [birthday, setBirthday] = useState(new Date());
 
+  const onChange = (event, selectedDate) => {
+    setShow(false);
+    const currentDate = selectedDate;
+    setBirthday(currentDate);
+    console.log(birthday);
+  };
   const checkHidePass = () => {
     return hidePassword ? (
       <Icon
@@ -46,7 +56,16 @@ const LoginPage = () => {
       ></Icon>
     );
   };
+  const resetError = () => {
+    setErrConfirmPassword("");
+    setErrEmail("");
+    setErrFirstName("");
+    setErrGender("");
+    setErrPassword("");
+    setErrLastName("");
+  };
   const isValid = () => {
+    resetError();
     if (!firstName) {
       setErrFirstName("Required");
     } else {
@@ -80,6 +99,10 @@ const LoginPage = () => {
       setErrEmail("Invalid Email");
       return false;
     }
+    if (gender == "Unknown") {
+      setErrGender("Bạn phải lựa chọn giới tính");
+      return false;
+    }
     if (firstName && lastName && email && password && confirmPassword)
       return true;
     else return false;
@@ -92,11 +115,11 @@ const LoginPage = () => {
         email: email,
         name: name,
         password: password,
-        uuid : "00000000-54b3-e7c7-0000-000046bffd57",
-        "birthday" : "2001-01-01",
-    "gender" : "1"
+        uuid: "00000000-54b3-e7c7-0000-000046bffd57",
+        birthday: parseTime(birthday, "{y}/{m}/{d}"),
+        gender: gender,
       };
-  
+
       const res = signupApi.post(data);
       res
         .then((response) => {
@@ -135,6 +158,65 @@ const LoginPage = () => {
             ></Input>
           </View>
         </View>
+
+        <View
+          style={{
+            marginBottom: 10,
+            marginLeft: 10,
+            marginRight: 10,
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+          }}
+        >
+          {/* <Text style={{ fontSize: 18, marginRight: 10 }}>Ngày sinh:</Text> */}
+          <TouchableOpacity
+            onPress={() => setShow(true)}
+            style={{
+              width: "100%",
+              height: 30,
+              borderColor: "#9c9c9c",
+              borderBottomWidth: 1,
+              paddingHorizontal: 10,
+              display: "flex",
+              flexDirection: "row",
+            }}
+          >
+            <Text style={{ fontSize: 18, marginRight: 10 }}>Ngày sinh:</Text>
+            <Text style={{ fontSize: 16, lineHeight: 30 }}>
+              {parseTime(birthday, "{d}/{m}/{y}")}
+            </Text>
+          </TouchableOpacity>
+          {show && (
+            <DateTimePicker
+              testID="dateTimePicker"
+              value={birthday}
+              onChange={onChange}
+            />
+          )}
+        </View>
+
+        <View
+          style={{
+            borderBottomWidth: 0.3,
+            marginBottom: 20,
+            marginLeft: 10,
+            marginRight: 10,
+          }}
+        >
+          <Picker
+            selectedValue={gender}
+            onValueChange={(value, index) => setGender(value)}
+            mode="dropdown" // Android only
+          >
+            <Picker.Item label="Select Gender" value="Unknown" />
+            <Picker.Item label="Male" value={"1"} />
+            <Picker.Item label="Female" value={"0"} />
+          </Picker>
+        </View>
+        {errGender && (
+          <Text style={{ color: "red", paddingLeft: 10 }}>{errGender}</Text>
+        )}
         <View style={styles.form_item}>
           <Input
             style={styles.input}
@@ -155,6 +237,7 @@ const LoginPage = () => {
             secureTextEntry={hidePassword}
           ></Input>
         </View>
+
         <View style={styles.form_item}>
           <Input
             style={styles.input}
