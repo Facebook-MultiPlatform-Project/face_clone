@@ -11,6 +11,7 @@ import { Icon } from "react-native-elements";
 import { NotificationApi } from "../apis/Notification/notificationApi";
 import { getTimeDisplay } from "../utils";
 import { navigation } from "../rootNavigation";
+import { useFocusEffect } from "@react-navigation/native";
 
 const SECURITY = "0";
 const POST = "1";
@@ -19,8 +20,9 @@ const ACCEPT_FRIEND = "3";
 
 const NotiItems = ({
   id,
-  avatar,
   content,
+  userName,
+  userAvatar,
   active,
   createdAt,
   type,
@@ -29,7 +31,7 @@ const NotiItems = ({
   return (
     <TouchableOpacity
       style={{
-        backgroundColor: active ? "#BFEAF5" : "white",
+        backgroundColor: active ? "white" : "#BFEAF5",
         display: "flex",
         flexDirection: "row",
         alignItems: "center",
@@ -44,7 +46,7 @@ const NotiItems = ({
             case REQ_FRIEND:
             case ACCEPT_FRIEND:
               navigation.navigate("profile", {
-                userId: "d537d44a-4de3-4407-b25c-3b0d193fc96d",
+                userId: content.slice(7),
               });
             default:
           }
@@ -56,7 +58,7 @@ const NotiItems = ({
       <Avatar.Image
         size={75}
         source={{
-          uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHMbNbn5XcHIXV3PoLxkmsKdTQIbNffNpyuQ&usqp=CAU",
+          uri: userAvatar,
         }}
       />
       <View
@@ -68,12 +70,36 @@ const NotiItems = ({
           marginRight: 20,
         }}
       >
-        <Text
-          style={{ flex: 1, flexWrap: "wrap", maxWidth: "100%", fontSize: 16 }}
-          numberOfLines={3}
-        >
-          {content}
-        </Text>
+        {type === REQ_FRIEND && (
+          <Text
+            style={{
+              flex: 1,
+              flexWrap: "wrap",
+              maxWidth: "100%",
+              fontSize: 16,
+              paddingTop: 10,
+            }}
+            numberOfLines={3}
+          >
+            <Text style={{ fontWeight: "700" }}>{userName}</Text>
+            <Text> đã gửi lời mời kết bạn cho bạn.</Text>
+          </Text>
+        )}
+        {type === ACCEPT_FRIEND && (
+          <Text
+            style={{
+              flex: 1,
+              flexWrap: "wrap",
+              maxWidth: "100%",
+              fontSize: 16,
+              paddingTop: 10,
+            }}
+            numberOfLines={3}
+          >
+            <Text style={{ fontWeight: "700" }}>{userName}</Text>
+            <Text> đã chấp nhận lời mời kết bạn của bạn.</Text>
+          </Text>
+        )}
         <Text style={{ fontSize: 14, color: "grey" }}>
           {getTimeDisplay(createdAt)}
         </Text>
@@ -91,7 +117,7 @@ const Notifications = () => {
   const getNotification = async () => {
     try {
       const data = await NotificationApi.getAll();
-      console.log("data", data.data.data);
+      console.log("get notification");
       setNotificationList(data.data.data);
     } catch (err) {
       console.log("notification", err);
@@ -105,6 +131,13 @@ const Notifications = () => {
     getNotification();
     setRefreshing(false);
   });
+  useFocusEffect(
+    React.useCallback(() => {
+      setRefreshing(true);
+      getNotification();
+      setRefreshing(false);
+    }, [])
+  );
   return (
     <View
       style={{

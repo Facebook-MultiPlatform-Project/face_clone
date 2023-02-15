@@ -14,6 +14,7 @@ import { FriendApi } from "../apis/Friend/Friend";
 import { navigation } from "../rootNavigation";
 import { UserApi } from "../apis/User/UserApi";
 import Icon from "react-native-vector-icons/FontAwesome";
+import { useFocusEffect } from "@react-navigation/native";
 const FriendList = () => {
   const [showUnfirendModal, setShowUnfriendModal] = useState(false);
   const [selectedID, setSelectedID] = useState("");
@@ -54,6 +55,12 @@ const FriendList = () => {
     setRefreshing(true);
     getListFriend();
   }, []);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      getListFriend();
+    }, [])
+  );
   return (
     // <Provider>
     <View

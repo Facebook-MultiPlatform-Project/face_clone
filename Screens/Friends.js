@@ -46,6 +46,8 @@ const setupSocket = async (getList) => {
     console.log("setup socket", err);
   }
 };
+import { useFocusEffect } from "@react-navigation/native";
+
 const Friends = () => {
   const [friendsRequests, setFriendsRequests] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
@@ -70,6 +72,12 @@ const Friends = () => {
       socket.off("disconnect");
     };
   }, []);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      getListFriendRequest();
+    }, [])
+  );
   return (
     <View
       style={{
