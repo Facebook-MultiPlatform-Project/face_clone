@@ -125,10 +125,11 @@ export const MainTab = () => {
     tabBarShowIcon: true,
     tabBarShowLabel: false,
   };
-  var access_token = "";
-  var socket;
+
   const [numOfNotification, setNumOfNotification] = useState(0);
   const [unreadNotificationList, setUnreadNotificationList] = useState([]);
+  var access_token = "";
+  var socket;
   const setupSocket = async () => {
     try {
       access_token = await SecureStore.getItemAsync("access_token");
