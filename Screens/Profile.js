@@ -162,7 +162,7 @@ const Profile = ({ route, navigation }) => {
     if (userId === user.id) {
       getListFriend();
     }
-  }, []);
+  }, [userId]);
 
   return (
     <View style={{ paddingVertical: 10 }}>
@@ -461,6 +461,9 @@ const Profile = ({ route, navigation }) => {
                         paddingVertical: 5,
                         borderRadius: 8,
                         backgroundColor: "#e4e4e4",
+                      }}
+                      onPress={() => {
+                        navigation.navigate("friendList");
                       }}
                     >
                       <Text

@@ -6,6 +6,8 @@ import {
   StatusBar,
   TouchableOpacity,
   Button,
+  FlatList,
+  RefreshControl,
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import { Avatar } from "react-native-paper";
@@ -13,16 +15,23 @@ import { Divider } from "react-native-elements";
 import { FriendApi } from "../apis/Friend/Friend";
 import { getTimeDisplay } from "../utils";
 import { navigation } from "../rootNavigation";
+import { io } from "socket.io-client";
 
 const Friends = () => {
   const [friendsRequests, setFriendsRequests] = useState([]);
-
+  const [refreshing, setRefreshing] = useState(false);
+  const onRefresh = () => {
+    setRefreshing(true);
+    getListFriendRequest();
+  };
   async function getListFriendRequest() {
     const data = await FriendApi.getRequestFriend();
     setFriendsRequests(data.data.data);
+    setRefreshing(false);
   }
 
   useEffect(() => {
+    setRefreshing(true);
     getListFriendRequest();
   }, []);
   return (
@@ -32,13 +41,8 @@ const Friends = () => {
         flex: 1,
         flexDirection: "column",
         alignItems: "flex-start",
-        // backgroundColor:'red',
-        // paddingTop: StatusBar.currentHeight,
       }}
     >
-      {/* <Text style={{ paddingLeft: 20, fontSize: 30, fontWeight: "bold" }}>
-        {"Lời mời kết bạn"}
-      </Text> */}
       <View style={{ display: "flex", flexDirection: "row" }}>
         <Text style={{ paddingLeft: 10, fontSize: 25, fontWeight: "bold" }}>
           {"Lời mời kết bạn "}
@@ -48,9 +52,14 @@ const Friends = () => {
         </Text>
       </View>
       <Divider orientation="horizontal" width={1} />
-      {friendsRequests.length > 0 ? (
-        <ScrollView style={{ width: "100%" }}>
-          {friendsRequests.map((item) => {
+      <ScrollView
+        style={{ width: "100%" }}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
+        {friendsRequests.length > 0 ? (
+          friendsRequests.map((item) => {
             return (
               <FriendsItems
                 avatar={item.avatar}
@@ -60,11 +69,11 @@ const Friends = () => {
                 callBack={getListFriendRequest}
               />
             );
-          })}
-        </ScrollView>
-      ) : (
-        <Text style={{ paddingLeft: 10 }}>Hiện không có lời mời nào</Text>
-      )}
+          })
+        ) : (
+          <Text style={{ paddingLeft: 10 }}>Hiện không có lời mời nào</Text>
+        )}
+      </ScrollView>
     </View>
   );
 };
@@ -196,36 +205,7 @@ const FriendsItems = ({ avatar, name, id, time, callBack }) => {
             </Text>
           </TouchableOpacity>
         </View>
-        {/* <Text style={{fontSize:12,color:'grey'}}>{isRead?'white':"#BFEAF5"}</Text> */}
       </View>
     </TouchableOpacity>
   );
 };
-
-// const AvatarItem = ({ avatarUrl, isActive }) => {
-//   const [active, setActive] = useState(false);
-//   return (
-//     <View>
-//       <Avatar.Image
-//         size={70}
-//         source={
-//           { uri: avatarUrl }
-//           // "https://storage.googleapis.com/facebook-storage.appspot.com/user%2Favatar%2Fdefault.jpg"
-//         }
-//       />
-//       {/* <View
-//         style={{
-//           borderRadius: 100,
-//           backgroundColor: "green",
-//           width: 20,
-//           height: 20,
-//           position: "absolute",
-//           bottom: 1,
-//           right: 1,
-//           // bottom
-//           // size:20
-//         }}
-//       ></View> */}
-//     </View>
-//   );
-// };
