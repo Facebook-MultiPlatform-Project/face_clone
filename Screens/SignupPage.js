@@ -115,15 +115,12 @@ const LoginPage = () => {
         email: email,
         name: name,
         password: password,
-        uuid: "00000000-54b3-e7c7-0000-000046bffd57",
-        birthday: parseTime(birthday, "{y}/{m}/{d}"),
-        gender: gender,
       };
 
       const res = signupApi.post(data);
       res
         .then((response) => {
-          // console.log("res:", response.data);
+          console.log("res:", response.data);
           navigation.navigate("verify");
           setActiveSignup(false);
         })
