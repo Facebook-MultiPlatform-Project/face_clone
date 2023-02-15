@@ -145,7 +145,7 @@ const Profile = ({ route, navigation }) => {
     if (userId === user.id) {
       getListFriend();
     }
-  }, []);
+  }, [userId]);
 
   return (
     <View style={{ paddingVertical: 10 }}>
@@ -381,7 +381,7 @@ const Profile = ({ route, navigation }) => {
                 style={{
                   display: "flex",
                   flexWrap: "wrap",
-                  justifyContent: "space-between",
+                  justifyContent: "flex-start",
                   flexDirection: "row",
                   gap: 10,
                 }}
@@ -422,7 +422,7 @@ const Profile = ({ route, navigation }) => {
                 })}
               </View>
               <View>
-                {listFriend.length > 6 && (
+                {listFriend.length > 0 && (
                   <TouchableOpacity
                     style={{
                       width: "100%",
@@ -430,6 +430,9 @@ const Profile = ({ route, navigation }) => {
                       paddingVertical: 5,
                       borderRadius: 8,
                       backgroundColor: "#e4e4e4",
+                    }}
+                    onPress={() => {
+                      navigation.navigate("friendList");
                     }}
                   >
                     <Text

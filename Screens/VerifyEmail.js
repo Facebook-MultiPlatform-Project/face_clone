@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
     height: "50%",
   },
   title: {
-    color: "#00008b",
+    // color: "#00008b",
     fontSize: 30,
     fontWeight: "700",
     textAlign: "center",
@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     marginTop: 30,
     borderRadius: 8,
-    backgroundColor: "#00008b",
+    backgroundColor: "#008000",
     padding: 10,
   },
   login_text: {

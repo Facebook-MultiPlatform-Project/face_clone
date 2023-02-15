@@ -5,7 +5,7 @@ import SignupPage from "./Screens/SignupPage.js";
 import * as React from "react";
 
 import { Icon, Badge } from "react-native-elements";
-import Toast from "react-native-toast-message";
+
 import { navigationRef } from "./rootNavigation";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -31,7 +31,6 @@ import ListEmoji from "./Screens/ListEmoji.js";
 import { io } from "socket.io-client";
 import * as SecureStore from "expo-secure-store";
 import { useRef } from "react";
-import WaitingPage from "./Screens/WaitingPage.js";
 import Search from "./Screens/Search.js";
 const Stack = createStackNavigator();
 const rootStack = createStackNavigator();
@@ -177,11 +176,24 @@ export const MainTab = () => {
         <Tab.Screen
           options={{
             tabBarIcon: ({ tintColor, focused }) => (
-              <Icon
-                name="group"
-                size={25}
-                color={focused ? "#318bfb" : "#ddd"}
-              ></Icon>
+              <View>
+                <Icon
+                  name="group"
+                  size={25}
+                  color={focused ? "#318bfb" : "#ddd"}
+                ></Icon>
+                {/* {numOfFriendRequest.current > 0 && (
+                  <Badge
+                    value={numOfFriendRequest.current}
+                    status="error"
+                    containerStyle={{
+                      position: "absolute",
+                      top: -4,
+                      right: -4,
+                    }}
+                  />
+                )} */}
+              </View>
             ),
             headerShown: true,
           }}
@@ -217,7 +229,7 @@ export const MainTab = () => {
             },
           })}
           name="Notification"
-          component={NotificationTab}
+          component={Notifications}
         />
         <Tab.Screen
           options={{
@@ -246,7 +258,6 @@ export default function App() {
     <Provider store={store}>
       <NavigationContainer ref={navigationRef}>
         <rootStack.Navigator screenOptions={navigationOptions}>
-          <rootStack.Screen component={WaitingPage} name="waiting" />
           <rootStack.Screen component={LoginPage} name="login" />
           <rootStack.Screen component={VerifyEmail} name="verify" />
           <rootStack.Screen component={MainTab} name="facebook" />
@@ -264,7 +275,6 @@ export default function App() {
           <rootStack.Screen component={Search} name="search" />
         </rootStack.Navigator>
       </NavigationContainer>
-      <Toast />
     </Provider>
   );
 }

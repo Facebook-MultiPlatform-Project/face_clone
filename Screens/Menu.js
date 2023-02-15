@@ -1,4 +1,11 @@
-import { View, Text, TouchableOpacity, Image } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Image,
+  Modal,
+  Dimensions,
+} from "react-native";
 import * as SecureStore from "expo-secure-store";
 import { logoutApi } from "../apis/Auth/logoutApi";
 import { UserApi } from "../apis/User/UserApi";
@@ -45,6 +52,9 @@ const Shortcut = (props) => {
 
 const Menu = () => {
   const [user, setUser] = useState();
+  const [showModal, setShowModal] = useState(false);
+  const windowWidth = Dimensions.get("window").width;
+  const windowHeight = Dimensions.get("window").height;
   const getUserInfo = async () => {
     try {
       const data = await UserApi.getProfile();
@@ -64,10 +74,12 @@ const Menu = () => {
       navigation.navigate("login");
     } catch (err) {
       console.log(err);
+    } finally {
+      setShowModal(false);
     }
   };
   return (
-    <View style={{ padding: 16 }}>
+    <View style={{ padding: 16, height: "100%" }}>
       <View>
         <Text style={{ color: "#000", fontWeight: "700", fontSize: 30 }}>
           Menu
@@ -80,7 +92,9 @@ const Menu = () => {
           marginTop: 10,
           alignItems: "center",
         }}
-        onTouchEnd={() => navigation.navigate("profile", {userId: user && user.id})}
+        onTouchEnd={() =>
+          navigation.navigate("profile", { userId: user && user.id })
+        }
       >
         <View>
           <Image
@@ -194,7 +208,9 @@ const Menu = () => {
         <View style={{ marginTop: 10 }}>
           <TouchableOpacity
             style={{ backgroundColor: "#ccc", borderRadius: 10, padding: 10 }}
-            onPress={handleLogOut}
+            onPress={() => {
+              setShowModal(true);
+            }}
           >
             <Text
               style={{
@@ -209,6 +225,83 @@ const Menu = () => {
           </TouchableOpacity>
         </View>
       </View>
+      <Modal
+        visible={showModal}
+        transparent
+        onDismiss={() => {
+          setShowModal(false);
+        }}
+      >
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+            // width: windowWidth / 1.05,
+            // height: windowHeight / 5,
+            // backgroundColor:'red'
+            backgroundColor: 'rgba(0,0,0,0.5)'
+          }}
+        >
+          <View
+            style={{
+              borderRadius: 10,
+              backgroundColor: "white",
+              width: windowWidth / 1.05,
+              height: windowHeight / 5,
+              display: "flex",
+              flexDirection: "column",
+              padding: 15,
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <Text style={{ fontWeight: "bold", fontSize: 17 }}>
+              Bạn có muốn đăng xuất
+            </Text>
+            <View
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "space-between",
+                // padding: 10,
+              }}
+            >
+              <TouchableOpacity
+                style={{
+                  // backgroundColor: "#DC3535",
+                  backgroundColor: "#0084FF",
+                  borderRadius: 10,
+                  width: "30%",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  flex: 1,
+                }}
+                onPress={handleLogOut}
+              >
+                <Text style={{ color: "white" }}>Đăng xuất</Text>
+              </TouchableOpacity>
+              <View style={{ width: 30 }}></View>
+              <TouchableOpacity
+                style={{
+                  backgroundColor: "#d3d3d3",
+                  padding: 10,
+                  borderRadius: 10,
+                  width: "30%",
+                  justifyContent: "center", //Centered horizontally
+                  alignItems: "center", //Centered vertically
+                  flex: 1,
+                }}
+                onPress={() => {
+                  setShowModal(false);
+                }}
+              >
+                <Text>Huỷ</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
