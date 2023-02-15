@@ -412,7 +412,7 @@ const Profile = ({ route, navigation }) => {
                   style={{
                     display: "flex",
                     flexWrap: "wrap",
-                    justifyContent: "space-between",
+                    justifyContent: "flex-start",
                     flexDirection: "row",
                     gap: 10,
                   }}
