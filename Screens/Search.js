@@ -7,41 +7,108 @@ import {
   RefreshControl,
   TextInput,
   StatusBar,
+  ActivityIndicator,
 } from "react-native";
 import React from "react";
 import { Icon } from "react-native-elements";
 import { navigation } from "../rootNavigation";
 import { SearchApi } from "../apis/Search/SearchApi";
 import Post from "../Components/Post";
+import { Avatar } from "react-native-paper";
 
 const buttonList = [
-  { name: "Tất cả", value: 0 },
+  // { name: "Tất cả", value: 0 },
   { name: "Bài đăng", value: 1 },
   { name: "Người dùng", value: 2 },
 ];
 
+const UserItem = ({ id, avatar, name }) => {
+  return (
+    <TouchableOpacity
+      style={{
+        backgroundColor: "white",
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "center",
+        padding: 10,
+        maxWidth: "100%",
+      }}
+      onPress={() => {
+        navigation.navigate("profile", {
+          userId: id,
+        });
+      }}
+    >
+      <Avatar.Image
+        size={75}
+        source={{
+          uri: avatar,
+        }}
+      />
+      <View
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "center",
+          flex: 1,
+          marginLeft: 20,
+          marginRight: 20,
+        }}
+      >
+        <Text
+          style={{
+            flex: 1,
+            flexWrap: "wrap",
+            maxWidth: "100%",
+            fontSize: 20,
+            fontWeight: "700",
+          }}
+          numberOfLines={3}
+        >
+          {name}
+        </Text>
+      </View>
+    </TouchableOpacity>
+  );
+};
+
 const Search = () => {
   const [searchInput, setSearchInput] = React.useState("");
-  const [searchType, setSearchType] = React.useState(0);
+  const [searchType, setSearchType] = React.useState(1);
   const [isLoading, setIsLoading] = React.useState(false);
+  const [refreshing, setRefreshing] = React.useState(false);
+  const [res, setRes] = React.useState([]);
   const handleChange = (input) => {
     try {
       setSearchInput(input);
     } catch (err) {
-      console.log("search err", err);
+      console.log("change text err", err);
     }
   };
-  const handleSubmit = async () => {
+  const handleChangeType = async (type) => {
+    try {
+      setSearchType(type);
+      await handleSubmit(searchInput, type);
+    } catch (err) {
+      console.log("change type err", err);
+    }
+  };
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    handleSubmit(searchInput, searchType);
+    setRefreshing(false);
+  });
+  const handleSubmit = async (input, type) => {
     setIsLoading(true);
     try {
-      console.log("searchInput", searchInput);
       const res = await SearchApi.search({
-        keyword: searchInput,
-        searchType: searchType,
+        keyword: input,
+        searchType: type,
         take: 10,
         skip: 0,
       });
       console.log("data", res.data.data);
+      setRes(res.data.data);
     } catch (err) {
       console.log("search err", err);
     }
@@ -86,7 +153,9 @@ const Search = () => {
               marginRight: 15,
             }}
             onChangeText={(text) => handleChange(text)}
-            onSubmitEditing={handleSubmit}
+            onSubmitEditing={async () => {
+              await handleSubmit(searchInput, searchType);
+            }}
             value={searchInput}
           ></TextInput>
         </View>
@@ -109,7 +178,7 @@ const Search = () => {
                 padding: 10,
                 marginRight: 6,
               }}
-              onPress={() => setSearchType(button.value)}
+              onPress={() => handleChangeType(button.value)}
             >
               <Text
                 style={{
@@ -130,8 +199,29 @@ const Search = () => {
           paddingBottom: 15,
         }}
       >
-        {isLoading && <Text>Loading...</Text>}
-        {!isLoading && <Post />}
+        <ScrollView
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+        >
+          {isLoading && (
+            <ActivityIndicator color={"000"} style={{ marginTop: 10 }} />
+          )}
+          {!isLoading && res.length === 0 && (
+            <Text style={{ fontSize: 20, fontWeight: "600", padding: 10 }}>
+              0 kết quả
+            </Text>
+          )}
+          {!isLoading &&
+            searchType === 1 &&
+            res.map((item, index) => <Post key={index} {...item} />)}
+          {!isLoading &&
+            searchType === 2 &&
+            res.map((item, index) => {
+              console.log("item", item);
+              return <UserItem key={index} {...item} />;
+            })}
+        </ScrollView>
       </View>
     </View>
   );

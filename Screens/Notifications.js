@@ -103,7 +103,6 @@ const Notifications = () => {
   const onRefresh = useCallback(() => {
     setRefreshing(true);
     getNotification();
-
     setRefreshing(false);
   });
   return (
