@@ -4,9 +4,10 @@ import { logoutApi } from "../apis/Auth/logoutApi";
 import { UserApi } from "../apis/User/UserApi";
 import { navigation } from "../rootNavigation";
 import { useEffect, useState } from "react";
+import { Icon } from "react-native-elements";
 
 const Shortcut = (props) => {
-  const { name, icon, des } = props;
+  const { name, des, iconName, iconType } = props;
   return (
     <View style={{ width: "50%" }}>
       <View
@@ -15,19 +16,15 @@ const Shortcut = (props) => {
           borderRadius: 10,
           padding: 16,
           margin: 5,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
         }}
-        // onTouchEnd={() => navigation.navigate(des)}
+        onTouchEnd={() => {
+          if (name === "Friends") navigation.navigate(des);
+        }}
       >
-        <Image
-          source={{
-            uri: icon,
-          }}
-          style={{
-            width: 40,
-            height: 40,
-            borderRadius: 100,
-          }}
-        ></Image>
+        <Icon name={iconName} type={iconType} size={25} color="#06f"></Icon>
         <Text
           style={{
             color: "#333",
@@ -80,7 +77,9 @@ const Menu = () => {
           marginTop: 10,
           alignItems: "center",
         }}
-        onTouchEnd={() => navigation.navigate("profile", {userId: user && user.id})}
+        onTouchEnd={() =>
+          navigation.navigate("profile", { userId: user && user.id })
+        }
       >
         <View>
           <Image
@@ -134,11 +133,14 @@ const Menu = () => {
         >
           <Shortcut
             name="Friends"
-            icon="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHMbNbn5XcHIXV3PoLxkmsKdTQIbNffNpyuQ&usqp=CAU"
+            iconName="user-friends"
+            iconType="font-awesome-5"
+            des="friendList"
           ></Shortcut>
           <Shortcut
             name="Shortcut 2"
-            icon="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHMbNbn5XcHIXV3PoLxkmsKdTQIbNffNpyuQ&usqp=CAU"
+            iconName="user-friends"
+            iconType="font-awesome-5"
           ></Shortcut>
         </View>
         <View
@@ -150,11 +152,13 @@ const Menu = () => {
         >
           <Shortcut
             name="Shortcut 3"
-            icon="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHMbNbn5XcHIXV3PoLxkmsKdTQIbNffNpyuQ&usqp=CAU"
+            iconName="user-friends"
+            iconType="font-awesome-5"
           ></Shortcut>
           <Shortcut
             name="Shortcut 4"
-            icon="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHMbNbn5XcHIXV3PoLxkmsKdTQIbNffNpyuQ&usqp=CAU"
+            iconName="user-friends"
+            iconType="font-awesome-5"
           ></Shortcut>
         </View>
         <View style={{ marginTop: 10 }}>
@@ -174,10 +178,10 @@ const Menu = () => {
             </Text>
           </TouchableOpacity>
         </View>
-        {/* <View style={{ marginTop: 10 }}>
+        <View style={{ marginTop: 10 }}>
           <TouchableOpacity
             style={{ backgroundColor: "#ccc", borderRadius: 10, padding: 10 }}
-            onPress={() => navigation.navigate("changepassword")}
+            onPress={() => navigation.navigate("changePassword")}
           >
             <Text
               style={{
@@ -190,7 +194,7 @@ const Menu = () => {
               Change password
             </Text>
           </TouchableOpacity>
-        </View> */}
+        </View>
         <View style={{ marginTop: 10 }}>
           <TouchableOpacity
             style={{ backgroundColor: "#ccc", borderRadius: 10, padding: 10 }}

@@ -35,6 +35,7 @@ import Search from "./Screens/Search.js";
 import Chat from "./Screens/Chat.js";
 import { useState } from "react";
 import { NotificationApi } from "./apis/Notification/notificationApi.js";
+import ChangePassword from "./Screens/ChangePassword.js";
 const Stack = createStackNavigator();
 const rootStack = createStackNavigator();
 
@@ -286,6 +287,7 @@ export default function App() {
           <rootStack.Screen component={Messager} name="messager" />
           <rootStack.Screen component={FriendList} name="friendList" />
           <rootStack.Screen component={Search} name="search" />
+          <rootStack.Screen component={ChangePassword} name="changePassword" />
           <rootStack.Screen component={Chat} name="chat" />
         </rootStack.Navigator>
       </NavigationContainer>
