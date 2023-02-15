@@ -11,6 +11,7 @@ import { Icon } from "react-native-elements";
 import { NotificationApi } from "../apis/Notification/notificationApi";
 import { getTimeDisplay } from "../utils";
 import { navigation } from "../rootNavigation";
+import { useFocusEffect } from "@react-navigation/native";
 
 const SECURITY = "0";
 const POST = "1";
@@ -116,7 +117,7 @@ const Notifications = () => {
   const getNotification = async () => {
     try {
       const data = await NotificationApi.getAll();
-      console.log("data", data.data.data);
+      console.log("get notification");
       setNotificationList(data.data.data);
     } catch (err) {
       console.log("notification", err);
@@ -130,6 +131,13 @@ const Notifications = () => {
     getNotification();
     setRefreshing(false);
   });
+  useFocusEffect(
+    React.useCallback(() => {
+      setRefreshing(true);
+      getNotification();
+      setRefreshing(false);
+    }, [])
+  );
   return (
     <View
       style={{
