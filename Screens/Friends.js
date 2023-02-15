@@ -16,6 +16,7 @@ import { FriendApi } from "../apis/Friend/Friend";
 import { getTimeDisplay } from "../utils";
 import { navigation } from "../rootNavigation";
 import { io } from "socket.io-client";
+import { useFocusEffect } from "@react-navigation/native";
 
 const Friends = () => {
   const [friendsRequests, setFriendsRequests] = useState([]);
@@ -34,6 +35,12 @@ const Friends = () => {
     setRefreshing(true);
     getListFriendRequest();
   }, []);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      getListFriendRequest();
+    }, [])
+  );
   return (
     <View
       style={{
