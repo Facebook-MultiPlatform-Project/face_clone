@@ -5,7 +5,7 @@ import SignupPage from "./Screens/SignupPage.js";
 import * as React from "react";
 
 import { Icon, Badge } from "react-native-elements";
-import Toast from "react-native-toast-message";
+
 import { navigationRef } from "./rootNavigation";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -30,6 +30,7 @@ import UpdateDetail from "./Screens/updateDetail";
 import ListEmoji from "./Screens/ListEmoji.js";
 import { io } from "socket.io-client";
 import * as SecureStore from "expo-secure-store";
+import { useRef } from "react";
 import WaitingPage from "./Screens/WaitingPage.js";
 import Search from "./Screens/Search.js";
 import Chat from "./Screens/Chat.js";
@@ -38,7 +39,11 @@ import { NotificationApi } from "./apis/Notification/notificationApi.js";
 import ChangePassword from "./Screens/ChangePassword.js";
 const Stack = createStackNavigator();
 const rootStack = createStackNavigator();
+import { LogBox } from "react-native";
 
+LogBox.ignoreLogs([
+  "Non-serializable values were found in the navigation state",
+]);
 const Home = () => {
   return (
     <View>
@@ -123,7 +128,7 @@ export const MainTab = () => {
   };
   var access_token = "";
   var socket;
-  const [numOfNotification,setNumOfNotification] = useState(0);
+  const [numOfNotification, setNumOfNotification] = useState(0);
   const [unreadNotificationList, setUnreadNotificationList] = useState([]);
   const setupSocket = async () => {
     try {
@@ -140,7 +145,7 @@ export const MainTab = () => {
         console.log("socket disconnected");
       });
       socket.on("notification", (notification) => {
-        setNumOfNotification((value) => value + 1)
+        setNumOfNotification((value) => value + 1);
         console.log("socket notification", notification);
       });
       socket.on("error", (err) => {
@@ -153,25 +158,31 @@ export const MainTab = () => {
   const getUnreadNotification = async () => {
     try {
       const data = await NotificationApi.getAll();
-      const list = data.data.data.filter((item) => Boolean(item.read) === false);
+      const list = data.data.data.filter(
+        (item) => Boolean(item.read) === false
+      );
       setUnreadNotificationList(list);
-      setNumOfNotification(list.length)
+      setNumOfNotification(list.length);
     } catch (err) {
       console.log("get notification", err);
     }
   };
   const readNotification = async () => {
     try {
-      console.log({notificationIds: unreadNotificationList.map(item => item.id)})
-      await NotificationApi.read({notificationIds: unreadNotificationList.map(item => item.id)});
+      console.log({
+        notificationIds: unreadNotificationList.map((item) => item.id),
+      });
+      await NotificationApi.read({
+        notificationIds: unreadNotificationList.map((item) => item.id),
+      });
       setUnreadNotificationList([]);
-      setNumOfNotification(0)
+      setNumOfNotification(0);
     } catch (err) {
       console.log("read notification", err.response.data.message);
     }
   };
   useEffect(() => {
-    getUnreadNotification()
+    getUnreadNotification();
     setupSocket();
     return () => {
       socket.off("connect");
@@ -202,11 +213,24 @@ export const MainTab = () => {
         <Tab.Screen
           options={{
             tabBarIcon: ({ tintColor, focused }) => (
-              <Icon
-                name="group"
-                size={25}
-                color={focused ? "#318bfb" : "#ddd"}
-              ></Icon>
+              <View>
+                <Icon
+                  name="group"
+                  size={25}
+                  color={focused ? "#318bfb" : "#ddd"}
+                ></Icon>
+                {/* {numOfFriendRequest.current > 0 && (
+                  <Badge
+                    value={numOfFriendRequest.current}
+                    status="error"
+                    containerStyle={{
+                      position: "absolute",
+                      top: -4,
+                      right: -4,
+                    }}
+                  />
+                )} */}
+              </View>
             ),
             headerShown: true,
           }}
@@ -241,7 +265,7 @@ export const MainTab = () => {
               await readNotification();
             },
           })}
-          name="Notification"
+          name="Notifications"
           component={NotificationTab}
         />
         <Tab.Screen
@@ -291,7 +315,6 @@ export default function App() {
           <rootStack.Screen component={Chat} name="chat" />
         </rootStack.Navigator>
       </NavigationContainer>
-      <Toast />
     </Provider>
   );
 }

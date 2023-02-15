@@ -6,31 +6,22 @@ import {
   KeyboardAvoidingView,
 } from "react-native";
 import React, { useState } from "react";
-import { Icon, Input } from "react-native-elements";
-import { EMAIL_REGEX } from "../common/regex";
+import { Input } from "react-native-elements";
 import { navigation } from "../rootNavigation";
 import { verifyApi } from "../apis/Auth/verifyApi";
+import Toast from "react-native-toast-message";
 
-const VerifyEmail = () => {
-  const [email, setEmail] = useState("");
+const VerifyEmail = ({ route }) => {
+  const email = route.params.email;
   const [verifyCode, setVerifyCode] = useState("");
-  const [errMail, setErrMail] = useState("");
   const [errVerify, setErrVerify] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const validate = () => {
-    if (email === "") {
-      setErrMail("Required");
-      if (verifyCode.length < 6) {
-        setErrVerify("code must be 6 character");
-        return false;
-      } else setErrVerify(null);
+    if (verifyCode.length < 6) {
+      setErrVerify("code must be 6 character");
       return false;
-    } else setErrMail(null);
-    if (!EMAIL_REGEX.test(email)) {
-      setErrMail("Invalid Email");
-      return false;
-    }
+    } else setErrVerify(null);
     return true;
   };
 
@@ -38,18 +29,22 @@ const VerifyEmail = () => {
     if (validate()) {
       setIsSubmitting(true);
       const data = {
-        email: email,
-        verifyCode: verifyCode,
+        email,
+        verifyCode,
       };
       const res = verifyApi.post(data);
       res
         .then((response) => {
-          console.log(response);
-          alert("verify success, please login");
+          console.log(response.data);
+          Toast.show({
+            type: "success",
+            text1: "Xác thực thành công!!!",
+            visibilityTime: 1000,
+          });
           navigation.navigate("login");
         })
         .catch((err) => {
-          console.log('verify email', err)
+          console.log("verify email", err);
           setErrVerify("err");
         });
     }
@@ -58,15 +53,6 @@ const VerifyEmail = () => {
     <View style={styles.container}>
       <View style={styles.form}>
         <Text style={styles.title}>Xác thực tài khoản</Text>
-        <View style={styles.form_item}>
-          <Input
-            style={styles.input}
-            placeholder="Email"
-            value={email}
-            onChangeText={(text) => setEmail(text)}
-            errorMessage={errMail}
-          ></Input>
-        </View>
         <View style={styles.form_item}>
           <Input
             style={styles.input}
@@ -109,7 +95,7 @@ const styles = StyleSheet.create({
     height: "50%",
   },
   title: {
-    color: "#00008b",
+    // color: "#00008b",
     fontSize: 30,
     fontWeight: "700",
     textAlign: "center",
@@ -122,7 +108,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     marginTop: 30,
     borderRadius: 8,
-    backgroundColor: "#00008b",
+    backgroundColor: "#008000",
     padding: 10,
   },
   login_text: {
@@ -140,5 +126,5 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginTop: "auto",
     marginBottom: 20,
-  }
+  },
 });

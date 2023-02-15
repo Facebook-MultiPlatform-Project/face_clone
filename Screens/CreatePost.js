@@ -226,15 +226,17 @@ const CreatePost = ({ route, navigation }) => {
               marginRight: 10,
             }}
           ></Image>
-          <Text style={{ fontSize: 18, fontWeight: "600" }}>{user.name}</Text>
-          <Text style={{ fontSize: 16, lineHeight: 24 }}>
-            {mood &&
-              ` - Đang ${
-                constant.EMOJI.find((item) => item.value === mood).img
-              } cảm thấy ${
-                constant.EMOJI.find((item) => item.value === mood).text
-              }.`}
-          </Text>
+          <View>
+            <Text style={{ fontSize: 18, fontWeight: "600" }}>{user.name}</Text>
+            <Text style={{ fontSize: 16, lineHeight: 24 }}>
+              {mood &&
+                ` - Đang ${
+                  constant.EMOJI.find((item) => item.value === mood).img
+                } cảm thấy ${
+                  constant.EMOJI.find((item) => item.value === mood).text
+                }.`}
+            </Text>
+          </View>
         </View>
         <View>
           <TextInput
