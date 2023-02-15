@@ -19,7 +19,37 @@ import { UserApi } from "../apis/User/UserApi";
 import { FriendApi } from "../apis/Friend/Friend";
 import { constant } from "../utils/constant";
 import { SafeAreaView } from "react-native";
+import { io } from "socket.io-client";
+import * as SecureStore from "expo-secure-store";
+var access_token = "";
+var socket;
+const setupSocket = async () => {
+  try {
+    access_token = await SecureStore.getItemAsync("access_token");
+    socket = io("https://facebook-api-production.up.railway.app", {
+      extraHeaders: {
+        Authorization: access_token,
+      },
+    });
+    socket.on("connect", () => {
+      console.log("socket connected");
+    });
+    socket.on("disconnect", () => {
+      console.log("socket disconnected");
+    });
+    socket.on("error", (err) => {
+      console.log("socket error", err);
+    });
 
+    // socket.on("notification", () => {
+    //   // setRefreshing(true);
+    //   // getListFriendRequest();
+    //   // console.log("haha");
+    // });
+  } catch (err) {
+    console.log("setup socket", err);
+  }
+};
 const Profile = ({ route, navigation }) => {
   const userId = route.params.userId;
   const [listPost, setListPost] = useState([]);
@@ -86,6 +116,10 @@ const Profile = ({ route, navigation }) => {
       .then((res) => {
         console.log(res.data);
         checkFriend();
+        socket.emit("request-friend", {
+          userId: userId,
+          requestId: "1",
+        });
       })
       .catch((err) => {
         console.log(err);
@@ -156,12 +190,19 @@ const Profile = ({ route, navigation }) => {
   };
 
   useEffect(() => {
+    setupSocket();
     getUserInfo();
     getListPost();
     checkFriend();
     if (userId === user.id) {
       getListFriend();
     }
+    return () => {
+      socket.off("connect");
+      socket.off("error");
+      // socket.off("notification");
+      socket.off("disconnect");
+    };
   }, [userId]);
 
   return (

@@ -39,7 +39,7 @@ const InputItem = ({
           display: "flex",
           flexDirection: "row",
           alignItems: "center",
-          justifyContent: "start",
+          justifyContent: "flex-start",
           padding: 10,
           borderWidth: 1,
           borderRadius: 5,

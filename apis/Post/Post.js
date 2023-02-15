@@ -16,8 +16,8 @@ export const PostApi = {
     return axiosClient.get(url, { params });
   },
   deletePost: (id) => {
-    const url = `/posts/delete-post/${id}`;
-    return axiosClient.delete(url);
+    const url = `/posts/delete-post`;
+    return axiosClient.post(url,{postId:id});
   },
   likePost: (id) => {
     const url = `/posts/like-post`;

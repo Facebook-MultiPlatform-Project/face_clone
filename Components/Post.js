@@ -16,7 +16,7 @@ import { PostApi } from "../apis/Post/Post";
 import { constant } from "../utils/constant";
 import { Video } from "expo-av";
 
-const Post = ({ id }) => {
+const Post = ({ id, onDelete }) => {
   const [postData, setPostData] = useState({});
   const [author, setAuthor] = useState({});
   const [textShown, setTextShown] = useState(false);
@@ -40,6 +40,7 @@ const Post = ({ id }) => {
         console.log(err);
       });
   };
+
   const likePost = async () => {
     await PostApi.likePost(id)
       .then((res) => {
@@ -89,9 +90,25 @@ const Post = ({ id }) => {
               }.`}</Text>
             )}
           </View>
-          <View style={{ marginLeft: "auto" }}>
-            <Icon name="ellipsis-horizontal" type="ionicon"></Icon>
-          </View>
+          {user.id === author.id && (
+            <View
+              style={{
+                marginLeft: "auto",
+                flex: 1,
+                flexDirection: "row-reverse",
+              }}
+            >
+              <TouchableOpacity onPress={onDelete}>
+                <Icon name="close" type="material"></Icon>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={() => navigation.navigate("editPost", { data: postData })}
+              >
+                <Icon name="edit" type="material"></Icon>
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
         <TouchableOpacity
           onPress={() => {

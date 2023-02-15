@@ -163,7 +163,7 @@ const Search = () => {
           style={{
             display: "flex",
             flexDirection: "row",
-            justifyContent: "start",
+            justifyContent: "flex-start",
             alignItems: "center",
           }}
         >

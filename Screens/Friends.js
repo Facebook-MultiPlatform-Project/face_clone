@@ -16,7 +16,36 @@ import { FriendApi } from "../apis/Friend/Friend";
 import { getTimeDisplay } from "../utils";
 import { navigation } from "../rootNavigation";
 import { io } from "socket.io-client";
-
+import * as SecureStore from "expo-secure-store";
+var access_token = "";
+var socket;
+const setupSocket = async (getList) => {
+  try {
+    access_token = await SecureStore.getItemAsync("access_token");
+    socket = io("https://facebook-api-production.up.railway.app", {
+      extraHeaders: {
+        Authorization: access_token,
+      },
+    });
+    socket.on("connect", () => {
+      console.log("socket connected");
+    });
+    socket.on("disconnect", () => {
+      console.log("socket disconnected");
+    });
+    socket.on("error", (err) => {
+      console.log("socket error", err);
+    });
+    socket.on("notification", () => {
+      // setRefreshing(true);
+      // getListFriendRequest();
+      // console.log("haha");
+      getList();
+    });
+  } catch (err) {
+    console.log("setup socket", err);
+  }
+};
 const Friends = () => {
   const [friendsRequests, setFriendsRequests] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
@@ -32,7 +61,14 @@ const Friends = () => {
 
   useEffect(() => {
     setRefreshing(true);
+    setupSocket(getListFriendRequest);
     getListFriendRequest();
+    return () => {
+      socket.off("connect");
+      socket.off("error");
+      socket.off("notification");
+      socket.off("disconnect");
+    };
   }, []);
   return (
     <View
@@ -86,18 +122,17 @@ const FriendsItems = ({ avatar, name, id, time, callBack }) => {
       id: id,
       isAccept: true,
     };
+    socket.emit("accept-friend", {
+      userId: id,
+      requestId: "1",
+    });
     const x = await FriendApi.setAccept(body);
-    // getListFriendRequest();
     callBack();
   }
 
   async function handleDecline(id) {
-    // const body = {
-    //   id: id,
-    //   // 'isAccept': true,
-    // };
     const x = await FriendApi.cancelRequest(id);
-    // getListFriendRequest();
+
     callBack();
   }
   return (
