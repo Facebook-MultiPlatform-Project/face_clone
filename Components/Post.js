@@ -188,7 +188,7 @@ const Post = ({ id, onDelete }) => {
             }}
           >
             {postData.is_liked ? (
-              <TouchableOpacity style={styles.button}>
+              <TouchableOpacity style={styles.button} onPress={likePost}>
                 <Icon color="#4292FF" name="thumb-up" type="material" />
                 <Text style={{ marginLeft: 10, color: "#4292FF" }}>Thích</Text>
               </TouchableOpacity>
