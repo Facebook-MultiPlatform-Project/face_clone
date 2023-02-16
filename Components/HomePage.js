@@ -23,6 +23,7 @@ const HomePage = () => {
   const [refreshing, setRefreshing] = useState(false);
 
   const onRefresh = () => {
+    // setListPost([]);
     getListPost();
   };
 
@@ -34,6 +35,7 @@ const HomePage = () => {
 
   const getListPost = async () => {
     setRefreshing(true);
+    setListPost([]);
     await PostApi.getAll()
       .then((res) => {
         setListPost(res.data.data.map((item) => item.id));

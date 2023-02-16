@@ -43,6 +43,9 @@ const Chat = ({ route, navigation }) => {
       let clone = [...listMess];
       setListMess(clone.concat(messobj));
       onPressTouch();
+      return ()=>{
+        socketClient.off("new-message");
+      }
     });
   }, [listMess]);
 

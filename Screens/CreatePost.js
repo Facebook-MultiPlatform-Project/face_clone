@@ -117,7 +117,7 @@ const CreatePost = ({ route, navigation }) => {
     if (mood) {
       data.append("status", mood);
     }
-    
+
     const res = upPostApi.post(data);
     res
       .then((res) => {
