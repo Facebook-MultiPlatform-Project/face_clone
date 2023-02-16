@@ -12,7 +12,7 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import { getAllComment } from "../apis/Comment/getComment";
 import { postComment } from "../apis/Comment/postComment";
 import { Keyboard } from "react-native";
-
+import socketClient from "../utils/socketClient";
 const CommentPage = ({ route, navigation }) => {
   const postID = route.params.postId;
   const [data, setData] = useState([]);
@@ -46,8 +46,15 @@ const CommentPage = ({ route, navigation }) => {
       content: cmt,
       commentAnsweredId: "c75cdf4c-173a-4c19-bfea-d2bf1494de07",
     };
-    // console.log(param);
-    const res = await postComment.post(param);
+    postComment
+      .post(param)
+      .then((res) => {
+        socketClient.emit("comment", {
+          postId: postID,
+          commentId: res.data.data.id,
+        });
+      })
+      .catch((e) => console.log(e));
     // console.log(res);
     getData();
     setCmt("");
