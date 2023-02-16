@@ -17,36 +17,37 @@ import { getTimeDisplay } from "../utils";
 import { navigation } from "../rootNavigation";
 import { io } from "socket.io-client";
 import * as SecureStore from "expo-secure-store";
-var access_token = "";
-var socket;
-const setupSocket = async (getList) => {
-  try {
-    access_token = await SecureStore.getItemAsync("access_token");
-    socket = io("https://facebook-api-production.up.railway.app", {
-      extraHeaders: {
-        Authorization: access_token,
-      },
-    });
-    socket.on("connect", () => {
-      console.log("socket connected");
-    });
-    socket.on("disconnect", () => {
-      console.log("socket disconnected");
-    });
-    socket.on("error", (err) => {
-      console.log("socket error", err);
-    });
-    socket.on("notification", () => {
-      // setRefreshing(true);
-      // getListFriendRequest();
-      // console.log("haha");
-      getList();
-    });
-  } catch (err) {
-    console.log("setup socket", err);
-  }
-};
+// var access_token = "";
+// var socket;
+// const setupSocket = async (getList) => {
+//   try {
+//     access_token = await SecureStore.getItemAsync("access_token");
+//     socket = io("https://facebook-api-production.up.railway.app", {
+//       extraHeaders: {
+//         Authorization: access_token,
+//       },
+//     });
+//     socket.on("connect", () => {
+//       console.log("socket connected");
+//     });
+//     socket.on("disconnect", () => {
+//       console.log("socket disconnected");
+//     });
+//     socket.on("error", (err) => {
+//       console.log("socket error", err);
+//     });
+//     socket.on("notification", () => {
+//       // setRefreshing(true);
+//       // getListFriendRequest();
+//       // console.log("haha");
+//       getList();
+//     });
+//   } catch (err) {
+//     console.log("setup socket", err);
+//   }
+// };
 import { useFocusEffect } from "@react-navigation/native";
+import socketClient from "../utils/socketClient";
 
 const Friends = () => {
   const [friendsRequests, setFriendsRequests] = useState([]);
@@ -63,14 +64,14 @@ const Friends = () => {
 
   useEffect(() => {
     setRefreshing(true);
-    setupSocket(getListFriendRequest);
+    // setupSocket(getListFriendRequest);
     getListFriendRequest();
-    return () => {
-      socket.off("connect");
-      socket.off("error");
-      socket.off("notification");
-      socket.off("disconnect");
-    };
+    // return () => {
+    //   socket.off("connect");
+    //   socket.off("error");
+    //   socket.off("notification");
+    //   socket.off("disconnect");
+    // };
   }, []);
 
   useFocusEffect(
@@ -130,7 +131,11 @@ const FriendsItems = ({ avatar, name, id, time, callBack }) => {
       id: id,
       isAccept: true,
     };
-    socket.emit("accept-friend", {
+    // socket.emit("accept-friend", {
+    //   userId: id,
+    //   requestId: "1",
+    // });
+    socketClient.emit("accept-friend", {
       userId: id,
       requestId: "1",
     });

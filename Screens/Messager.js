@@ -68,6 +68,9 @@ const Messager = ({ navigation }) => {
     socketClient.on("new-message", (messobj) => {
       getListRoom();
     });
+    return () => {
+      socketClient.off("new-message");
+    };
   }, [navigation]);
 
   const getListRoom = async () => {
