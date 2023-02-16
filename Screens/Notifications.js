@@ -153,8 +153,8 @@ const Notifications = () => {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
-        {notificationList.map((item) => (
-          <NotiItems {...item} getNotification={getNotification} />
+        {notificationList.map((item, index) => (
+          <NotiItems key={index} {...item} getNotification={getNotification} />
         ))}
       </ScrollView>
     </View>
