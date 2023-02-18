@@ -6,11 +6,12 @@ import { useDispatch } from "react-redux";
 import { navigation } from "../rootNavigation";
 import { addUser } from "../store/user";
 
-const WaitingPage = () => {
+const WaitingPage = ({ route }) => {
+  console.log(route);
   const dispatch = useDispatch();
 
   const getUserProfile = async () => {
-    const token = await SecureStore.getItemAsync("acess_token");
+    const token = await SecureStore.getItemAsync("access_token");
     if (!token) {
       navigation.navigate("login");
       return;
@@ -27,7 +28,7 @@ const WaitingPage = () => {
   };
   useEffect(() => {
     getUserProfile();
-  }, []);
+  }, [route.params]);
 
   return (
     <View

@@ -6,6 +6,7 @@ import {
   Modal,
   Dimensions,
   RefreshControl,
+  BackHandler,
 } from "react-native";
 import * as SecureStore from "expo-secure-store";
 import { logoutApi } from "../apis/Auth/logoutApi";
@@ -57,6 +58,7 @@ const Shortcut = (props) => {
 const Menu = () => {
   const [user, setUser] = useState();
   const [showModal, setShowModal] = useState(false);
+  const [showModalExit, setShowModalExit] = useState(false);
   const windowWidth = Dimensions.get("window").width;
   const windowHeight = Dimensions.get("window").height;
   const [refreshing, setRefreshing] = useState(false);
@@ -250,6 +252,25 @@ const Menu = () => {
             </Text>
           </TouchableOpacity>
         </View>
+        <View style={{ marginTop: 10 }}>
+          <TouchableOpacity
+            style={{ backgroundColor: "#ccc", borderRadius: 10, padding: 10 }}
+            onPress={() => {
+              setShowModalExit(true);
+            }}
+          >
+            <Text
+              style={{
+                color: "#333",
+                fontWeight: "600",
+                fontSize: 18,
+                textAlign: "center",
+              }}
+            >
+              Exit app
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
       <Modal
         visible={showModal}
@@ -323,6 +344,84 @@ const Menu = () => {
                 }}
               >
                 <Text>Huỷ</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+      <Modal
+        visible={showModalExit}
+        transparent
+        onDismiss={() => {
+          setShowModalExit(false);
+        }}
+      >
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+            backgroundColor: "rgba(0,0,0,0.5)",
+          }}
+        >
+          <View
+            style={{
+              borderRadius: 10,
+              backgroundColor: "white",
+              width: windowWidth / 1.05,
+              height: windowHeight / 5,
+              display: "flex",
+              flexDirection: "column",
+              padding: 15,
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <Text style={{ fontWeight: "bold", fontSize: 17 }}>
+              Bạn có muốn đóng ứng dụng
+            </Text>
+            <View
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "space-between",
+                // padding: 10,
+              }}
+            >
+              <TouchableOpacity
+                style={{
+                  // backgroundColor: "#DC3535",
+                  backgroundColor: "#0084FF",
+                  borderRadius: 10,
+                  width: "30%",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  flex: 1,
+                }}
+                onPress={() => {
+                  BackHandler.exitApp();
+                  setShowModalExit(false);
+                  navigation.navigate("waiting", { reset: true });
+                }}
+              >
+                <Text style={{ color: "white" }}>Exit</Text>
+              </TouchableOpacity>
+              <View style={{ width: 30 }}></View>
+              <TouchableOpacity
+                style={{
+                  backgroundColor: "#d3d3d3",
+                  padding: 10,
+                  borderRadius: 10,
+                  width: "30%",
+                  justifyContent: "center", //Centered horizontally
+                  alignItems: "center", //Centered vertically
+                  flex: 1,
+                }}
+                onPress={() => {
+                  setShowModalExit(false);
+                }}
+              >
+                <Text>Cancel</Text>
               </TouchableOpacity>
             </View>
           </View>
