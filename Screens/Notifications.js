@@ -10,9 +10,27 @@ import { Avatar } from "react-native-paper";
 import { Icon } from "react-native-elements";
 import { NotificationApi } from "../apis/Notification/notificationApi";
 import { getTimeDisplay } from "../utils";
+import { navigation } from "../rootNavigation";
+import { useFocusEffect } from "@react-navigation/native";
+import socketClient from "../utils/socketClient";
 
-const NotiItems = ({ avatar, content, isRead, createdAt }) => {
+const SECURITY = "0";
+const POST = "1";
+const REQ_FRIEND = "2";
+const ACCEPT_FRIEND = "3";
+const COMMENT_POST = "4";
+const LIKE_POST = "5";
 
+const NotiItems = ({
+  id,
+  content,
+  userName,
+  userAvatar,
+  active,
+  createdAt,
+  type,
+  fromPost,
+}) => {
   return (
     <TouchableOpacity
       style={{
@@ -22,6 +40,27 @@ const NotiItems = ({ avatar, content, isRead, createdAt }) => {
         alignItems: "center",
         padding: 10,
         maxWidth: "100%",
+      }}
+      onPress={async () => {
+        try {
+          await NotificationApi.active(id);
+          switch (type) {
+            case REQ_FRIEND:
+            case ACCEPT_FRIEND:
+              navigation.navigate("profile", {
+                userId: content.slice(7),
+              });
+              break;
+            case COMMENT_POST:
+              navigation.navigate("comment", {
+                postId: fromPost,
+              });
+              break;
+            default:
+          }
+        } catch (err) {
+          console.log("active notification", err);
+        }
       }}
     >
       <Avatar.Image
@@ -39,12 +78,80 @@ const NotiItems = ({ avatar, content, isRead, createdAt }) => {
           marginRight: 20,
         }}
       >
-        <Text
-          style={{ flex: 1, flexWrap: "wrap", maxWidth: "100%", fontSize: 16 }}
-          numberOfLines={3}
-        >
-          {content}
-        </Text>
+        {type === SECURITY && (
+          <Text
+            style={{
+              flex: 1,
+              flexWrap: "wrap",
+              maxWidth: "100%",
+              fontSize: 16,
+              paddingTop: 10,
+            }}
+            numberOfLines={3}
+          >
+            <Text>Bạn đã đăng nhập facebook trên 1 thiết bị mới.</Text>
+          </Text>
+        )}
+        {type === REQ_FRIEND && (
+          <Text
+            style={{
+              flex: 1,
+              flexWrap: "wrap",
+              maxWidth: "100%",
+              fontSize: 16,
+              paddingTop: 10,
+            }}
+            numberOfLines={3}
+          >
+            <Text style={{ fontWeight: "700" }}>{userName}</Text>
+            <Text> đã gửi lời mời kết bạn cho bạn.</Text>
+          </Text>
+        )}
+        {type === ACCEPT_FRIEND && (
+          <Text
+            style={{
+              flex: 1,
+              flexWrap: "wrap",
+              maxWidth: "100%",
+              fontSize: 16,
+              paddingTop: 10,
+            }}
+            numberOfLines={3}
+          >
+            <Text style={{ fontWeight: "700" }}>{userName}</Text>
+            <Text> đã chấp nhận lời mời kết bạn của bạn.</Text>
+          </Text>
+        )}
+        {type === COMMENT_POST && (
+          <Text
+            style={{
+              flex: 1,
+              flexWrap: "wrap",
+              maxWidth: "100%",
+              fontSize: 16,
+              paddingTop: 10,
+            }}
+            numberOfLines={3}
+          >
+            <Text style={{ fontWeight: "700" }}>{userName}</Text>
+            <Text> đã bình luận trong bài đăng của bạn.</Text>
+          </Text>
+        )}
+        {type === LIKE_POST && (
+          <Text
+            style={{
+              flex: 1,
+              flexWrap: "wrap",
+              maxWidth: "100%",
+              fontSize: 16,
+              paddingTop: 10,
+            }}
+            numberOfLines={3}
+          >
+            <Text style={{ fontWeight: "700" }}>{userName}</Text>
+            <Text> đã thích bài đăng của bạn.</Text>
+          </Text>
+        )}
         <Text style={{ fontSize: 14, color: "grey" }}>
           {getTimeDisplay(createdAt)}
         </Text>
@@ -59,6 +166,17 @@ const NotiItems = ({ avatar, content, isRead, createdAt }) => {
 const Notifications = () => {
   const [notificationList, setNotificationList] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
+
+  // useEffect(() => {
+  //   socketClient.on("notification", (notification) => {
+  //     getNotification();
+  //     console.log("socket notification notification.js");
+  //   });
+  //   return () => {
+  //     socketClient.off('notification');
+  //   };
+  // }, []);
+
   const getNotification = async () => {
     try {
       const data = await NotificationApi.getAll();
@@ -73,9 +191,15 @@ const Notifications = () => {
   const onRefresh = useCallback(() => {
     setRefreshing(true);
     getNotification();
-    setTimeout(() => {
+    setRefreshing(false);
+  });
+  useFocusEffect(
+    React.useCallback(() => {
+      setRefreshing(true);
+      console.log("use focus effect");
+      getNotification();
       setRefreshing(false);
-    }, 2000);
+      });
   }, []);
   return (
     <View
@@ -92,39 +216,9 @@ const Notifications = () => {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
-        {notificationList.length > 0 &&
-          notificationList.map((item) => (
-            <NotiItems
-              isRead={item.read}
-              content={item.content}
-              avatar={item.avatar}
-              createdAt={item.createdAt}
-            />
-          ))}
-        <NotiItems
-          isRead={false}
-          avatar="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHMbNbn5XcHIXV3PoLxkmsKdTQIbNffNpyuQ&usqp=CAU"
-          content="sssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss"
-          createdAt="2023-02-13 17:19:25"
-        />
-        <NotiItems
-          isRead={false}
-          avatar="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHMbNbn5XcHIXV3PoLxkmsKdTQIbNffNpyuQ&usqp=CAU"
-          content="sssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss"
-          createdAt="2023-02-13 17:19:25"
-        />
-        <NotiItems
-          isRead={false}
-          avatar="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHMbNbn5XcHIXV3PoLxkmsKdTQIbNffNpyuQ&usqp=CAU"
-          content="sssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss"
-          createdAt="2023-02-13 17:19:25"
-        />
-        <NotiItems
-          isRead={false}
-          avatar="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHMbNbn5XcHIXV3PoLxkmsKdTQIbNffNpyuQ&usqp=CAU"
-          content="sssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss"
-          createdAt="2023-02-13 17:19:25"
-        />
+        {notificationList.map((item, index) => (
+          <NotiItems key={index} {...item} />
+        ))}
       </ScrollView>
     </View>
   );

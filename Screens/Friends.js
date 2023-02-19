@@ -11,7 +11,11 @@ import React, { useState, useEffect } from "react";
 import { Avatar } from "react-native-paper";
 import { Divider } from "react-native-elements";
 import { FriendApi } from "../apis/Friend/Friend";
-// const arr = Array.from({ length: 5 }, (v, i) => i);
+import { getTimeDisplay } from "../utils";
+import { navigation } from "../rootNavigation";
+import { useFocusEffect } from "@react-navigation/native";
+import socketClient from "../utils/socketClient";
+
 const Friends = () => {
   const [friendsRequests, setFriendsRequests] = useState([]);
 
@@ -53,7 +57,25 @@ const Friends = () => {
 
 export default Friends;
 
-const FriendsItems = ({ avatar, name }) => {
+const FriendsItems = ({ avatar, name, id, time, callBack }) => {
+  async function handleAccept(id) {
+    const body = {
+      id: id,
+      isAccept: true,
+    };
+    socketClient.emit("accept-friend", {
+      userId: id,
+      requestId: "1",
+    });
+    const x = await FriendApi.setAccept(body);
+    callBack();
+  }
+
+  async function handleDecline(id) {
+    const x = await FriendApi.cancelRequest(id);
+
+    callBack();
+  }
   return (
     <TouchableOpacity
       style={{

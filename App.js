@@ -29,6 +29,7 @@ import UpdateDetail from "./Screens/updateDetail";
 import Notifications from "./Screens/Notifications.js";
 import { io } from "socket.io-client";
 import * as SecureStore from "expo-secure-store";
+import ListEmoji from "./Screens/ListEmoji.js";
 import { useRef } from "react";
 const Stack = createStackNavigator();
 const rootStack = createStackNavigator();
@@ -117,40 +118,49 @@ export const MainTab = () => {
   };
   var access_token = "";
   var socket;
-  const numOfNotification = useRef(2);
-  const setupSocket = async () => {
+  const [numOfNotification, setNumOfNotification] = useState(0);
+  const [unreadNotificationList, setUnreadNotificationList] = useState([]);
+
+  const getUnreadNotification = async () => {
     try {
-      access_token = await SecureStore.getItemAsync("access_token");
-      socket = io("https://facebook-api-production.up.railway.app", {
-        extraHeaders: {
-          Authorization: access_token,
-        },
-      });
-      socket.on("connect", () => {
-        console.log("socket connected");
-      });
-      socket.on("disconnect", () => {
-        console.log("socket disconnected");
-      });
-      socket.on("notification", (notification) => {
-        notification.current = notification.current + 1;
-        console.log("socket notification", notification);
-      });
-      socket.on("error", (err) => {
-        console.log("socket error", err);
-      });
+      console.log("get unread notification");
+      const data = await NotificationApi.getAll();
+      const list = data.data.data.filter(
+        (item) => Boolean(item.read) === false
+      );
+      setUnreadNotificationList(list);
+      setNumOfNotification(list.length);
     } catch (err) {
-      console.log("setup socket", err);
+      console.log("get notification", err);
+    }
+  };
+  const readNotification = async () => {
+    try {
+      console.log("read notification");
+      if (unreadNotificationList.length > 0)
+        await NotificationApi.read({
+          notificationIds: unreadNotificationList.map((item) => item.id),
+        });
+      setUnreadNotificationList([]);
+      setNumOfNotification(0);
+    } catch (err) {
+      console.log("read notification", err.response.data.message);
     }
   };
   useEffect(() => {
-    setupSocket();
+    socketClient.on("notification", (notification) => {
+      getUnreadNotification();
+      console.log("socket notification app.js");
+    });
     return () => {
-      socket.off("connect");
-      socket.off("error");
-      socket.off("notification");
+      socketClient.off('notification');
     };
   }, []);
+
+  useEffect(() => {
+    getUnreadNotification();
+  }, []);
+
   return (
     <>
       <Header></Header>

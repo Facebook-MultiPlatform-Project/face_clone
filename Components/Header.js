@@ -90,7 +90,7 @@ const Header = () => {
     <View
       style={{
         backgroundColor: "#fff",
-        paddingTop: StatusBar.currentHeight,
+        paddingTop: StatusBar.currentHeight + 100,
       }}
     >
       {isHome ? <HeaderOut></HeaderOut> : <View></View>}

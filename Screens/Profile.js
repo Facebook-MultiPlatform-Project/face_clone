@@ -16,6 +16,9 @@ import { useEffect } from "react";
 import { PostApi } from "../apis/Post/Post";
 import { UserApi } from "../apis/User/UserApi";
 import { FriendApi } from "../apis/Friend/Friend";
+import { constant } from "../utils/constant";
+import { SafeAreaView } from "react-native";
+import socketClient from "../utils/socketClient";
 
 const Profile = ({ route, navigation }) => {
   const userId = route.params.userId;
@@ -60,6 +63,11 @@ const Profile = ({ route, navigation }) => {
     await FriendApi.sendRequest(userId)
       .then((res) => {
         console.log(res.data);
+        checkFriend();
+        socketClient.emit("request-friend", {
+          userId: userId,
+          requestId: "1",
+        });
       })
       .catch((err) => {
         console.log(err);
