@@ -12,7 +12,8 @@ class WSService {
           Authorization: access_token,
         },
       });
-      console.log("initializing socket", this.socket);
+
+      console.log("initializing socket");
 
       this.socket.on("connect", (data) => {
         console.log("=== socket connected ====");

@@ -12,11 +12,14 @@ import { NotificationApi } from "../apis/Notification/notificationApi";
 import { getTimeDisplay } from "../utils";
 import { navigation } from "../rootNavigation";
 import { useFocusEffect } from "@react-navigation/native";
+import socketClient from "../utils/socketClient";
 
 const SECURITY = "0";
 const POST = "1";
 const REQ_FRIEND = "2";
 const ACCEPT_FRIEND = "3";
+const COMMENT_POST = "4";
+const LIKE_POST = "5";
 
 const NotiItems = ({
   id,
@@ -26,7 +29,7 @@ const NotiItems = ({
   active,
   createdAt,
   type,
-  getNotification,
+  fromPost,
 }) => {
   return (
     <TouchableOpacity
@@ -41,13 +44,18 @@ const NotiItems = ({
       onPress={async () => {
         try {
           await NotificationApi.active(id);
-          await getNotification();
           switch (type) {
             case REQ_FRIEND:
             case ACCEPT_FRIEND:
               navigation.navigate("profile", {
                 userId: content.slice(7),
               });
+              break;
+            case COMMENT_POST:
+              navigation.navigate("comment", {
+                postId: fromPost,
+              });
+              break;
             default:
           }
         } catch (err) {
@@ -70,6 +78,20 @@ const NotiItems = ({
           marginRight: 20,
         }}
       >
+        {type === SECURITY && (
+          <Text
+            style={{
+              flex: 1,
+              flexWrap: "wrap",
+              maxWidth: "100%",
+              fontSize: 16,
+              paddingTop: 10,
+            }}
+            numberOfLines={3}
+          >
+            <Text>Bạn đã đăng nhập facebook trên 1 thiết bị mới.</Text>
+          </Text>
+        )}
         {type === REQ_FRIEND && (
           <Text
             style={{
@@ -100,6 +122,36 @@ const NotiItems = ({
             <Text> đã chấp nhận lời mời kết bạn của bạn.</Text>
           </Text>
         )}
+        {type === COMMENT_POST && (
+          <Text
+            style={{
+              flex: 1,
+              flexWrap: "wrap",
+              maxWidth: "100%",
+              fontSize: 16,
+              paddingTop: 10,
+            }}
+            numberOfLines={3}
+          >
+            <Text style={{ fontWeight: "700" }}>{userName}</Text>
+            <Text> đã bình luận trong bài đăng của bạn.</Text>
+          </Text>
+        )}
+        {type === LIKE_POST && (
+          <Text
+            style={{
+              flex: 1,
+              flexWrap: "wrap",
+              maxWidth: "100%",
+              fontSize: 16,
+              paddingTop: 10,
+            }}
+            numberOfLines={3}
+          >
+            <Text style={{ fontWeight: "700" }}>{userName}</Text>
+            <Text> đã thích bài đăng của bạn.</Text>
+          </Text>
+        )}
         <Text style={{ fontSize: 14, color: "grey" }}>
           {getTimeDisplay(createdAt)}
         </Text>
@@ -114,6 +166,17 @@ const NotiItems = ({
 const Notifications = () => {
   const [notificationList, setNotificationList] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
+
+  // useEffect(() => {
+  //   socketClient.on("notification", (notification) => {
+  //     getNotification();
+  //     console.log("socket notification notification.js");
+  //   });
+  //   return () => {
+  //     socketClient.off('notification');
+  //   };
+  // }, []);
+
   const getNotification = async () => {
     try {
       const data = await NotificationApi.getAll();
@@ -154,7 +217,7 @@ const Notifications = () => {
         }
       >
         {notificationList.map((item, index) => (
-          <NotiItems key={index} {...item} getNotification={getNotification} />
+          <NotiItems key={index} {...item} />
         ))}
       </ScrollView>
     </View>
