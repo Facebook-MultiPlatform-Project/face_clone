@@ -34,7 +34,7 @@ const NotiItems = ({
   return (
     <TouchableOpacity
       style={{
-        backgroundColor: isRead ? "white" : "#BFEAF5",
+        backgroundColor: active ? "white" : "#BFEAF5",
         display: "flex",
         flexDirection: "row",
         alignItems: "center",
@@ -66,7 +66,7 @@ const NotiItems = ({
       <Avatar.Image
         size={75}
         source={{
-          uri: avatar,
+          uri: userAvatar,
         }}
       />
       <View
@@ -180,7 +180,8 @@ const Notifications = () => {
   const getNotification = async () => {
     try {
       const data = await NotificationApi.getAll();
-      setNotificationList[data.data.data];
+      console.log("get notification");
+      setNotificationList(data.data.data);
     } catch (err) {
       console.log("notification", err);
     }
@@ -196,11 +197,10 @@ const Notifications = () => {
   useFocusEffect(
     React.useCallback(() => {
       setRefreshing(true);
-      console.log("use focus effect");
       getNotification();
       setRefreshing(false);
-      });
-  }, []);
+    }, [])
+  );
   return (
     <View
       style={{

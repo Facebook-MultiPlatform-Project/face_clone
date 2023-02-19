@@ -19,6 +19,7 @@ import UpdateProfile from "./Screens/UpdateProfile.js";
 import BlockList from "./Screens/BlockList.js";
 import Notifications from "./Screens/Notifications.js";
 import Friends from "./Screens/Friends.js";
+import FriendList from "./Screens/FriendList.js";
 import Messager from "./Screens/Messager.js";
 import { Provider } from "react-redux";
 import { store } from "./store/store.js";
@@ -26,14 +27,27 @@ import Menu from "./Screens/Menu.js";
 import CommentPage from "./Screens/Comments.js";
 import { useEffect } from "react";
 import UpdateDetail from "./Screens/updateDetail";
-import Notifications from "./Screens/Notifications.js";
+import ListEmoji from "./Screens/ListEmoji.js";
 import { io } from "socket.io-client";
 import * as SecureStore from "expo-secure-store";
 import ListEmoji from "./Screens/ListEmoji.js";
 import { useRef } from "react";
+import WaitingPage from "./Screens/WaitingPage.js";
+import Search from "./Screens/Search.js";
+import Chat from "./Screens/Chat.js";
+import { useState } from "react";
+import { NotificationApi } from "./apis/Notification/notificationApi.js";
+import ChangePassword from "./Screens/ChangePassword.js";
+import EditPost from "./Screens/EditPost.js";
 const Stack = createStackNavigator();
 const rootStack = createStackNavigator();
+import { LogBox } from "react-native";
+import DetailPost from "./Screens/DetailPost.js";
+import socketClient from "./utils/socketClient.js";
 
+LogBox.ignoreLogs([
+  "Non-serializable values were found in the navigation state",
+]);
 const Home = () => {
   return (
     <View>
@@ -147,6 +161,30 @@ export const MainTab = () => {
       console.log("read notification", err.response.data.message);
     }
   };
+  const getUnreadNotification = async () => {
+    try {
+      const data = await NotificationApi.getAll();
+      const list = data.data.data.filter(
+        (item) => Boolean(item.read) === false
+      );
+      setUnreadNotificationList(list);
+      setNumOfNotification(list.length);
+    } catch (err) {
+      console.log("get notification", err);
+    }
+  };
+  const readNotification = async () => {
+    try {
+      if (unreadNotificationList.length > 0)
+        await NotificationApi.read({
+          notificationIds: unreadNotificationList.map((item) => item.id),
+        });
+      setUnreadNotificationList([]);
+      setNumOfNotification(0);
+    } catch (err) {
+      console.log("read notification", err.response.data.message);
+    }
+  };
   useEffect(() => {
     socketClient.on("notification", (notification) => {
       getUnreadNotification();
@@ -184,43 +222,29 @@ export const MainTab = () => {
         <Tab.Screen
           options={{
             tabBarIcon: ({ tintColor, focused }) => (
-              <Icon
-                name="group"
-                size={25}
-                color={focused ? "#318bfb" : "#ddd"}
-              ></Icon>
+              <View>
+                <Icon
+                  name="group"
+                  size={25}
+                  color={focused ? "#318bfb" : "#ddd"}
+                ></Icon>
+                {/* {numOfFriendRequest.current > 0 && (
+                  <Badge
+                    value={numOfFriendRequest.current}
+                    status="error"
+                    containerStyle={{
+                      position: "absolute",
+                      top: -4,
+                      right: -4,
+                    }}
+                  />
+                )} */}
+              </View>
             ),
             headerShown: true,
           }}
           name="Friend"
-          component={FriendTab}
-        />
-        <Tab.Screen
-          options={{
-            tabBarIcon: ({ tintColor, focused }) => (
-              <Icon
-                name="person"
-                size={25}
-                color={focused ? "#318bfb" : "#ddd"}
-              ></Icon>
-            ),
-            headerShown: true,
-          }}
-          name="Profile"
-          component={ProfileTab}
-        />
-        <Tab.Screen
-          options={{
-            tabBarIcon: ({ tintColor, focused }) => (
-              <Icon
-                name="email"
-                size={25}
-                color={focused ? "#318bfb" : "#ddd"}
-              ></Icon>
-            ),
-          }}
-          name="Messenger"
-          component={MessengerTab}
+          component={Friends}
         />
         <Tab.Screen
           options={{
@@ -231,9 +255,9 @@ export const MainTab = () => {
                   size={25}
                   color={focused ? "#318bfb" : "#ddd"}
                 ></Icon>
-                {numOfNotification.current > 0 && (
+                {numOfNotification > 0 && (
                   <Badge
-                    value={numOfNotification.current}
+                    value={numOfNotification}
                     status="error"
                     containerStyle={{
                       position: "absolute",
@@ -246,11 +270,11 @@ export const MainTab = () => {
             ),
           }}
           listeners={({ navigation, route }) => ({
-            focus: (e) => {
-              numOfNotification.current = 0;
+            focus: async (e) => {
+              await readNotification();
             },
           })}
-          name="Notification"
+          name="Notifications"
           component={NotificationTab}
         />
         <Tab.Screen
@@ -272,6 +296,9 @@ export const MainTab = () => {
 };
 
 export default function App() {
+  useEffect(() => {
+    socketClient.initializeSocket();
+  }, []);
   const navigationOptions = {
     headerShown: false,
     headerMode: "screen",
@@ -280,6 +307,7 @@ export default function App() {
     <Provider store={store}>
       <NavigationContainer ref={navigationRef}>
         <rootStack.Navigator screenOptions={navigationOptions}>
+          <rootStack.Screen component={WaitingPage} name="waiting" />
           <rootStack.Screen component={LoginPage} name="login" />
           <rootStack.Screen component={VerifyEmail} name="verify" />
           <rootStack.Screen component={MainTab} name="facebook" />
@@ -289,9 +317,16 @@ export default function App() {
           <rootStack.Screen component={CreatePost} name="createPost" />
           <rootStack.Screen component={BlockList} name="blockList" />
           <rootStack.Screen component={UpdateProfile} name="updateProfile" />
-          {/* <rootStack.Screen component={CommentPage} name="comment" /> */}
+          <rootStack.Screen component={CommentPage} name="comment" />
           <rootStack.Screen component={UpdateDetail} name="updateDetail" />
+          <rootStack.Screen component={ListEmoji} name="listEmoji" />
           <rootStack.Screen component={Messager} name="messager" />
+          <rootStack.Screen component={FriendList} name="friendList" />
+          <rootStack.Screen component={Search} name="search" />
+          <rootStack.Screen component={ChangePassword} name="changePassword" />
+          <rootStack.Screen component={Chat} name="chat" />
+          <rootStack.Screen component={EditPost} name="editPost" />
+          <rootStack.Screen component={DetailPost} name="detailPost" />
         </rootStack.Navigator>
       </NavigationContainer>
     </Provider>

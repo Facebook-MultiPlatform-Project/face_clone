@@ -1,33 +1,45 @@
-import { View, Text, TouchableOpacity, Image } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Image,
+  Modal,
+  Dimensions,
+  RefreshControl,
+  BackHandler,
+} from "react-native";
 import * as SecureStore from "expo-secure-store";
 import { logoutApi } from "../apis/Auth/logoutApi";
 import { UserApi } from "../apis/User/UserApi";
 import { navigation } from "../rootNavigation";
 import { useEffect, useState } from "react";
+import { Icon } from "react-native-elements";
+import { ScrollView } from "react-native-gesture-handler";
 
 const Shortcut = (props) => {
-  const { name, icon, des } = props;
+  const { name, des, iconName, iconType } = props;
   return (
-    <View style={{ width: "50%" }}>
+    <TouchableOpacity
+      onPress={() => {
+        navigation.navigate(des);
+      }}
+      style={{ width: "50%" }}
+    >
       <View
         style={{
           backgroundColor: "#fff",
           borderRadius: 10,
           padding: 16,
           margin: 5,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
         }}
-        // onTouchEnd={() => navigation.navigate(des)}
+        onTouchEnd={() => {
+          if (name === "Friends") navigation.navigate(des);
+        }}
       >
-        <Image
-          source={{
-            uri: icon,
-          }}
-          style={{
-            width: 40,
-            height: 40,
-            borderRadius: 100,
-          }}
-        ></Image>
+        <Icon name={iconName} type={iconType} size={25} color="#06f"></Icon>
         <Text
           style={{
             color: "#333",
@@ -39,19 +51,34 @@ const Shortcut = (props) => {
           {name}
         </Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 
 const Menu = () => {
   const [user, setUser] = useState();
+  const [showModal, setShowModal] = useState(false);
+  const [showModalExit, setShowModalExit] = useState(false);
+  const windowWidth = Dimensions.get("window").width;
+  const windowHeight = Dimensions.get("window").height;
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    getUserInfo();
+    // if (userId === user.id) {
+    //   getListFriend();
+    // }
+  };
+
   const getUserInfo = async () => {
     try {
-      const data = await UserApi.getInfo();
-      console.log("data", data.data.data);
+      const data = await UserApi.getProfile();
       setUser(data.data.data);
     } catch (err) {
       console.log(err);
+    } finally {
+      setRefreshing(false);
     }
   };
   useEffect(() => {
@@ -65,10 +92,17 @@ const Menu = () => {
       navigation.navigate("login");
     } catch (err) {
       console.log(err);
+    } finally {
+      setShowModal(false);
     }
   };
   return (
-    <View style={{ padding: 16 }}>
+    <ScrollView
+      style={{ padding: 16, height: "100%" }}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+    >
       <View>
         <Text style={{ color: "#000", fontWeight: "700", fontSize: 30 }}>
           Menu
@@ -81,7 +115,9 @@ const Menu = () => {
           marginTop: 10,
           alignItems: "center",
         }}
-        onTouchEnd={() => navigation.navigate("profile", {userId: user && user.id})}
+        onTouchEnd={() =>
+          navigation.navigate("profile", { userId: user && user.id })
+        }
       >
         <View>
           <Image
@@ -96,7 +132,7 @@ const Menu = () => {
             }}
           ></Image>
         </View>
-        <View >
+        <View>
           <Text style={{ color: "#333", fontWeight: "600", fontSize: 24 }}>
             {user && user.name}
           </Text>
@@ -135,11 +171,14 @@ const Menu = () => {
         >
           <Shortcut
             name="Friends"
-            icon="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHMbNbn5XcHIXV3PoLxkmsKdTQIbNffNpyuQ&usqp=CAU"
+            iconName="user-friends"
+            iconType="font-awesome-5"
+            des="friendList"
           ></Shortcut>
           <Shortcut
             name="Shortcut 2"
-            icon="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHMbNbn5XcHIXV3PoLxkmsKdTQIbNffNpyuQ&usqp=CAU"
+            iconName="user-friends"
+            iconType="font-awesome-5"
           ></Shortcut>
         </View>
         <View
@@ -151,11 +190,13 @@ const Menu = () => {
         >
           <Shortcut
             name="Shortcut 3"
-            icon="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHMbNbn5XcHIXV3PoLxkmsKdTQIbNffNpyuQ&usqp=CAU"
+            iconName="user-friends"
+            iconType="font-awesome-5"
           ></Shortcut>
           <Shortcut
             name="Shortcut 4"
-            icon="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHMbNbn5XcHIXV3PoLxkmsKdTQIbNffNpyuQ&usqp=CAU"
+            iconName="user-friends"
+            iconType="font-awesome-5"
           ></Shortcut>
         </View>
         <View style={{ marginTop: 10 }}>
@@ -175,10 +216,10 @@ const Menu = () => {
             </Text>
           </TouchableOpacity>
         </View>
-        {/* <View style={{ marginTop: 10 }}>
+        <View style={{ marginTop: 10 }}>
           <TouchableOpacity
             style={{ backgroundColor: "#ccc", borderRadius: 10, padding: 10 }}
-            onPress={() => navigation.navigate("changepassword")}
+            onPress={() => navigation.navigate("changePassword")}
           >
             <Text
               style={{
@@ -191,11 +232,13 @@ const Menu = () => {
               Change password
             </Text>
           </TouchableOpacity>
-        </View> */}
+        </View>
         <View style={{ marginTop: 10 }}>
           <TouchableOpacity
             style={{ backgroundColor: "#ccc", borderRadius: 10, padding: 10 }}
-            onPress={handleLogOut}
+            onPress={() => {
+              setShowModal(true);
+            }}
           >
             <Text
               style={{
@@ -209,8 +252,182 @@ const Menu = () => {
             </Text>
           </TouchableOpacity>
         </View>
+        <View style={{ marginTop: 10 }}>
+          <TouchableOpacity
+            style={{ backgroundColor: "#ccc", borderRadius: 10, padding: 10 }}
+            onPress={() => {
+              setShowModalExit(true);
+            }}
+          >
+            <Text
+              style={{
+                color: "#333",
+                fontWeight: "600",
+                fontSize: 18,
+                textAlign: "center",
+              }}
+            >
+              Exit app
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
+      <Modal
+        visible={showModal}
+        transparent
+        onDismiss={() => {
+          setShowModal(false);
+        }}
+      >
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+            // width: windowWidth / 1.05,
+            // height: windowHeight / 5,
+            // backgroundColor:'red'
+            backgroundColor: "rgba(0,0,0,0.5)",
+          }}
+        >
+          <View
+            style={{
+              borderRadius: 10,
+              backgroundColor: "white",
+              width: windowWidth / 1.05,
+              height: windowHeight / 5,
+              display: "flex",
+              flexDirection: "column",
+              padding: 15,
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <Text style={{ fontWeight: "bold", fontSize: 17 }}>
+              Bạn có muốn đăng xuất
+            </Text>
+            <View
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "space-between",
+                // padding: 10,
+              }}
+            >
+              <TouchableOpacity
+                style={{
+                  // backgroundColor: "#DC3535",
+                  backgroundColor: "#0084FF",
+                  borderRadius: 10,
+                  width: "30%",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  flex: 1,
+                }}
+                onPress={handleLogOut}
+              >
+                <Text style={{ color: "white" }}>Đăng xuất</Text>
+              </TouchableOpacity>
+              <View style={{ width: 30 }}></View>
+              <TouchableOpacity
+                style={{
+                  backgroundColor: "#d3d3d3",
+                  padding: 10,
+                  borderRadius: 10,
+                  width: "30%",
+                  justifyContent: "center", //Centered horizontally
+                  alignItems: "center", //Centered vertically
+                  flex: 1,
+                }}
+                onPress={() => {
+                  setShowModal(false);
+                }}
+              >
+                <Text>Huỷ</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+      <Modal
+        visible={showModalExit}
+        transparent
+        onDismiss={() => {
+          setShowModalExit(false);
+        }}
+      >
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+            backgroundColor: "rgba(0,0,0,0.5)",
+          }}
+        >
+          <View
+            style={{
+              borderRadius: 10,
+              backgroundColor: "white",
+              width: windowWidth / 1.05,
+              height: windowHeight / 5,
+              display: "flex",
+              flexDirection: "column",
+              padding: 15,
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <Text style={{ fontWeight: "bold", fontSize: 17 }}>
+              Bạn có muốn đóng ứng dụng
+            </Text>
+            <View
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "space-between",
+                // padding: 10,
+              }}
+            >
+              <TouchableOpacity
+                style={{
+                  // backgroundColor: "#DC3535",
+                  backgroundColor: "#0084FF",
+                  borderRadius: 10,
+                  width: "30%",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  flex: 1,
+                }}
+                onPress={() => {
+                  BackHandler.exitApp();
+                  setShowModalExit(false);
+                  navigation.navigate("waiting", { reset: true });
+                }}
+              >
+                <Text style={{ color: "white" }}>Exit</Text>
+              </TouchableOpacity>
+              <View style={{ width: 30 }}></View>
+              <TouchableOpacity
+                style={{
+                  backgroundColor: "#d3d3d3",
+                  padding: 10,
+                  borderRadius: 10,
+                  width: "30%",
+                  justifyContent: "center", //Centered horizontally
+                  alignItems: "center", //Centered vertically
+                  flex: 1,
+                }}
+                onPress={() => {
+                  setShowModalExit(false);
+                }}
+              >
+                <Text>Cancel</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+    </ScrollView>
   );
 };
 

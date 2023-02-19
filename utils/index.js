@@ -1,11 +1,11 @@
-import dayjs from 'dayjs';
+import dayjs from "dayjs";
 
 function isPlural(n) {
-  return n > 1 ? 's' : '';
+  return n > 1 ? "s" : "";
 }
 
 export function getTimeDisplay(createdAt) {
-  let secDif = dayjs(Date.now()).diff(dayjs(createdAt), 'second');
+  let secDif = dayjs(Date.now()).diff(dayjs(createdAt), "second");
   const years = Math.floor(secDif / (365 * 24 * 60 * 60));
   if (years > 0) return `${years} year${isPlural(years)} ago`;
   secDif = secDif - years * 365 * 24 * 60 * 60;
@@ -71,4 +71,31 @@ export function parseTime(time, cFormat) {
     return value.toString().padStart(2, "0");
   });
   return time_str;
+}
+
+export function timeSince(date) {
+  var seconds = Math.floor((new Date() - date) / 1000);
+
+  var interval = seconds / 31536000;
+
+  if (interval > 1) {
+    return Math.floor(interval) + " năm trước";
+  }
+  interval = seconds / 2592000;
+  if (interval > 1) {
+    return Math.floor(interval) + " tháng trước";
+  }
+  interval = seconds / 86400;
+  if (interval > 1) {
+    return Math.floor(interval) + " ngày trước";
+  }
+  interval = seconds / 3600;
+  if (interval > 1) {
+    return Math.floor(interval) + " giờ trước";
+  }
+  interval = seconds / 60;
+  if (interval > 1) {
+    return Math.floor(interval) + " phút trước";
+  }
+  return Math.floor(seconds) + " giây trước";
 }

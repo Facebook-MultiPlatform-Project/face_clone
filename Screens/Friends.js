@@ -6,6 +6,8 @@ import {
   StatusBar,
   TouchableOpacity,
   Button,
+  FlatList,
+  RefreshControl,
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import { Avatar } from "react-native-paper";
@@ -18,14 +20,34 @@ import socketClient from "../utils/socketClient";
 
 const Friends = () => {
   const [friendsRequests, setFriendsRequests] = useState([]);
-
+  const [refreshing, setRefreshing] = useState(false);
+  const onRefresh = () => {
+    setRefreshing(true);
+    getListFriendRequest();
+  };
   async function getListFriendRequest() {
     const data = await FriendApi.getRequestFriend();
     setFriendsRequests(data.data.data);
+    setRefreshing(false);
   }
+
   useEffect(() => {
+    setRefreshing(true);
+    // setupSocket(getListFriendRequest);
     getListFriendRequest();
+    // return () => {
+    //   socket.off("connect");
+    //   socket.off("error");
+    //   socket.off("notification");
+    //   socket.off("disconnect");
+    // };
   }, []);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      getListFriendRequest();
+    }, [])
+  );
   return (
     <View
       style={{
@@ -33,23 +55,38 @@ const Friends = () => {
         flex: 1,
         flexDirection: "column",
         alignItems: "flex-start",
-        // backgroundColor:'red',
-        paddingTop: StatusBar.currentHeight,
       }}
     >
-      {/* <Text>hello</Text> */}
-      {console.log()}
-      <Text style={{ paddingLeft: 20, fontSize: 30, fontWeight: "bold" }}>
-        Bạn bè
-      </Text>
+      <View style={{ display: "flex", flexDirection: "row" }}>
+        <Text style={{ paddingLeft: 10, fontSize: 25, fontWeight: "bold" }}>
+          {"Lời mời kết bạn "}
+        </Text>
+        <Text style={{ fontSize: 25, fontWeight: "bold", color: "red" }}>
+          {friendsRequests.length}
+        </Text>
+      </View>
       <Divider orientation="horizontal" width={1} />
-      <ScrollView style={{ width: "100%" }}>
-        {/* <FriendsItems />
-        <FriendsItems /> */}
-        {friendsRequests.map((item) => {
-          
-          return <FriendsItems avatar={item.avatar} name={item.name} />;
-        })}
+      <ScrollView
+        style={{ width: "100%" }}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
+        {friendsRequests.length > 0 ? (
+          friendsRequests.map((item) => {
+            return (
+              <FriendsItems
+                avatar={item.avatar}
+                name={item.name}
+                id={item.id}
+                time={item.createAt}
+                callBack={getListFriendRequest}
+              />
+            );
+          })
+        ) : (
+          <Text style={{ paddingLeft: 10 }}>Hiện không có lời mời nào</Text>
+        )}
       </ScrollView>
     </View>
   );
@@ -90,37 +127,43 @@ const FriendsItems = ({ avatar, name, id, time, callBack }) => {
         paddingBottom: 5,
         marginBottom: 3,
       }}
+      onPress={() => {
+        navigation.navigate("profile", {
+          userId: id,
+        });
+      }}
     >
       <View>
-        {/* <Avatar.Image
+        <Avatar.Image
           size={70}
           source={{
             uri: avatar,
           }}
-        /> */}
-        <AvatarItem avatarUrl={avatar} />
-        <View
-          style={{
-            borderRadius: 100,
-            backgroundColor: "green",
-            width: 20,
-            height: 20,
-            position: "absolute",
-            bottom: 1,
-            right: 1,
-            // bottom
-            // size:20
-          }}
-        ></View>
+        />
+        {/* <AvatarItem avatarUrl={avatar} /> */}
       </View>
       <View style={{ width: 30 }}></View>
       <View style={{ display: "flex", flexDirection: "column", flex: 1 }}>
-        <Text
-          style={{ flex: 1, flexWrap: "wrap", maxWidth: "100%", fontSize: 20 }}
-          numberOfLines={1}
+        <View
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "space-between",
+          }}
         >
-          {name}
-        </Text>
+          <Text
+            style={{
+              flex: 1,
+              flexWrap: "wrap",
+              maxWidth: "100%",
+              fontSize: 20,
+            }}
+            numberOfLines={1}
+          >
+            {name}
+          </Text>
+          <Text>{getTimeDisplay(time)}</Text>
+        </View>
         <View
           style={{
             display: "flex",
@@ -138,6 +181,9 @@ const FriendsItems = ({ avatar, name, id, time, callBack }) => {
               alignItems: "center", //Centered vertically
               flex: 1,
             }}
+            onPress={() => {
+              handleAccept(id);
+            }}
           >
             <Text
               style={{
@@ -145,7 +191,7 @@ const FriendsItems = ({ avatar, name, id, time, callBack }) => {
                 color: "white",
               }}
             >
-              Accept
+              Chấp nhận
             </Text>
           </TouchableOpacity>
           <View style={{ width: 5 }}></View>
@@ -159,46 +205,20 @@ const FriendsItems = ({ avatar, name, id, time, callBack }) => {
               alignItems: "center", //Centered vertically
               flex: 1,
             }}
+            onPress={() => {
+              handleDecline(id);
+            }}
           >
             <Text
               style={{
                 fontSize: 15,
               }}
             >
-              Decline
+              Từ chối
             </Text>
           </TouchableOpacity>
         </View>
-        {/* <Text style={{fontSize:12,color:'grey'}}>{isRead?'white':"#BFEAF5"}</Text> */}
       </View>
     </TouchableOpacity>
-  );
-};
-
-const AvatarItem = ({ avatarUrl, isActive }) => {
-  const [active, setActive] = useState(false);
-  return (
-    <View>
-      <Avatar.Image
-        size={70}
-        source={
-          { uri: avatarUrl }
-          // "https://storage.googleapis.com/facebook-storage.appspot.com/user%2Favatar%2Fdefault.jpg"
-        }
-      />
-      <View
-        style={{
-          borderRadius: 100,
-          backgroundColor: "green",
-          width: 20,
-          height: 20,
-          position: "absolute",
-          bottom: 1,
-          right: 1,
-          // bottom
-          // size:20
-        }}
-      ></View>
-    </View>
   );
 };

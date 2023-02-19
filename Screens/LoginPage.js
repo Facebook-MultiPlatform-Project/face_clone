@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import React, { useState } from "react";
 import * as SecureStore from "expo-secure-store";
-import { Icon, Input } from "react-native-elements";
+import { Input } from "react-native-elements";
 import { loginApi } from "../apis/Auth/loginApi";
 import { EMAIL_REGEX } from "../common/regex";
 import { getToken } from "../utils/getToken";
@@ -48,7 +48,6 @@ const LoginPage = () => {
     return true;
   };
   const handleSubmit = async () => {
-    console.log("asds");
     if (validate()) {
       setIsSubmitting(true);
       const data = {
@@ -61,9 +60,10 @@ const LoginPage = () => {
         const token = getToken(res.headers["set-cookie"][0]);
         await SecureStore.setItemAsync("access_token", token.access_token);
         await SecureStore.setItemAsync("refresh_token", token.refresh_token);
+        await SecureStore.setItemAsync("user_id", res.data.data.user.id);
         dispatch(addUser(res.data.data.user));
         setIsSubmitting(false);
-        navigation.navigate("facebook");
+        navigation.navigate("HomeTab");
       });
       res.catch((err) => {
         console.log("err", err);

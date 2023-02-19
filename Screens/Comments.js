@@ -12,9 +12,9 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import { getAllComment } from "../apis/Comment/getComment";
 import { postComment } from "../apis/Comment/postComment";
 import { Keyboard } from "react-native";
-
-const CommentPage = (postID) => {
-  postID = "f46c9a93-0a9b-4133-8a1d-9e4e8115aa72";
+import socketClient from "../utils/socketClient";
+const CommentPage = ({ route, navigation }) => {
+  const postID = route.params.postId;
   const [data, setData] = useState([]);
   const [numComments, setNumComments] = useState(data.length);
   const [cmt, setCmt] = useState("");
@@ -46,9 +46,16 @@ const CommentPage = (postID) => {
       content: cmt,
       commentAnsweredId: "c75cdf4c-173a-4c19-bfea-d2bf1494de07",
     };
-    console.log(param);
-    const res = await postComment.post(param);
-    console.log(res);
+    postComment
+      .post(param)
+      .then((res) => {
+        socketClient.emit("comment", {
+          postId: postID,
+          commentId: res.data.data.id,
+        });
+      })
+      .catch((e) => console.log(e));
+    // console.log(res);
     getData();
     setCmt("");
     Keyboard.dismiss();
@@ -58,9 +65,7 @@ const CommentPage = (postID) => {
   useEffect(() => {
     getData();
   }, []);
-  useEffect(() => {
-    console.log(cmt);
-  }, [cmt]);
+
   return (
     <View
       style={{
@@ -87,7 +92,9 @@ const CommentPage = (postID) => {
       >
         <TouchableOpacity
           // style={styles.button}
-          onPress={() => {}}
+          onPress={() => {
+            navigation.goBack();
+          }}
         >
           <Icon name="arrow-left" size={20} color="black" />
         </TouchableOpacity>
@@ -126,7 +133,6 @@ const CommentPage = (postID) => {
           }}
           placeholder="Enter your comment here"
           onChangeText={(text) => {
-            console.log(text);
             setCmt(text);
           }}
           value={cmt}
@@ -160,7 +166,7 @@ const CommentBox = (props) => {
         marginLeft: 10,
       }}
     >
-      <Avatar.Image size={40} source={{uri:props.avatar}} />
+      <Avatar.Image size={40} source={{ uri: props.avatar }} />
 
       <View
         style={{
