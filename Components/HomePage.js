@@ -5,6 +5,7 @@ import {
   ScrollView,
   SafeAreaView,
   RefreshControl,
+  ActivityIndicator,
 } from "react-native";
 import Post from "./Post";
 import React from "react";
@@ -21,9 +22,12 @@ const HomePage = () => {
   const user = useSelector((state) => state.user.user);
   const [listPost, setListPost] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
+  const [page, setPage] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
 
   const onRefresh = () => {
     // setListPost([]);
+    setPage(1);
     getListPost();
   };
 
@@ -35,8 +39,8 @@ const HomePage = () => {
 
   const getListPost = async () => {
     setRefreshing(true);
-    setListPost([]);
-    await PostApi.getAll()
+    const params = { take: 10 * page, skip: 0 };
+    await PostApi.getAll(params)
       .then((res) => {
         setListPost(res.data.data.map((item) => item.id));
       })
@@ -47,6 +51,28 @@ const HomePage = () => {
         setRefreshing(false);
       });
   };
+
+  const handleLoadMore = () => {
+    console.log("vaoday");
+    if (!isLoading) {
+      setIsLoading(true);
+      setPage(page + 1);
+      getListPost();
+    }
+  };
+
+  const renderFooter = () => {
+    if (isLoading) {
+      return (
+        <View style={{ paddingVertical: 20 }}>
+          <ActivityIndicator size="large" color="#0000ff" />
+        </View>
+      );
+    } else {
+      return null;
+    }
+  };
+
   useEffect(() => {
     getListPost();
   }, [user]);
@@ -59,6 +85,9 @@ const HomePage = () => {
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
+          onEndReached={handleLoadMore}
+          onEndReachedThreshold={0.5}
+          ListFooterComponent={renderFooter}
         >
           <View
             style={{

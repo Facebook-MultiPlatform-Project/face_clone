@@ -63,7 +63,7 @@ const LoginPage = () => {
         await SecureStore.setItemAsync("user_id", res.data.data.user.id);
         dispatch(addUser(res.data.data.user));
         setIsSubmitting(false);
-        navigation.navigate("facebook");
+        navigation.navigate("HomeTab");
       });
       res.catch((err) => {
         console.log("err", err);
