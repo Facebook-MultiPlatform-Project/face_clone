@@ -161,30 +161,7 @@ export const MainTab = () => {
       console.log("read notification", err.response.data.message);
     }
   };
-  const getUnreadNotification = async () => {
-    try {
-      const data = await NotificationApi.getAll();
-      const list = data.data.data.filter(
-        (item) => Boolean(item.read) === false
-      );
-      setUnreadNotificationList(list);
-      setNumOfNotification(list.length);
-    } catch (err) {
-      console.log("get notification", err);
-    }
-  };
-  const readNotification = async () => {
-    try {
-      if (unreadNotificationList.length > 0)
-        await NotificationApi.read({
-          notificationIds: unreadNotificationList.map((item) => item.id),
-        });
-      setUnreadNotificationList([]);
-      setNumOfNotification(0);
-    } catch (err) {
-      console.log("read notification", err.response.data.message);
-    }
-  };
+
   useEffect(() => {
     socketClient.on("notification", (notification) => {
       getUnreadNotification();
