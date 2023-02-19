@@ -15,6 +15,7 @@ import { useSelector } from "react-redux";
 import { PostApi } from "../apis/Post/Post";
 import { constant } from "../utils/constant";
 import { Video } from "expo-av";
+import { timeSince } from "../utils/index";
 
 const Post = ({ id, onDelete }) => {
   const [postData, setPostData] = useState({});
@@ -89,6 +90,7 @@ const Post = ({ id, onDelete }) => {
                   .text
               }.`}</Text>
             )}
+            <Text>{timeSince(new Date(postData.createdAt))}</Text>
           </View>
           {user.id === author.id && (
             <View
@@ -103,7 +105,9 @@ const Post = ({ id, onDelete }) => {
               </TouchableOpacity>
 
               <TouchableOpacity
-                onPress={() => navigation.navigate("editPost", { data: postData })}
+                onPress={() =>
+                  navigation.navigate("editPost", { data: postData })
+                }
               >
                 <Icon name="edit" type="material"></Icon>
               </TouchableOpacity>

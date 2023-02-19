@@ -1,9 +1,8 @@
 import axiosClient from "../axiosClient";
 
 export const PostApi = {
-  getAll: () => {
+  getAll: (params) => {
     const url = "/posts";
-    const params = { take: 10, skip: 0 };
     return axiosClient.get(url, { params });
   },
   getPost: (id) => {
@@ -17,7 +16,7 @@ export const PostApi = {
   },
   deletePost: (id) => {
     const url = `/posts/delete-post`;
-    return axiosClient.post(url,{postId:id});
+    return axiosClient.post(url, { postId: id });
   },
   likePost: (id) => {
     const url = `/posts/like-post`;

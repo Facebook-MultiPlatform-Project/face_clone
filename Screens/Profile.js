@@ -188,6 +188,7 @@ const Profile = ({ route, navigation }) => {
         setListFriendRender(
           res.data.data.length <= 6 ? res.data.data : res.data.data.slice(0, 5)
         );
+        console.log(listFriendRender);
       })
       .catch((err) => {
         console.log(err);
@@ -465,7 +466,13 @@ const Profile = ({ route, navigation }) => {
                 >
                   {listFriendRender.map((item) => {
                     return (
-                      <TouchableOpacity style={{ width: "33%" }} key={item.id}>
+                      <TouchableOpacity
+                        style={{ width: "33%" }}
+                        key={item.id}
+                        onPress={() => {
+                          navigation.navigate("profile", { userId: item.id });
+                        }}
+                      >
                         <View
                           style={{
                             marginBottom: 5,
