@@ -354,6 +354,7 @@ const Profile = ({ route, navigation }) => {
                         height: 30,
                         width: 100,
                         borderRadius: 4,
+                        marginBottom: 5,
                         display: "flex",
                         justifyContent: "center",
                         flexDirection: "row",
@@ -504,6 +505,18 @@ const Profile = ({ route, navigation }) => {
             {listPost.map((item) => (
               <Post id={item.id} key={item.id} />
             ))}
+            {!listPost[0] && (
+              <Text
+                style={{
+                  textAlign: "center",
+                  fontSize: 18,
+                  marginTop: 30,
+                  color: "#3A3B3C",
+                }}
+              >
+                Tài khoản chưa có bài viết nào
+              </Text>
+            )}
           </View>
         </ScrollView>
       </SafeAreaView>
