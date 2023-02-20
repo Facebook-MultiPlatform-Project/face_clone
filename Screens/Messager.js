@@ -73,6 +73,16 @@ const Messager = ({ navigation }) => {
     };
   }, [navigation]);
 
+  useEffect(() => {
+    socketClient.on("receive-join-room", (roomdto) => {
+      socketClient.emit('join-room',{roomId: roomdto.roomId})
+      getListRoom()
+    });
+    return () => {
+      socketClient.off("receive-join-room");
+    };
+  }, [navigation]);
+
   const getListRoom = async () => {
     try {
       const res = await MessageApi.listRoom();

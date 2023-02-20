@@ -28,7 +28,6 @@ const Chat = ({ route, navigation }) => {
   const [otherInfo, setOtherInfo] = useState(null);
 
   const scrollRef = useRef();
-  var arr = [];
 
   useEffect(() => {
     if (otherId) {
@@ -43,10 +42,10 @@ const Chat = ({ route, navigation }) => {
       let clone = [...listMess];
       setListMess(clone.concat(messobj));
       onPressTouch();
-      return ()=>{
-        socketClient.off("new-message");
-      }
     });
+    return ()=>{
+      socketClient.off("new-message");
+    }
   }, [listMess]);
 
   const createRoomChat = async () => {
@@ -91,7 +90,6 @@ const Chat = ({ route, navigation }) => {
   const handleSendMeassage = () => {
     if (message && message.length > 0) {
       socketClient.emit("send-message", { roomId, message });
-      arr = [...listMess];
       setMess("");
       Keyboard.dismiss();
     }
