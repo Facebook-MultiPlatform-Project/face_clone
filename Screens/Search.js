@@ -22,7 +22,7 @@ const buttonList = [
   { name: "Người dùng", value: 2 },
 ];
 
-const UserItem = ({ id, avatar, name }) => {
+const UserItem = ({ id, avatar, name, redirect }) => {
   return (
     <TouchableOpacity
       style={{
@@ -34,9 +34,15 @@ const UserItem = ({ id, avatar, name }) => {
         maxWidth: "100%",
       }}
       onPress={() => {
-        navigation.navigate("profile", {
-          userId: id,
-        });
+        if(redirect) {
+          navigation.navigate("chat", {
+            otherId: id,
+          });
+        }else {
+          navigation.navigate("profile", {
+            userId: id,
+          });
+        }
       }}
     >
       <Avatar.Image
@@ -71,8 +77,21 @@ const UserItem = ({ id, avatar, name }) => {
     </TouchableOpacity>
   );
 };
+const data = [
+  {
+    id: 1,
+    uri: "https://source.unsplash.com/random?sig=10",
+    name: "nobita kirama",
+  },
+  {
+    id: 1,
+    uri: "https://source.unsplash.com/random?sig=10",
+    name: "nobita kirama",
+  },
+]
+const Search = ({route}) => {
+  const redirect = route.params && route.params.redirectFromMess ?route.params.redirectFromMess:false
 
-const Search = () => {
   const [searchInput, setSearchInput] = React.useState("");
   const [searchType, setSearchType] = React.useState(1);
   const [isLoading, setIsLoading] = React.useState(false);
@@ -95,7 +114,11 @@ const Search = () => {
   };
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
-    handleSubmit(searchInput, searchType);
+    if(redirect){
+      handleSubmit(searchInput, 2);
+    } else{
+      handleSubmit(searchInput, searchType);
+    }
     setRefreshing(false);
   });
   const handleSubmit = async (input, type) => {
@@ -107,7 +130,6 @@ const Search = () => {
         take: 10,
         skip: 0,
       });
-      console.log("data", res.data.data);
       setRes(res.data.data);
     } catch (err) {
       console.log("search err", err);
@@ -154,7 +176,11 @@ const Search = () => {
             }}
             onChangeText={(text) => handleChange(text)}
             onSubmitEditing={async () => {
-              await handleSubmit(searchInput, searchType);
+              if(redirect) {
+                await handleSubmit(searchInput, 2)
+              } else {
+                await handleSubmit(searchInput, searchType);
+              }
             }}
             value={searchInput}
           ></TextInput>
@@ -167,7 +193,7 @@ const Search = () => {
             alignItems: "center",
           }}
         >
-          {buttonList.map((button) => (
+          {!redirect && buttonList.map((button) => (
             <TouchableOpacity
               key={button.value}
               style={{
@@ -216,10 +242,9 @@ const Search = () => {
             searchType === 1 &&
             res.map((item, index) => <Post key={index} {...item} />)}
           {!isLoading &&
-            searchType === 2 &&
+            (searchType === 2 || redirect) &&
             res.map((item, index) => {
-              console.log("item", item);
-              return <UserItem key={index} {...item} />;
+              return <UserItem key={index} {...item} redirect={redirect} />;
             })}
         </ScrollView>
       </View>
