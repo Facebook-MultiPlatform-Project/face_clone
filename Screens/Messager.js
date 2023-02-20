@@ -165,8 +165,7 @@ const Messager = ({ navigation }) => {
       <ScrollView>
         <TouchableOpacity
           onPress={() => {
-            // findUser to chat
-            // navigation.navigate("findUser");
+            navigation.navigate("search", { redirectFromMess: true});
           }}
           style={{
             backgroundColor: "#e2e2e2",
