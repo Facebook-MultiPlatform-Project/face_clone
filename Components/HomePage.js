@@ -38,7 +38,6 @@ const HomePage = () => {
   };
 
   const getListPost = async () => {
-    setRefreshing(true);
     const params = { take: 10 * page, skip: 0 };
     await PostApi.getAll(params)
       .then((res) => {
@@ -49,7 +48,17 @@ const HomePage = () => {
       })
       .finally(() => {
         setRefreshing(false);
+        setIsLoading(false);
       });
+  };
+  const handleScroll = (event) => {
+    const offsetY = event.nativeEvent.contentOffset.y;
+    const contentSizeHeight = event.nativeEvent.contentSize.height;
+    const layoutMeasurementHeight = event.nativeEvent.layoutMeasurement.height;
+    const threshold = 0.5;
+    if (offsetY + layoutMeasurementHeight >= contentSizeHeight * threshold) {
+      handleLoadMore();
+    }
   };
 
   const handleLoadMore = () => {
@@ -65,7 +74,7 @@ const HomePage = () => {
     if (isLoading) {
       return (
         <View style={{ paddingVertical: 20 }}>
-          <ActivityIndicator size="large" color="#0000ff" />
+          <ActivityIndicator size="small" color="#0000ff" />
         </View>
       );
     } else {
@@ -74,6 +83,7 @@ const HomePage = () => {
   };
 
   useEffect(() => {
+    setRefreshing(true);
     getListPost();
   }, [user]);
   return (
@@ -85,9 +95,7 @@ const HomePage = () => {
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
-          onEndReached={handleLoadMore}
-          onEndReachedThreshold={0.5}
-          ListFooterComponent={renderFooter}
+          onScroll={handleScroll}
         >
           <View
             style={{
@@ -153,6 +161,7 @@ const HomePage = () => {
                 />
               );
             })}
+          {renderFooter()}
         </ScrollView>
       </SafeAreaView>
     </View>
