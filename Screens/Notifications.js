@@ -53,7 +53,7 @@ const NotiItems = ({
               break;
             case COMMENT_POST:
               navigation.navigate("comment", {
-                postId: fromPost,
+                postId: fromPost.postId,
               });
               break;
             default:
