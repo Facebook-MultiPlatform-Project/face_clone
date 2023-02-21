@@ -26,7 +26,7 @@ const HomePage = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const onRefresh = () => {
-    // setListPost([]);
+    setListPost([]);
     setPage(1);
     getListPost();
   };

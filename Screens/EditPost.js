@@ -29,19 +29,27 @@ const EditPost = ({ route, navigation }) => {
   const [video, setVideo] = useState({});
   const [mood, setMood] = useState(route.params.data.status);
   const [loading, setLoading] = useState(false);
+  const [deleteList, setDeleteList] = useState([]);
+  const [upImg, setUpImg] = useState(route.params.data.medias);
   const windowWidth = Dimensions.get("window").width;
   const user = useSelector((state) => state.user.user);
-  const checkMedia = () => {
-    let media = route.params.data.medias;
-    if (media.length === 0) return;
-    if (media.length > 1) {
-      setImage(media);
-      return;
-    }
-    if (media[0].name[-3] === "mp4") {
-      setVideo(media);
-    }
-  };
+  // const checkMedia = () => {
+  //   let media = route.params.data.medias;
+  //   console.log(media.length)
+  //   // if (media.length === 0) return;
+  //   // console.log(media)
+  //   // setUpImg(media.map(item => item));
+  //   setUpImg(['a','b'])
+  //   console.log(upImg)
+
+  //   // if (media.length > 1) {
+  //   //   setUpImg(media);
+  //   //   return;
+  //   // }
+  //   // if (media[0].name[-3] === "mp4") {
+  //   //   setVideo(media);
+  //   // }
+  // };
   const updateMood = (value) => {
     setMood(value);
   };
@@ -76,10 +84,15 @@ const EditPost = ({ route, navigation }) => {
       }
     }
   };
+  const handleDropOnlineImage = (id, idx) => {
+    let newImageList = upImg.filter((item, index) => index !== idx);
+    setUpImg(newImageList);
+    setDeleteList([...deleteList, id]);
+  };
   const handleAddImage = () => {
     if (loading) return;
     if (video.uri) alert("Chỉ được up 4 ảnh hoặc 1 video");
-    else if (image.length < 4) uploadImage();
+    else if (image.length + upImg.length < 4) uploadImage();
     else alert("Chỉ dược up tối đa 4 ảnh!!!");
   };
   const handleUploadVideo = async () => {
@@ -118,6 +131,16 @@ const EditPost = ({ route, navigation }) => {
       };
       data.append("images", upload_body);
     }
+    if (deleteList.length>0){
+      data.append('image_del',deleteList.join(';'))
+    }
+    if (image.length > 0 ){
+      let s = []
+      for (let i = upImg.length;i < upImg.length + image.length;i++){
+        s.push(i)
+      }
+      data.append('image_sort',s.join(';'))
+    }
     if (video["uri"]) {
       data.append("video", {
         uri: video["uri"],
@@ -131,13 +154,12 @@ const EditPost = ({ route, navigation }) => {
     if (mood) {
       data.append("status", mood);
     }
-    // console.log(data);
-    // console.log(data);
-    // const res = upPostApi.edit(data);
-    // console.log(res)
+    console.log(data);
+
     upPostApi
       .edit(data)
       .then((res) => {
+        // console.log(res)
         Toast.show({
           type: "success",
           text1: "Sửa bài thành công!!!",
@@ -156,9 +178,10 @@ const EditPost = ({ route, navigation }) => {
         setLoading(false);
       });
   };
-  useEffect(() => {
-    checkMedia();
-  }, []);
+
+  // useEffect(() => {
+  //   console.log(deleteList);
+  // }, [deleteList]);
   return (
     <View
       style={{
@@ -304,49 +327,95 @@ const EditPost = ({ route, navigation }) => {
         ) : (
           <View style={{ height: 0 }}></View>
         )}
-        {image[0] || video.uri ? (
+        {image[0] || upImg[0] || video.uri ? (
           <SafeAreaView style={{ minHeight: 380, maxHeight: 570 }}>
-            <FlatList
-              data={image}
-              numColumns={2}
-              keyExtractor={(e) => e.uri}
-              renderItem={({ item, index }) => {
-                return (
-                  <View>
-                    <Image
-                      source={{ uri: item.uri }}
-                      containerStyle={{
-                        aspectRatio: 1,
-                        width: "100%",
-                        height: 150,
-                        flex: 1,
-                      }}
-                    />
-                    <View
-                      style={{
-                        height: 30,
-                        width: 30,
-                        borderRadius: 100,
-                        // backgroundColor: "red",
-                        position: "absolute",
-                        right: 3,
-                        top: 3,
-                      }}
-                    >
-                      <TouchableOpacity
-                        onPress={() => {
-                          // console.log(index);
-                          handleDropImage(index);
+            {upImg.length > 0 && (
+              <FlatList
+                data={upImg}
+                numColumns={2}
+                keyExtractor={(e) => e.id}
+                renderItem={({ item, index }) => {
+                  return (
+                    <View>
+                      <Image
+                        source={{ uri: item.name }}
+                        containerStyle={{
+                          aspectRatio: 1,
+                          width: "100%",
+                          height: 150,
+                          flex: 1,
                         }}
-                        // style={{ borderRadius: 100 }}
+                      />
+                      <View
+                        style={{
+                          height: 30,
+                          width: 30,
+                          borderRadius: 100,
+                          // backgroundColor: "red",
+                          position: "absolute",
+                          right: 3,
+                          top: 3,
+                        }}
                       >
-                        <Icon type="material" name="cancel"></Icon>
-                      </TouchableOpacity>
+                        <TouchableOpacity
+                          onPress={() => {
+                            // console.log(index);
+                            handleDropOnlineImage(item.id, index);
+                            // console.log(deleteList)
+                          }}
+                          // style={{ borderRadius: 100 }}
+                        >
+                          <Icon type="material" name="cancel"></Icon>
+                        </TouchableOpacity>
+                      </View>
                     </View>
-                  </View>
-                );
-              }}
-            ></FlatList>
+                  );
+                }}
+              ></FlatList>
+            )}
+            {image.length > 0 && (
+              <FlatList
+                data={image}
+                numColumns={2}
+                keyExtractor={(e) => e.id}
+                renderItem={({ item, index }) => {
+                  return (
+                    <View>
+                      <Image
+                        source={{ uri: item.uri }}
+                        containerStyle={{
+                          aspectRatio: 1,
+                          width: "100%",
+                          height: 150,
+                          flex: 1,
+                        }}
+                      />
+                      <View
+                        style={{
+                          height: 30,
+                          width: 30,
+                          borderRadius: 100,
+                          // backgroundColor: "red",
+                          position: "absolute",
+                          right: 3,
+                          top: 3,
+                        }}
+                      >
+                        <TouchableOpacity
+                          onPress={() => {
+                            // console.log(index);
+                            handleDropImage(index);
+                          }}
+                          // style={{ borderRadius: 100 }}
+                        >
+                          <Icon type="material" name="cancel"></Icon>
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  );
+                }}
+              ></FlatList>
+            )}
           </SafeAreaView>
         ) : (
           <></>
