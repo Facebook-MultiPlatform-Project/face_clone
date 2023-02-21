@@ -57,7 +57,7 @@ const Friends = () => {
         alignItems: "flex-start",
       }}
     >
-      <View style={{ display: "flex", flexDirection: "row" }}>
+      <View style={{ display: "flex", flexDirection: "row", paddingTop: 5, paddingBottom: 5 }}>
         <Text style={{ paddingLeft: 10, fontSize: 25, fontWeight: "bold" }}>
           {"Lời mời kết bạn "}
         </Text>
@@ -149,6 +149,7 @@ const FriendsItems = ({ avatar, name, id, time, callBack }) => {
             display: "flex",
             flexDirection: "row",
             justifyContent: "space-between",
+            alignItems: 'baseline'
           }}
         >
           <Text
@@ -157,6 +158,7 @@ const FriendsItems = ({ avatar, name, id, time, callBack }) => {
               flexWrap: "wrap",
               maxWidth: "100%",
               fontSize: 20,
+              fontWeight: '700'
             }}
             numberOfLines={1}
           >
@@ -169,6 +171,8 @@ const FriendsItems = ({ avatar, name, id, time, callBack }) => {
             display: "flex",
             flexDirection: "row",
             justifyContent: "space-between",
+            marginTop: 5,
+            marginBottom: 5
           }}
         >
           <TouchableOpacity

@@ -326,6 +326,7 @@ const FriendsItems = ({ avatar, name, id, unfriendModal, blockModal }) => {
               flexWrap: "wrap",
               maxWidth: "100%",
               fontSize: 20,
+              fontWeight: '700'
             }}
             numberOfLines={1}
           >
@@ -337,6 +338,8 @@ const FriendsItems = ({ avatar, name, id, unfriendModal, blockModal }) => {
             display: "flex",
             flexDirection: "row",
             justifyContent: "space-between",
+            marginTop: 5,
+            marginBottom: 5
           }}
         >
           <TouchableOpacity
